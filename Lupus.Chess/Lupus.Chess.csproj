@@ -40,8 +40,31 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Interface\IChessStrategy.cs" />
+    <Compile Include="Algorithm\Evaluation.cs" />
+    <Compile Include="Algorithm\Material.cs" />
+    <Compile Include="ChessException.cs" />
+    <Compile Include="Interface\Algorithm\IBishopPosition.cs" />
+    <Compile Include="Interface\Algorithm\ICenterControl.cs" />
+    <Compile Include="Interface\Algorithm\IConnectivity.cs" />
+    <Compile Include="Interface\Algorithm\IEvaluation.cs" />
+    <Compile Include="Interface\Algorithm\IKingSafety.cs" />
+    <Compile Include="Interface\Algorithm\IKnightPosition.cs" />
+    <Compile Include="Interface\Algorithm\IMaterial.cs" />
+    <Compile Include="Interface\Algorithm\IMobility.cs" />
+    <Compile Include="Interface\Algorithm\IMoveGenerator.cs" />
+    <Compile Include="Interface\Algorithm\IPawnStructure.cs" />
+    <Compile Include="Interface\Algorithm\IQueenPosition.cs" />
+    <Compile Include="Interface\Algorithm\IRookPosition.cs" />
+    <Compile Include="Piece.cs" />
+    <Compile Include="Side.cs" />
+    <Compile Include="Move.cs" />
+    <Compile Include="Interface\INodeComposite.cs" />
+    <Compile Include="Interface\IField.cs" />
+    <Compile Include="Interface\INode.cs" />
+    <Compile Include="Interface\IPiece.cs" />
+    <Compile Include="Position.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Trait.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -15,6 +15,5 @@ namespace Lupus.Chess.Interface.Algorithm
 		Tuple<int, IQueenPosition> QueenPosition { get; set; }
 		Tuple<int, IRookPosition> RookPosition { get; set; }
 		int Execute(IField field, Move move);
-		int Execute(IField field, Move move, Side side);
 	}
 }

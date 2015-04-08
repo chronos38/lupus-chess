@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Lupus.Chess
 {
-	public enum Piece
+	[Serializable]
+	public enum PieceType
 	{
 		King,
 		Queen,

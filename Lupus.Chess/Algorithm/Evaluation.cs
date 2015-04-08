@@ -23,29 +23,24 @@ namespace Lupus.Chess.Algorithm
 
 		public int Execute(IField field, Move move)
 		{
-			return Execute(field, move, Side.Black);
-		}
-
-		public int Execute(IField field, Move move, Side side)
-		{
 			var clone = (IField)field.Clone();
 			var pieces = move.Side == Side.Black ? clone.BlackPieces : clone.WhitePieces;
 
-			foreach (var piece in pieces.Where(piece => piece.Piece == move.Piece && piece.CurrentPosition == move.From))
+			foreach (var piece in pieces.Where(piece => piece.Piece == move.Piece && piece.Position == move.From))
 			{
 				piece.Move(move.To);
 			}
 
-			return (BishopPosition.Item1 * BishopPosition.Item2.Execute(clone, side)
-				+ CenterControl.Item1 * CenterControl.Item2.Execute(clone, side)
-				+ Connectivity.Item1 * Connectivity.Item2.Execute(clone, side)
-				+ KnightPosition.Item1 * KnightPosition.Item2.Execute(clone, side)
-				+ KingSafety.Item1 * KingSafety.Item2.Execute(clone, side)
-				+ Material.Item1 * Material.Item2.Execute(clone, side)
-				+ Mobility.Item1 * Mobility.Item2.Execute(clone, side)
-				+ PawnStructure.Item1 * PawnStructure.Item2.Execute(clone, side)
-				+ QueenPosition.Item1 * QueenPosition.Item2.Execute(clone, side)
-				+ RookPosition.Item1 * RookPosition.Item2.Execute(clone, side))
+			return (BishopPosition.Item1 * BishopPosition.Item2.Execute(clone, move.Side)
+				+ CenterControl.Item1 * CenterControl.Item2.Execute(clone, move.Side)
+				+ Connectivity.Item1 * Connectivity.Item2.Execute(clone, move.Side)
+				+ KnightPosition.Item1 * KnightPosition.Item2.Execute(clone, move.Side)
+				+ KingSafety.Item1 * KingSafety.Item2.Execute(clone, move.Side)
+				+ Material.Item1 * Material.Item2.Execute(clone, move.Side)
+				+ Mobility.Item1 * Mobility.Item2.Execute(clone, move.Side)
+				+ PawnStructure.Item1 * PawnStructure.Item2.Execute(clone, move.Side)
+				+ QueenPosition.Item1 * QueenPosition.Item2.Execute(clone, move.Side)
+				+ RookPosition.Item1 * RookPosition.Item2.Execute(clone, move.Side))
 				/ 100;
 		}
 	}

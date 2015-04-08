@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Lupus.Chess
 {
+	[Serializable]
 	public class ChessException : Exception
 	{
 		public ChessException()

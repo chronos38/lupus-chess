@@ -9,8 +9,8 @@ namespace Lupus.Chess.Interface
 	public interface IPiece
 	{
 		Side Side { get; }
-		Piece Piece { get; }
-		Position CurrentPosition { get; }
+		PieceType Piece { get; }
+		Position Position { get; }
 		void Move(Position position);
 		bool TryMove(Position position);
 		ICollection<Position> AllowedPositions();

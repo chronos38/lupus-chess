@@ -12,7 +12,7 @@ namespace Lupus.Chess
 	{
 		public Position From { get; set; }
 		public Position To { get; set; }
-		public Piece Piece { get; set; }
+		public PieceType Piece { get; set; }
 		public Side Side { get; set; }
 	}
 }

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Lupus.Chess.Interface
 {
-	public interface IComposite : IComponent, ICollection<IComponent>
+	public interface INodeComposite : INode, ICollection<INode>
 	{
-		IComponent this[int index] { get; }
-		IComponent GetChild(int index);
+		INode this[int index] { get; }
+		INode GetChild(int index);
 	}
 }

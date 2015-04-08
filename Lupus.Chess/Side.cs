@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Lupus.Chess
 {
+	[Serializable]
 	public enum Side
 	{
 		White,

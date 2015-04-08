@@ -10,23 +10,26 @@ namespace Lupus.Chess.Algorithm
 {
 	public class Material : IMaterial
 	{
-		private static readonly IDictionary<Piece, int> LookupTable = new Dictionary<Piece, int>
+		private static readonly IDictionary<PieceType, int> LookupTable = new Dictionary<PieceType, int>
 		{
-			{ Piece.Queen, 10000 },
-			{ Piece.Bishop, 350 },
-			{ Piece.Knight, 350 },
-			{ Piece.Rook, 525 },
-			{ Piece.Pawn, 100 }
+			{ PieceType.Queen, 10000 },
+			{ PieceType.Bishop, 350 },
+			{ PieceType.Knight, 350 },
+			{ PieceType.Rook, 525 },
+			{ PieceType.Pawn, 100 }
 		};
-
-		public int Execute(IField field)
-		{
-			return Execute(field.BlackPieces) - Execute(field.WhitePieces);
-		}
 
 		public int Execute(IField field, Side side)
 		{
-			return Execute(field)*(side == Side.Black ? 1 : -1);
+			switch (side)
+			{
+				case Side.Black:
+					return Execute(field.BlackPieces) - Execute(field.WhitePieces);
+				case Side.White:
+					return Execute(field.WhitePieces) - Execute(field.BlackPieces);
+			}
+
+			return 0;
 		}
 
 		public int Execute(IEnumerable<IPiece> pieces)
@@ -38,9 +41,9 @@ namespace Lupus.Chess.Algorithm
 			{
 				switch (piece.Piece)
 				{
-					case Piece.King:
+					case PieceType.King:
 						continue;
-					case Piece.Bishop:
+					case PieceType.Bishop:
 						bishopCount += 1;
 						break;
 				}
