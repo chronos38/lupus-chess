@@ -16,10 +16,7 @@ namespace Lupus.Chess
 		public bool Validate()
 		{
 			if (File.ToString(CultureInfo.InvariantCulture).IndexOfAny(new[] {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'}) == -1)
-			{
 				return false;
-			}
-
 			return Rank >= 1 && Rank <= 8;
 		}
 	}
