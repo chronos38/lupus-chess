@@ -1,14 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Lupus.Chess.Exception;
 using Lupus.Chess.Interface;
 
 namespace Lupus.Chess.Piece
 {
+	[Serializable]
 	public abstract class AbstractPiece : IPiece
 	{
-		public Side Side { get; private set; }
-		public PieceType Piece { get; private set; }
-		public Position Position { get; private set; }
+		public Side Side { get; protected set; }
+		public PieceType Piece { get; protected set; }
+		public Position Position { get; protected set; }
 
 		public void Move(Position position)
 		{
