@@ -15,9 +15,13 @@ namespace Lupus.Chess.Tree
 
 		public IEnumerable<Move> AllowedMoves()
 		{
-			// TODO: Implement
 			var pieces = PlySide == Side.White ? Field.WhitePieces : Field.BlackPieces;
-			return null;
+			return (from piece in pieces
+				from position in piece.AllowedPositions()
+				select new Move()
+				{
+					From = piece.Position, To = position, Piece = piece.Piece, Side = PlySide
+				}).ToList();
 		}
 	}
 }
