@@ -8,10 +8,19 @@ using System.Threading.Tasks;
 namespace Lupus.Chess
 {
 	[Serializable]
-	public class Position
+	public class Position : ICloneable
 	{
 		public char File { get; set; }
 		public int Rank { get; set; }
+
+		public object Clone()
+		{
+			return new Position()
+			{
+				File = File,
+				Rank = Rank
+			};
+		}
 
 		public bool Validate()
 		{

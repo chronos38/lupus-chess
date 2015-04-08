@@ -14,7 +14,7 @@ namespace Lupus.Chess.Tree
 		private readonly Collection<INode> _nodes = new Collection<INode>(); 
 		public int Count { get { return _nodes.Count; } }
 		public bool IsReadOnly { get { return false; } }
-		public IField Field { get; set; }
+		public Field Field { get; set; }
 		public Side PlySide { get; set; }
 		public int Value { get; set; }
 

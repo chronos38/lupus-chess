@@ -42,7 +42,9 @@
   <ItemGroup>
     <Compile Include="Algorithm\Evaluation.cs" />
     <Compile Include="Algorithm\Material.cs" />
-    <Compile Include="ChessException.cs" />
+    <Compile Include="Exception\ChessEvaluationException.cs" />
+    <Compile Include="Exception\ChessException.cs" />
+    <Compile Include="Exception\ChessMoveException.cs" />
     <Compile Include="Interface\Algorithm\IBishopPosition.cs" />
     <Compile Include="Interface\Algorithm\ICenterControl.cs" />
     <Compile Include="Interface\Algorithm\IConnectivity.cs" />
@@ -55,11 +57,13 @@
     <Compile Include="Interface\Algorithm\IPawnStructure.cs" />
     <Compile Include="Interface\Algorithm\IQueenPosition.cs" />
     <Compile Include="Interface\Algorithm\IRookPosition.cs" />
+    <Compile Include="Piece\AbstractPiece.cs" />
     <Compile Include="PieceType.cs" />
+    <Compile Include="Piece\King.cs" />
     <Compile Include="Side.cs" />
     <Compile Include="Move.cs" />
     <Compile Include="Interface\INodeComposite.cs" />
-    <Compile Include="Interface\IField.cs" />
+    <Compile Include="Field.cs" />
     <Compile Include="Interface\INode.cs" />
     <Compile Include="Interface\IPiece.cs" />
     <Compile Include="Position.cs" />

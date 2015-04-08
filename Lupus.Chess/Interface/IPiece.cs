@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 
 namespace Lupus.Chess.Interface
 {
-	public interface IPiece
+	public interface IPiece : ICloneable
 	{
 		Side Side { get; }
 		PieceType Piece { get; }
 		Position Position { get; }
-		void Move(Position position);
-		bool TryMove(Position position);
-		ICollection<Position> AllowedPositions();
+		void Move(Field field, Position position);
+		bool TryMove(Field field, Position position);
+		ICollection<Position> AllowedPositions(Field field);
+		bool ValidateMove(Field field, Position position);
 	}
 }

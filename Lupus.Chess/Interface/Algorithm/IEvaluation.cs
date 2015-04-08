@@ -14,6 +14,6 @@ namespace Lupus.Chess.Interface.Algorithm
 		Tuple<int, IPawnStructure> PawnStructure { get; set; }
 		Tuple<int, IQueenPosition> QueenPosition { get; set; }
 		Tuple<int, IRookPosition> RookPosition { get; set; }
-		int Execute(IField field, Move move);
+		int Execute(Field field, Move move);
 	}
 }

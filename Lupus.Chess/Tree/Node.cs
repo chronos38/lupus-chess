@@ -9,7 +9,7 @@ namespace Lupus.Chess.Tree
 {
 	public class Node : INode
 	{
-		public IField Field { get; set; }
+		public Field Field { get; set; }
 		public Side PlySide { get; set; }
 		public int Value { get; set; }
 
@@ -17,7 +17,7 @@ namespace Lupus.Chess.Tree
 		{
 			var pieces = PlySide == Side.White ? Field.WhitePieces : Field.BlackPieces;
 			return (from piece in pieces
-				from position in piece.AllowedPositions()
+				from position in piece.AllowedPositions(Field)
 				select new Move()
 				{
 					From = piece.Position, To = position, Piece = piece.Piece, Side = PlySide

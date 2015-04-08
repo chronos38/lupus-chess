@@ -12,9 +12,9 @@ namespace Lupus.Chess.Piece
 		public PieceType Piece { get; protected set; }
 		public Position Position { get; protected set; }
 
-		public void Move(Position position)
+		public void Move(Field field, Position position)
 		{
-			if (!TryMove(position))
+			if (!TryMove(field, position))
 				throw new ChessMoveException(new Move()
 				{
 					From = Position,
@@ -24,15 +24,20 @@ namespace Lupus.Chess.Piece
 				});
 		}
 
-		public bool TryMove(Position position)
+		public bool TryMove(Field field, Position position)
 		{
-			if (!ValidateMove(position)) return false;
+			if (!ValidateMove(field, position)) return false;
 			Position = position;
 			return true;
 		}
 
-		public abstract ICollection<Position> AllowedPositions();
+		public bool ValidateMove(Field field, Position position)
+		{
+			return AllowedPositions(field).Contains(position);
+		}
 
-		protected abstract bool ValidateMove(Position position);
+		public abstract object Clone();
+
+		public abstract ICollection<Position> AllowedPositions(Field field);
 	}
 }

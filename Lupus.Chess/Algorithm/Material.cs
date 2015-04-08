@@ -19,7 +19,7 @@ namespace Lupus.Chess.Algorithm
 			{ PieceType.Pawn, 100 }
 		};
 
-		public int Execute(IField field, Side side)
+		public int Execute(Field field, Side side)
 		{
 			switch (side)
 			{

@@ -8,7 +8,7 @@ namespace Lupus.Chess.Interface
 {
 	public interface INode
 	{
-		IField Field { get; set; }
+		Field Field { get; set; }
 		Side PlySide { get; set; }
 		int Value { get; set; }
 		IEnumerable<Move> AllowedMoves();
