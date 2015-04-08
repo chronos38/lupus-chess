@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Lupus.Chess.Interface
 {
-	public interface INode : ICloneable
+	public interface INode
 	{
-		IDictionary<Side, ICollection<PieceType>> Pieces { get; }
+		IField Field { get; set; }
 		Side PlySide { get; set; }
 		int Value { get; set; }
-		ICollection<Move> AllowedMoves();
+		IEnumerable<Move> AllowedMoves();
 	}
 }
