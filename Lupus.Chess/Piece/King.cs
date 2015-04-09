@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Lupus.Chess.Interface;
 
 namespace Lupus.Chess.Piece
@@ -34,7 +31,7 @@ namespace Lupus.Chess.Piece
 			{
 				return new King()
 				{
-					Side = Side.Black,
+					Side = Side.White,
 					Piece = PieceType.King,
 					Position = new Position()
 					{
@@ -55,27 +52,35 @@ namespace Lupus.Chess.Piece
 			};
 		}
 
-		public override ICollection<Position> AllowedPositions(Field field)
+		public override IEnumerable<Position> AllowedPositions(Field field)
 		{
-			// TODO: If position is in checkmate than do not add it
 			var result = new Collection<Position>();
 			var position = Chess.Move.Direction(Position, 1);
-			if (position.Validate()) result.Add(position);
+			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
 			position = Chess.Move.Direction(Position, 2);
-			if (position.Validate()) result.Add(position);
+			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
 			position = Chess.Move.Direction(Position, 3);
-			if (position.Validate()) result.Add(position);
+			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
 			position = Chess.Move.Direction(Position, 4);
-			if (position.Validate()) result.Add(position);
+			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
 			position = Chess.Move.Direction(Position, 6);
-			if (position.Validate()) result.Add(position);
+			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
 			position = Chess.Move.Direction(Position, 7);
-			if (position.Validate()) result.Add(position);
+			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
 			position = Chess.Move.Direction(Position, 8);
-			if (position.Validate()) result.Add(position);
+			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
 			position = Chess.Move.Direction(Position, 9);
-			if (position.Validate()) result.Add(position);
+			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
 			return result;
+		}
+
+		public override IEnumerable<IPiece> StartPieces()
+		{
+			return new Collection<IPiece>()
+			{
+				White,
+				Black
+			};
 		}
 	}
 }

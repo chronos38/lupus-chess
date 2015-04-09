@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Lupus.Chess.Interface;
 using Lupus.Chess.Interface.Algorithm;
 
 namespace Lupus.Chess.Algorithm
 {
-	public class Material : IMaterial
+	public class Material : IStrategy
 	{
 		private static readonly IDictionary<PieceType, int> LookupTable = new Dictionary<PieceType, int>
 		{
@@ -24,15 +20,15 @@ namespace Lupus.Chess.Algorithm
 			switch (side)
 			{
 				case Side.Black:
-					return Execute(field.BlackPieces) - Execute(field.WhitePieces);
+					return Compute(field.BlackPieces) - Compute(field.WhitePieces);
 				case Side.White:
-					return Execute(field.WhitePieces) - Execute(field.BlackPieces);
+					return Compute(field.WhitePieces) - Compute(field.BlackPieces);
 			}
 
 			return 0;
 		}
 
-		public int Execute(IEnumerable<IPiece> pieces)
+		private static int Compute(IEnumerable<IPiece> pieces)
 		{
 			var bishopCount = 0;
 			var result = 0;

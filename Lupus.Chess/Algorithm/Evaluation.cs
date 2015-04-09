@@ -1,39 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Lupus.Chess.Exception;
-using Lupus.Chess.Interface;
 using Lupus.Chess.Interface.Algorithm;
 
 namespace Lupus.Chess.Algorithm
 {
 	public class Evaluation : IEvaluation
 	{
-		public Tuple<int, IBishopPosition> BishopPosition { get; set; }
-		public Tuple<int, ICenterControl> CenterControl { get; set; }
-		public Tuple<int, IConnectivity> Connectivity { get; set; }
-		public Tuple<int, IKnightPosition> KnightPosition { get; set; }
-		public Tuple<int, IKingSafety> KingSafety { get; set; }
-		public Tuple<int, IMaterial> Material { get; set; }
-		public Tuple<int, IMobility> Mobility { get; set; }
-		public Tuple<int, IPawnStructure> PawnStructure { get; set; }
-		public Tuple<int, IQueenPosition> QueenPosition { get; set; }
-		public Tuple<int, IRookPosition> RookPosition { get; set; }
+		public Tuple<int, IStrategy> BishopPosition { get; set; }
+		public Tuple<int, IStrategy> CenterControl { get; set; }
+		public Tuple<int, IStrategy> Connectivity { get; set; }
+		public Tuple<int, IStrategy> KnightPosition { get; set; }
+		public Tuple<int, IStrategy> KingSafety { get; set; }
+		public Tuple<int, IStrategy> Material { get; set; }
+		public Tuple<int, IStrategy> Mobility { get; set; }
+		public Tuple<int, IStrategy> PawnStructure { get; set; }
+		public Tuple<int, IStrategy> QueenPosition { get; set; }
+		public Tuple<int, IStrategy> RookPosition { get; set; }
 
-		public int Execute(Field field, Move move)
+		public int Execute(Field field, Side side)
 		{
-			return (BishopPosition.Item1 * BishopPosition.Item2.Execute(field, move.Side)
-				+ CenterControl.Item1 * CenterControl.Item2.Execute(field, move.Side)
-				+ Connectivity.Item1 * Connectivity.Item2.Execute(field, move.Side)
-				+ KnightPosition.Item1 * KnightPosition.Item2.Execute(field, move.Side)
-				+ KingSafety.Item1 * KingSafety.Item2.Execute(field, move.Side)
-				+ Material.Item1 * Material.Item2.Execute(field, move.Side)
-				+ Mobility.Item1 * Mobility.Item2.Execute(field, move.Side)
-				+ PawnStructure.Item1 * PawnStructure.Item2.Execute(field, move.Side)
-				+ QueenPosition.Item1 * QueenPosition.Item2.Execute(field, move.Side)
-				+ RookPosition.Item1 * RookPosition.Item2.Execute(field, move.Side))
+			return (BishopPosition.Item1 * BishopPosition.Item2.Execute(field, side)
+				+ CenterControl.Item1 * CenterControl.Item2.Execute(field, side)
+				+ Connectivity.Item1 * Connectivity.Item2.Execute(field, side)
+				+ KnightPosition.Item1 * KnightPosition.Item2.Execute(field, side)
+				+ KingSafety.Item1 * KingSafety.Item2.Execute(field, side)
+				+ Material.Item1 * Material.Item2.Execute(field, side)
+				+ Mobility.Item1 * Mobility.Item2.Execute(field, side)
+				+ PawnStructure.Item1 * PawnStructure.Item2.Execute(field, side)
+				+ QueenPosition.Item1 * QueenPosition.Item2.Execute(field, side)
+				+ RookPosition.Item1 * RookPosition.Item2.Execute(field, side))
 				/ (BishopPosition.Item1
 				+ CenterControl.Item1
 				+ Connectivity.Item1

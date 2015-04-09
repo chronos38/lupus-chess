@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Lupus.Chess.Exception;
 using Lupus.Chess.Interface;
 
@@ -38,6 +39,8 @@ namespace Lupus.Chess.Piece
 
 		public abstract object Clone();
 
-		public abstract ICollection<Position> AllowedPositions(Field field);
+		public abstract IEnumerable<Position> AllowedPositions(Field field);
+
+		public abstract IEnumerable<IPiece> StartPieces();
 	}
 }
