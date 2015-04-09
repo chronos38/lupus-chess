@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using Lupus.Chess.Interface;
 
@@ -23,10 +24,11 @@ namespace Lupus.Chess
 		/// Checks if the position is free from any piece.
 		/// </summary>
 		/// <param name="position">Position to check for.</param>
-		/// <returns>true if the position is free, otherwise false.</returns>
-		public bool IsFree(Position position)
+		/// <returns>Side which is occupying this position or undefined if it is free.</returns>
+		public Side IsFree(Position position)
 		{
-			return WhitePieces.Concat(BlackPieces).All(piece => piece.Position != position);
+			var piece = (from p in WhitePieces.Concat(BlackPieces) where p.Position == position select p).FirstOrDefault();
+			return piece == null ? Side.None : piece.Side;
 		}
 
 		/// <summary>

@@ -47,7 +47,7 @@ namespace Lupus.Chess.Piece
 			return new King()
 			{
 				Piece = PieceType.King,
-				Position = (Position)Position.Clone(),
+				Position = (Position) Position.Clone(),
 				Side = Side
 			};
 		}
@@ -55,21 +55,21 @@ namespace Lupus.Chess.Piece
 		public override IEnumerable<Position> AllowedPositions(Field field)
 		{
 			var result = new Collection<Position>();
-			var position = Chess.Move.Direction(Position, 1);
+			var position = Chess.Move.Direction((Position) Position.Clone(), 1);
 			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
-			position = Chess.Move.Direction(Position, 2);
+			position = Chess.Move.Direction((Position) Position.Clone(), 2);
 			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
-			position = Chess.Move.Direction(Position, 3);
+			position = Chess.Move.Direction((Position) Position.Clone(), 3);
 			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
-			position = Chess.Move.Direction(Position, 4);
+			position = Chess.Move.Direction((Position) Position.Clone(), 4);
 			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
-			position = Chess.Move.Direction(Position, 6);
+			position = Chess.Move.Direction((Position) Position.Clone(), 6);
 			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
-			position = Chess.Move.Direction(Position, 7);
+			position = Chess.Move.Direction((Position) Position.Clone(), 7);
 			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
-			position = Chess.Move.Direction(Position, 8);
+			position = Chess.Move.Direction((Position) Position.Clone(), 8);
 			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
-			position = Chess.Move.Direction(Position, 9);
+			position = Chess.Move.Direction((Position) Position.Clone(), 9);
 			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
 			return result;
 		}

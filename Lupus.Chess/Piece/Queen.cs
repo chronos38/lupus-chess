@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 using Lupus.Chess.Interface;
@@ -48,19 +50,32 @@ namespace Lupus.Chess.Piece
 			return new Queen()
 			{
 				Piece = PieceType.Queen,
-				Position = Position,
+				Position = (Position)Position.Clone(),
 				Side = Side
 			};
 		}
 
 		public override IEnumerable<Position> AllowedPositions(Field field)
 		{
-			throw new NotImplementedException();
+			var result = new List<Position>();
+			result.AddRange(FindPositions(field, Side, Position, 1));
+			result.AddRange(FindPositions(field, Side, Position, 2));
+			result.AddRange(FindPositions(field, Side, Position, 3));
+			result.AddRange(FindPositions(field, Side, Position, 4));
+			result.AddRange(FindPositions(field, Side, Position, 6));
+			result.AddRange(FindPositions(field, Side, Position, 7));
+			result.AddRange(FindPositions(field, Side, Position, 8));
+			result.AddRange(FindPositions(field, Side, Position, 9));
+			return result;
 		}
 
 		public override IEnumerable<IPiece> StartPieces()
 		{
-			throw new NotImplementedException();
+			return new Collection<IPiece>()
+			{
+				White,
+				Black
+			};
 		}
 	}
 }

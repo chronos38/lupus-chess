@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Lupus.Chess.Exception;
 using Lupus.Chess.Interface;
@@ -42,5 +43,27 @@ namespace Lupus.Chess.Piece
 		public abstract IEnumerable<Position> AllowedPositions(Field field);
 
 		public abstract IEnumerable<IPiece> StartPieces();
+
+		protected static IEnumerable<Position> FindPositions(Field field, Side side, Position position, int direction)
+		{
+			var pos = position;
+			var result = new Collection<Position>();
+
+			while (true)
+			{
+				pos = Chess.Move.Direction(pos, direction);
+				var free = field.IsFree(pos);
+
+				if (!pos.Validate()) break;
+				if (free == Side.None) result.Add(pos);
+				else
+				{
+					if (free != side) result.Add(pos);
+					break;
+				}
+			}
+
+			return result;
+		}
 	}
 }
