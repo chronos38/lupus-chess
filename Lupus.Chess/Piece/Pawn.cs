@@ -79,7 +79,15 @@ namespace Lupus.Chess.Piece
 
 		public override IEnumerable<Position> AllowedPositions(Field field)
 		{
-			throw new NotImplementedException();
+			switch (Side)
+			{
+				case Side.White:
+					return WhiteMoves(field, this);
+				case Side.Black:
+					return BlackMoves(field, this);
+				default:
+					return new Position[] { };
+			}
 		}
 
 		public static IEnumerable<IPiece> StartPieces()
@@ -87,6 +95,40 @@ namespace Lupus.Chess.Piece
 			var result = new List<IPiece>();
 			result.AddRange(White);
 			result.AddRange(Black);
+			return result;
+		}
+
+		private static IEnumerable<Position> WhiteMoves(Field field, Pawn pawn)
+		{
+			var result = new Collection<Position>();
+			var next = Chess.Move.Up(pawn.Position);
+			var upperLeft = Chess.Move.UpperLeft(pawn.Position);
+			var upperRight = Chess.Move.UpperLeft(pawn.Position);
+
+			if (field.IsFree(upperLeft) == Side.Black) result.Add(upperLeft);
+			if (field.IsFree(upperRight) == Side.Black) result.Add(upperRight);
+			if (field.IsFree(next) == Side.None) result.Add(next);
+			if (pawn.Moved) return result;
+			var overNext = Chess.Move.Up(next);
+			if (field.IsFree(overNext) == Side.None) result.Add(overNext);
+
+			return result;
+		}
+
+		private static IEnumerable<Position> BlackMoves(Field field, Pawn pawn)
+		{
+			var result = new Collection<Position>();
+			var next = Chess.Move.Down(pawn.Position);
+			var lowerLeft = Chess.Move.LowerLeft(pawn.Position);
+			var lowerRight = Chess.Move.LowerRight(pawn.Position);
+
+			if (field.IsFree(lowerLeft) == Side.Black) result.Add(lowerLeft);
+			if (field.IsFree(lowerRight) == Side.Black) result.Add(lowerRight);
+			if (field.IsFree(next) == Side.None) result.Add(next);
+			if (pawn.Moved) return result;
+			var overNext = Chess.Move.Down(next);
+			if (field.IsFree(overNext) == Side.None) result.Add(overNext);
+
 			return result;
 		}
 	}

@@ -55,7 +55,7 @@ namespace Lupus.Chess.Piece
 		{
 			if (!ValidateMove(field, position)) return false;
 			Position = position;
-			return true;
+			return Moved = true;
 		}
 
 		public bool ValidateMove(Field field, Position position)

@@ -57,7 +57,6 @@ namespace Lupus.Chess.Piece
 
 		public override IEnumerable<Position> AllowedPositions(Field field)
 		{
-			throw new NotImplementedException();
 			// TODO: Add castling
 			var result = new Collection<Position>();
 			var position = Chess.Move.Direction((Position) Position.Clone(), 1);

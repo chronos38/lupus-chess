@@ -62,10 +62,10 @@ namespace Lupus.Chess
 			{
 				case Side.Black:
 					return
-						(from blackPiece in BlackPieces from positions in blackPiece.AllowedPositions(this) select positions).ToList();
+						(from blackPiece in BlackPieces from positions in blackPiece.AllowedPositions(this) select positions).ToArray();
 				case Side.White:
 					return
-						(from whitePiece in WhitePieces from positions in whitePiece.AllowedPositions(this) select positions).ToList();
+						(from whitePiece in WhitePieces from positions in whitePiece.AllowedPositions(this) select positions).ToArray();
 				default:
 					return new Position[] {};
 			}
@@ -81,20 +81,8 @@ namespace Lupus.Chess
 			pieces.AddRange(Rook.StartPieces());
 			pieces.AddRange(Queen.StartPieces());
 			pieces.AddRange(King.StartPieces());
-
-			foreach (var piece in pieces)
-			{
-				switch (piece.Side)
-				{
-					case Side.White:
-						result.WhitePieces.Add(piece);
-						break;
-					case Side.Black:
-						result.BlackPieces.Add(piece);
-						break;
-				}
-			}
-
+			result.WhitePieces = (from piece in pieces where piece.Side == Side.White select piece).ToArray();
+			result.BlackPieces = (from piece in pieces where piece.Side == Side.Black select piece).ToArray();
 			return result;
 		}
 	}
