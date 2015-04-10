@@ -1,4 +1,6 @@
 ﻿using System;
+using Lupus.Chess.Exception;
+using Lupus.Chess.Piece;
 
 namespace Lupus.Chess
 {
@@ -128,28 +130,68 @@ namespace Lupus.Chess
 			};
 		}
 
-		public static Position Direction(Position position, int direction)
+		public static Position Direction(Position position, Direction direction)
 		{
 			switch (direction)
 			{
-				case 1:
+				case Chess.Direction.LowerLeft:
 					return LowerLeft(position);
-				case 2:
+				case Chess.Direction.Down:
 					return Down(position);
-				case 3:
+				case Chess.Direction.LowerRight:
 					return LowerRight(position);
-				case 4:
+				case Chess.Direction.Left:
 					return Left(position);
-				case 6:
+				case Chess.Direction.Right:
 					return Right(position);
-				case 7:
+				case Chess.Direction.UpperLeft:
 					return UpperLeft(position);
-				case 8:
+				case Chess.Direction.Up:
 					return Up(position);
-				case 9:
+				case Chess.Direction.UpperRight:
 					return UpperRight(position);
 				default:
 					return null;
+			}
+		}
+
+		public static void Castling(Field field, King king, Rook rook, CastlingSide side)
+		{
+			var allowedSide = king.CanUseCastling(field);
+			if (king.Side != rook.Side && !(allowedSide == CastlingSide.Both || allowedSide == side))
+				throw new ChessCastlingException(king.Side, "King cannot use castling.");
+
+			switch (side)
+			{
+				case CastlingSide.King:
+					switch (king.Side)
+					{
+						case Side.White:
+							rook.Move(field, new Position {File = 'F', Rank = 1});
+							king.Move(field, new Position {File = 'G', Rank = 1});
+							break;
+						case Side.Black:
+							rook.Move(field, new Position {File = 'F', Rank = 8});
+							king.Move(field, new Position {File = 'G', Rank = 8});
+							break;
+					}
+					break;
+				case CastlingSide.Queen:
+					switch (king.Side)
+					{
+						case Side.White:
+							rook.Move(field, new Position {File = 'D', Rank = 1});
+							king.Move(field, new Position {File = 'C', Rank = 1});
+							break;
+						case Side.Black:
+							rook.Move(field, new Position {File = 'D', Rank = 8});
+							king.Move(field, new Position {File = 'C', Rank = 8});
+							break;
+					}
+					break;
+				default:
+					throw new ChessCastlingException(king.Side,
+						"Got invalid castling side. Valid values are CastlingSide.King and CastlingSide.Queen.");
 			}
 		}
 	}

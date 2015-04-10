@@ -19,7 +19,7 @@ namespace Lupus.Chess.Piece
 				{
 					Moved = false,
 					Side = Side.Black,
-					Piece = PieceType.King,
+					Piece = PieceType.Queen,
 					Position = new Position
 					{
 						File = 'D',
@@ -37,7 +37,7 @@ namespace Lupus.Chess.Piece
 				{
 					Moved = false,
 					Side = Side.White,
-					Piece = PieceType.King,
+					Piece = PieceType.Queen,
 					Position = new Position
 					{
 						File = 'D',
@@ -61,14 +61,14 @@ namespace Lupus.Chess.Piece
 		public override IEnumerable<Position> AllowedPositions(Field field)
 		{
 			var result = new List<Position>();
-			result.AddRange(FindPositions(field, Side, Position, 1));
-			result.AddRange(FindPositions(field, Side, Position, 2));
-			result.AddRange(FindPositions(field, Side, Position, 3));
-			result.AddRange(FindPositions(field, Side, Position, 4));
-			result.AddRange(FindPositions(field, Side, Position, 6));
-			result.AddRange(FindPositions(field, Side, Position, 7));
-			result.AddRange(FindPositions(field, Side, Position, 8));
-			result.AddRange(FindPositions(field, Side, Position, 9));
+			result.AddRange(FindPositions(field, Side, Position, Direction.Down));
+			result.AddRange(FindPositions(field, Side, Position, Direction.Left));
+			result.AddRange(FindPositions(field, Side, Position, Direction.LowerLeft));
+			result.AddRange(FindPositions(field, Side, Position, Direction.LowerRight));
+			result.AddRange(FindPositions(field, Side, Position, Direction.Right));
+			result.AddRange(FindPositions(field, Side, Position, Direction.Up));
+			result.AddRange(FindPositions(field, Side, Position, Direction.UpperLeft));
+			result.AddRange(FindPositions(field, Side, Position, Direction.UpperRight));
 			return result;
 		}
 

@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Lupus.Chess</RootNamespace>
     <AssemblyName>Lupus.Chess</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -42,6 +42,9 @@
   <ItemGroup>
     <Compile Include="Algorithm\Evaluation.cs" />
     <Compile Include="Algorithm\Material.cs" />
+    <Compile Include="Castling.cs" />
+    <Compile Include="Direction.cs" />
+    <Compile Include="Exception\ChessCastlingException.cs" />
     <Compile Include="Exception\ChessEvaluationException.cs" />
     <Compile Include="Exception\ChessException.cs" />
     <Compile Include="Exception\ChessMoveException.cs" />

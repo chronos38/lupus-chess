@@ -84,10 +84,10 @@ namespace Lupus.Chess.Piece
 		public override IEnumerable<Position> AllowedPositions(Field field)
 		{
 			var result = new List<Position>();
-			result.AddRange(FindPositions(field, Side, Position, 1));
-			result.AddRange(FindPositions(field, Side, Position, 3));
-			result.AddRange(FindPositions(field, Side, Position, 7));
-			result.AddRange(FindPositions(field, Side, Position, 9));
+			result.AddRange(FindPositions(field, Side, Position, Direction.LowerLeft));
+			result.AddRange(FindPositions(field, Side, Position, Direction.LowerRight));
+			result.AddRange(FindPositions(field, Side, Position, Direction.UpperLeft));
+			result.AddRange(FindPositions(field, Side, Position, Direction.UpperRight));
 			return result;
 		}
 

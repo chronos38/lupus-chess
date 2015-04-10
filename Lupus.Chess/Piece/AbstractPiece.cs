@@ -67,7 +67,7 @@ namespace Lupus.Chess.Piece
 
 		public abstract IEnumerable<Position> AllowedPositions(Field field);
 
-		protected static IEnumerable<Position> FindPositions(Field field, Side side, Position position, int direction)
+		protected static IEnumerable<Position> FindPositions(Field field, Side side, Position position, Direction direction)
 		{
 			var pos = position;
 			var result = new Collection<Position>();
