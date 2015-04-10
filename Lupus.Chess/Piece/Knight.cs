@@ -70,6 +70,26 @@ namespace Lupus.Chess.Piece
 			}
 		}
 
+		internal Knight()
+		{
+			Piece = PieceType.Knight;
+		}
+
+		internal Knight(Side side, Position position)
+		{
+			Piece = PieceType.Knight;
+			Side = side;
+			Position = position;
+		}
+
+		internal Knight(Side side, Position position, bool moved)
+		{
+			Moved = moved;
+			Piece = PieceType.Knight;
+			Side = side;
+			Position = position;
+		}
+
 		public override object Clone()
 		{
 			return new Knight

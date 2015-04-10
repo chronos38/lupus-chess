@@ -45,12 +45,24 @@ namespace Lupus.Chess.Piece
 			}
 		}
 
-		public bool Moved { get; protected set; }
-
-		public override bool TryMove(Field field, Position position)
+		internal King()
 		{
-			Moved = true;
-			return base.TryMove(field, position);
+			Piece = PieceType.King;
+		}
+
+		internal King(Side side, Position position)
+		{
+			Piece = PieceType.King;
+			Side = side;
+			Position = position;
+		}
+
+		internal King(Side side, Position position, bool moved)
+		{
+			Moved = moved;
+			Piece = PieceType.King;
+			Side = side;
+			Position = position;
 		}
 
 		public override object Clone()

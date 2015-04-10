@@ -66,6 +66,26 @@ namespace Lupus.Chess.Piece
 			}
 		}
 
+		internal Bishop()
+		{
+			Piece = PieceType.Bishop;
+		}
+
+		internal Bishop(Side side, Position position)
+		{
+			Piece = PieceType.Bishop;
+			Side = side;
+			Position = position;
+		}
+
+		internal Bishop(Side side, Position position, bool moved)
+		{
+			Moved = moved;
+			Piece = PieceType.Bishop;
+			Side = side;
+			Position = position;
+		}
+
 		public override object Clone()
 		{
 			return new Bishop

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Lupus.Chess.Interface;
@@ -69,6 +70,15 @@ namespace Lupus.Chess
 				default:
 					return new Position[] {};
 			}
+		}
+
+		public static Field Create()
+		{
+			return new Field
+			{
+				BlackPieces = new Collection<IPiece>(),
+				WhitePieces = new Collection<IPiece>()
+			};
 		}
 
 		public static Field Start()

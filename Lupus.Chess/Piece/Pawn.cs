@@ -67,12 +67,32 @@ namespace Lupus.Chess.Piece
 			}
 		}
 
-		public bool Moved { get; protected set; }
-
-		public override bool TryMove(Field field, Position position)
+		public bool Promotion
 		{
-			Moved = true;
-			return base.TryMove(field, position);
+			get
+			{
+				return Side == Side.White ? Position.Rank == 8 : Position.Rank == 1;
+			}
+		}
+
+		internal Pawn()
+		{
+			Piece = PieceType.Pawn;
+		}
+
+		internal Pawn(Side side, Position position)
+		{
+			Piece = PieceType.Pawn;
+			Side = side;
+			Position = position;
+		}
+
+		internal Pawn(Side side, Position position, bool moved)
+		{
+			Moved = moved;
+			Piece = PieceType.Bishop;
+			Side = side;
+			Position = position;
 		}
 
 		public override object Clone()
@@ -111,7 +131,7 @@ namespace Lupus.Chess.Piece
 			var result = new Collection<Position>();
 			var next = Chess.Move.Up(pawn.Position);
 			var upperLeft = Chess.Move.UpperLeft(pawn.Position);
-			var upperRight = Chess.Move.UpperLeft(pawn.Position);
+			var upperRight = Chess.Move.UpperRight(pawn.Position);
 
 			if (field.IsFree(upperLeft) == Side.Black) result.Add(upperLeft);
 			if (field.IsFree(upperRight) == Side.Black) result.Add(upperRight);

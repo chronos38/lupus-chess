@@ -45,6 +45,26 @@ namespace Lupus.Chess.Piece
 			}
 		}
 
+		internal Queen()
+		{
+			Piece = PieceType.Queen;
+		}
+
+		internal Queen(Side side, Position position)
+		{
+			Piece = PieceType.Queen;
+			Side = side;
+			Position = position;
+		}
+
+		internal Queen(Side side, Position position, bool moved)
+		{
+			Moved = moved;
+			Piece = PieceType.Queen;
+			Side = side;
+			Position = position;
+		}
+
 		public override object Clone()
 		{
 			return new Queen
