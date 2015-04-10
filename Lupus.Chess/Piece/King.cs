@@ -91,14 +91,37 @@ namespace Lupus.Chess.Piece
 			// Check if king have moved
 			if (Moved) return CastlingSide.None;
 			// Check if king is in check
-			if (IsCheckmate(field, Position)) return CastlingSide.None;
-			var pieces = Side == Side.White ? field.WhitePieces : field.BlackPieces;
+			var underAttack = field.UnderAttack(Side == Side.White ? Side.Black : Side.White).ToArray();
+			if (underAttack.Contains(Position)) return CastlingSide.None;
 			// Search for unmoved rooks
-			var rooks = (from piece in pieces where piece.Piece == PieceType.Rook && !((Rook) piece).Moved select piece);
+			var pieces = Side == Side.White ? field.WhitePieces : field.BlackPieces;
+			var rooks = (from piece in pieces where piece.Piece == PieceType.Rook && !((Rook) piece).Moved select piece).ToArray();
 			// If there are no rooks available than castling is disallowed
 			if (!rooks.Any()) return CastlingSide.None;
-			// Check if all fields between rook and king are free
-			throw new NotImplementedException();
+			// Check if all fields between rook and king are free and not under attack
+			var result = CastlingSide.Both;
+			foreach (var position in rooks.Select(rook => (Position) rook.Position.Clone()))
+			{
+				var pos = position;
+
+				if (position.File == 'A')
+				{
+					for (var i = 0; i < 3; i++)
+					{
+						pos = Chess.Move.Right(pos);
+						if (field.IsFree(pos) == Side.None && !underAttack.Contains(pos)) continue;
+						if (result == CastlingSide.Both) result = CastlingSide.King;
+						if (result == CastlingSide.Queen) return CastlingSide.None;
+					}
+				}
+				if (position.File != 'H') return CastlingSide.None;
+				pos = Chess.Move.Left(pos);
+				if (field.IsFree(pos) == Side.None && !underAttack.Contains(pos)) continue;
+				if (result == CastlingSide.Both) result = CastlingSide.Queen;
+				if (result == CastlingSide.King) return CastlingSide.None;
+			}
+
+			return result;
 		}
 
 		public static IEnumerable<IPiece> StartPieces()
@@ -108,6 +131,11 @@ namespace Lupus.Chess.Piece
 				White,
 				Black
 			};
+		}
+
+		public bool IsInCheck(Field field)
+		{
+			return field.UnderAttack(Side == Side.White ? Side.Black : Side.White).Contains(Position);
 		}
 
 		private bool IsCheckmate(Field field, Position position)
