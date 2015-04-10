@@ -8,10 +8,10 @@ namespace Lupus.Chess.Interface
 		Side Side { get; }
 		PieceType Piece { get; }
 		Position Position { get; }
+		bool Moved { get; }
 		void Move(Field field, Position position);
 		bool TryMove(Field field, Position position);
 		IEnumerable<Position> AllowedPositions(Field field);
 		bool ValidateMove(Field field, Position position);
-		IEnumerable<IPiece> StartPieces();
 	}
 }

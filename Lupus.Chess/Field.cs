@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Lupus.Chess.Interface;
+using Lupus.Chess.Piece;
 
 namespace Lupus.Chess
 {
@@ -50,10 +51,51 @@ namespace Lupus.Chess
 			}
 		}
 
+		/// <summary>
+		/// Gets all fields that are under attack from the given side.
+		/// </summary>
+		/// <param name="fromSide">Side to search for.</param>
+		/// <returns>All positions that are under attack from given side.</returns>
+		public IEnumerable<Position> UnderAttack(Side fromSide)
+		{
+			switch (fromSide)
+			{
+				case Side.Black:
+					return
+						(from blackPiece in BlackPieces from positions in blackPiece.AllowedPositions(this) select positions).ToList();
+				case Side.White:
+					return
+						(from whitePiece in WhitePieces from positions in whitePiece.AllowedPositions(this) select positions).ToList();
+				default:
+					return new Position[] {};
+			}
+		}
+
 		public static Field Start()
 		{
-			// TODO: Implement
-			return null;
+			var result = new Field();
+			var pieces = new List<IPiece>();
+			pieces.AddRange(Pawn.StartPieces());
+			pieces.AddRange(Knight.StartPieces());
+			pieces.AddRange(Bishop.StartPieces());
+			pieces.AddRange(Rook.StartPieces());
+			pieces.AddRange(Queen.StartPieces());
+			pieces.AddRange(King.StartPieces());
+
+			foreach (var piece in pieces)
+			{
+				switch (piece.Side)
+				{
+					case Side.White:
+						result.WhitePieces.Add(piece);
+						break;
+					case Side.Black:
+						result.BlackPieces.Add(piece);
+						break;
+				}
+			}
+
+			return result;
 		}
 	}
 }

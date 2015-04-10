@@ -15,11 +15,12 @@ namespace Lupus.Chess.Piece
 		{
 			get
 			{
-				return new Queen()
+				return new Queen
 				{
+					Moved = false,
 					Side = Side.Black,
 					Piece = PieceType.King,
-					Position = new Position()
+					Position = new Position
 					{
 						File = 'D',
 						Rank = 8
@@ -32,11 +33,12 @@ namespace Lupus.Chess.Piece
 		{
 			get
 			{
-				return new Queen()
+				return new Queen
 				{
+					Moved = false,
 					Side = Side.White,
 					Piece = PieceType.King,
-					Position = new Position()
+					Position = new Position
 					{
 						File = 'D',
 						Rank = 1
@@ -47,8 +49,9 @@ namespace Lupus.Chess.Piece
 
 		public override object Clone()
 		{
-			return new Queen()
+			return new Queen
 			{
+				Moved = Moved,
 				Piece = PieceType.Queen,
 				Position = (Position)Position.Clone(),
 				Side = Side
@@ -69,9 +72,9 @@ namespace Lupus.Chess.Piece
 			return result;
 		}
 
-		public override IEnumerable<IPiece> StartPieces()
+		public static IEnumerable<IPiece> StartPieces()
 		{
-			return new Collection<IPiece>()
+			return new Collection<IPiece>
 			{
 				White,
 				Black

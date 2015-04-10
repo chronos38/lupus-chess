@@ -12,7 +12,7 @@ namespace Lupus.Chess
 
 		public object Clone()
 		{
-			return new Move()
+			return new Move
 			{
 				From = (Position) From.Clone(),
 				To = (Position) To.Clone(),

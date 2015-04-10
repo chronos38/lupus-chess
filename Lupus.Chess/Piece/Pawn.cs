@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using Lupus.Chess.Interface;
@@ -10,9 +11,65 @@ namespace Lupus.Chess.Piece
 {
 	public class Pawn : AbstractPiece
 	{
+		public static IEnumerable<Pawn> White
+		{
+			get
+			{
+				var result = new Collection<Pawn>();
+				var position = new Position
+				{
+					File = 'A',
+					Rank = 2
+				};
+
+				for (var i = 0; i < 8; i++)
+				{
+					result.Add(new Pawn
+					{
+						Moved = false,
+						Piece = PieceType.Pawn,
+						Position = (Position) position.Clone(),
+						Side = Side.White
+					});
+
+					position.File = (char) (position.File + 1);
+				}
+
+				return result;
+			}
+		}
+
+		public static IEnumerable<Pawn> Black
+		{
+			get
+			{
+				var result = new Collection<Pawn>();
+				var position = new Position
+				{
+					File = 'A',
+					Rank = 7
+				};
+
+				for (var i = 0; i < 8; i++)
+				{
+					result.Add(new Pawn
+					{
+						Moved = false,
+						Piece = PieceType.Pawn,
+						Position = (Position) position.Clone(),
+						Side = Side.Black
+					});
+
+					position.File = (char) (position.File + 1);
+				}
+
+				return result;
+			}
+		}
+
 		public override object Clone()
 		{
-			return new Pawn()
+			return new Pawn
 			{
 				Piece = Piece,
 				Position = (Position) Position.Clone(),
@@ -25,36 +82,11 @@ namespace Lupus.Chess.Piece
 			throw new NotImplementedException();
 		}
 
-		public override IEnumerable<IPiece> StartPieces()
+		public static IEnumerable<IPiece> StartPieces()
 		{
-			var result = new Collection<IPiece>();
-			var line = new Position()
-			{
-				File = 'A',
-				Rank = 2
-			};
-
-			for (var j = 0; j < 2; j++)
-			{
-				for (var i = 0; i < 8; i++)
-				{
-					result.Add(new Pawn()
-					{
-						Piece = PieceType.Pawn,
-						Position = line,
-						Side = j == 0 ? Side.White : Side.Black
-					});
-
-					line.File = (char) (line.File + 1);
-				}
-
-				line = new Position()
-				{
-					File = 'A',
-					Rank = 7
-				};
-			}
-
+			var result = new List<IPiece>();
+			result.AddRange(White);
+			result.AddRange(Black);
 			return result;
 		}
 	}

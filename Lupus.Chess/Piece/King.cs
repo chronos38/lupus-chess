@@ -12,11 +12,12 @@ namespace Lupus.Chess.Piece
 		{
 			get
 			{
-				return new King()
+				return new King
 				{
+					Moved = false,
 					Side = Side.Black,
 					Piece = PieceType.King,
-					Position = new Position()
+					Position = new Position
 					{
 						File = 'E',
 						Rank = 8
@@ -29,11 +30,12 @@ namespace Lupus.Chess.Piece
 		{
 			get
 			{
-				return new King()
+				return new King
 				{
+					Moved = false,
 					Side = Side.White,
 					Piece = PieceType.King,
-					Position = new Position()
+					Position = new Position
 					{
 						File = 'E',
 						Rank = 1
@@ -44,8 +46,9 @@ namespace Lupus.Chess.Piece
 
 		public override object Clone()
 		{
-			return new King()
+			return new King
 			{
+				Moved = Moved,
 				Piece = PieceType.King,
 				Position = (Position) Position.Clone(),
 				Side = Side
@@ -54,6 +57,8 @@ namespace Lupus.Chess.Piece
 
 		public override IEnumerable<Position> AllowedPositions(Field field)
 		{
+			throw new NotImplementedException();
+			// TODO: Add castling
 			var result = new Collection<Position>();
 			var position = Chess.Move.Direction((Position) Position.Clone(), 1);
 			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
@@ -74,9 +79,9 @@ namespace Lupus.Chess.Piece
 			return result;
 		}
 
-		public override IEnumerable<IPiece> StartPieces()
+		public static IEnumerable<IPiece> StartPieces()
 		{
-			return new Collection<IPiece>()
+			return new Collection<IPiece>
 			{
 				White,
 				Black

@@ -10,9 +10,34 @@ namespace Lupus.Chess.Piece
 	[Serializable]
 	public abstract class AbstractPiece : IPiece
 	{
-		public Side Side { get; protected set; }
-		public PieceType Piece { get; protected set; }
-		public Position Position { get; protected set; }
+		private Side _side = Side.None;
+		private PieceType _piece = PieceType.Abstract;
+		private Position _position = new Position {File = 'A', Rank = 1};
+		private bool _moved = false;
+
+		public Side Side
+		{
+			get { return _side; }
+			protected set { _side = value; }
+		}
+
+		public PieceType Piece
+		{
+			get { return _piece; }
+			protected set { _piece = value; }
+		}
+
+		public Position Position
+		{
+			get { return _position; }
+			protected set { _position = value; }
+		}
+
+		public bool Moved
+		{
+			get { return _moved; }
+			protected set { _moved = value; }
+		}
 
 		public void Move(Field field, Position position)
 		{
@@ -41,8 +66,6 @@ namespace Lupus.Chess.Piece
 		public abstract object Clone();
 
 		public abstract IEnumerable<Position> AllowedPositions(Field field);
-
-		public abstract IEnumerable<IPiece> StartPieces();
 
 		protected static IEnumerable<Position> FindPositions(Field field, Side side, Position position, int direction)
 		{

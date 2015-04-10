@@ -11,7 +11,7 @@ namespace Lupus.Chess
 
 		public object Clone()
 		{
-			return new Position()
+			return new Position
 			{
 				File = File,
 				Rank = Rank
