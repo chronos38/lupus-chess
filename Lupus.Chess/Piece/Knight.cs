@@ -18,7 +18,6 @@ namespace Lupus.Chess.Piece
 				{
 					new Knight
 					{
-						Moved = false,
 						Piece = PieceType.Knight,
 						Side = Side.White,
 						Position = new Position
@@ -29,7 +28,6 @@ namespace Lupus.Chess.Piece
 					},
 					new Knight
 					{
-						Moved = false,
 						Piece = PieceType.Knight,
 						Side = Side.White,
 						Position = new Position
@@ -50,7 +48,6 @@ namespace Lupus.Chess.Piece
 				{
 					new Knight
 					{
-						Moved = false,
 						Piece = PieceType.Knight,
 						Side = Side.Black,
 						Position = new Position
@@ -61,7 +58,6 @@ namespace Lupus.Chess.Piece
 					},
 					new Knight
 					{
-						Moved = false,
 						Piece = PieceType.Knight,
 						Side = Side.Black,
 						Position = new Position
@@ -78,7 +74,6 @@ namespace Lupus.Chess.Piece
 		{
 			return new Knight
 			{
-				Moved = Moved,
 				Piece = PieceType.Knight,
 				Position = (Position) Position.Clone(),
 				Side = Side

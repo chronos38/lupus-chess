@@ -70,6 +70,14 @@ namespace Lupus.Chess.Piece
 			}
 		}
 
+		public bool Moved { get; protected set; }
+
+		public override bool TryMove(Field field, Position position)
+		{
+			Moved = true;
+			return base.TryMove(field, position);
+		}
+
 		public override object Clone()
 		{
 			return new Rook

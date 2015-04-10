@@ -16,8 +16,8 @@ namespace Lupus.Chess
 		{
 			return new Field()
 			{
-				WhitePieces = (from piece in WhitePieces select (IPiece)piece.Clone()).ToList(),
-				BlackPieces = (from piece in BlackPieces select (IPiece)piece.Clone()).ToList()
+				WhitePieces = (from piece in WhitePieces select (IPiece) piece.Clone()).ToArray(),
+				BlackPieces = (from piece in BlackPieces select (IPiece) piece.Clone()).ToArray()
 			};
 		}
 

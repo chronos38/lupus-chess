@@ -45,6 +45,14 @@ namespace Lupus.Chess.Piece
 			}
 		}
 
+		public bool Moved { get; protected set; }
+
+		public override bool TryMove(Field field, Position position)
+		{
+			Moved = true;
+			return base.TryMove(field, position);
+		}
+
 		public override object Clone()
 		{
 			return new King
@@ -58,36 +66,38 @@ namespace Lupus.Chess.Piece
 
 		public override IEnumerable<Position> AllowedPositions(Field field)
 		{
-			// TODO: Add checkmate
 			var result = new Collection<Position>();
-			var position = Chess.Move.Direction((Position) Position.Clone(), Direction.Down);
-			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
-			position = Chess.Move.Direction((Position) Position.Clone(), Direction.Left);
-			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
-			position = Chess.Move.Direction((Position) Position.Clone(), Direction.LowerLeft);
-			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
-			position = Chess.Move.Direction((Position) Position.Clone(), Direction.LowerRight);
-			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
-			position = Chess.Move.Direction((Position) Position.Clone(), Direction.Right);
-			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
-			position = Chess.Move.Direction((Position) Position.Clone(), Direction.Up);
-			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
-			position = Chess.Move.Direction((Position) Position.Clone(), Direction.UpperLeft);
-			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
-			position = Chess.Move.Direction((Position) Position.Clone(), Direction.UpperRight);
-			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
+			var position = Chess.Move.Direction(Position, Direction.Down);
+			if (position.Validate() && field.IsFree(position, Side) && !IsCheckmate(field, position)) result.Add(position);
+			position = Chess.Move.Direction(Position, Direction.Left);
+			if (position.Validate() && field.IsFree(position, Side) && !IsCheckmate(field, position)) result.Add(position);
+			position = Chess.Move.Direction(Position, Direction.LowerLeft);
+			if (position.Validate() && field.IsFree(position, Side) && !IsCheckmate(field, position)) result.Add(position);
+			position = Chess.Move.Direction(Position, Direction.LowerRight);
+			if (position.Validate() && field.IsFree(position, Side) && !IsCheckmate(field, position)) result.Add(position);
+			position = Chess.Move.Direction(Position, Direction.Right);
+			if (position.Validate() && field.IsFree(position, Side) && !IsCheckmate(field, position)) result.Add(position);
+			position = Chess.Move.Direction(Position, Direction.Up);
+			if (position.Validate() && field.IsFree(position, Side) && !IsCheckmate(field, position)) result.Add(position);
+			position = Chess.Move.Direction(Position, Direction.UpperLeft);
+			if (position.Validate() && field.IsFree(position, Side) && !IsCheckmate(field, position)) result.Add(position);
+			position = Chess.Move.Direction(Position, Direction.UpperRight);
+			if (position.Validate() && field.IsFree(position, Side) && !IsCheckmate(field, position)) result.Add(position);
 			return result;
 		}
 
 		public CastlingSide CanUseCastling(Field field)
 		{
-			// King has not moved
+			// Check if king have moved
 			if (Moved) return CastlingSide.None;
+			// Check if king is in check
+			if (IsCheckmate(field, Position)) return CastlingSide.None;
 			var pieces = Side == Side.White ? field.WhitePieces : field.BlackPieces;
-			// The choosen rooks have not moved
-			var rooks = (from piece in pieces where piece.Piece == PieceType.Rook && !piece.Moved select piece);
-			// If there are none than castling is not allowed
+			// Search for unmoved rooks
+			var rooks = (from piece in pieces where piece.Piece == PieceType.Rook && !((Rook) piece).Moved select piece);
+			// If there are no rooks available than castling is disallowed
 			if (!rooks.Any()) return CastlingSide.None;
+			// Check if all fields between rook and king are free
 			throw new NotImplementedException();
 		}
 
@@ -98,6 +108,11 @@ namespace Lupus.Chess.Piece
 				White,
 				Black
 			};
+		}
+
+		private bool IsCheckmate(Field field, Position position)
+		{
+			return field.UnderAttack(Side == Side.White ? Side.Black : Side.White).Contains(position);
 		}
 	}
 }

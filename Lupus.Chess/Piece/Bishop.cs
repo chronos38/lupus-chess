@@ -14,7 +14,6 @@ namespace Lupus.Chess.Piece
 				{
 					new Bishop
 					{
-						Moved = false,
 						Piece = PieceType.Bishop,
 						Side = Side.White,
 						Position = new Position
@@ -25,7 +24,6 @@ namespace Lupus.Chess.Piece
 					},
 					new Bishop
 					{
-						Moved = false,
 						Piece = PieceType.Bishop,
 						Side = Side.White,
 						Position = new Position
@@ -46,7 +44,6 @@ namespace Lupus.Chess.Piece
 				{
 					new Bishop
 					{
-						Moved = false,
 						Piece = PieceType.Bishop,
 						Side = Side.Black,
 						Position = new Position
@@ -57,7 +54,6 @@ namespace Lupus.Chess.Piece
 					},
 					new Bishop
 					{
-						Moved = false,
 						Piece = PieceType.Bishop,
 						Side = Side.Black,
 						Position = new Position
@@ -74,7 +70,6 @@ namespace Lupus.Chess.Piece
 		{
 			return new Bishop
 			{
-				Moved = Moved,
 				Piece = PieceType.Bishop,
 				Position = (Position) Position.Clone(),
 				Side = Side

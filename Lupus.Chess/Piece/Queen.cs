@@ -17,7 +17,6 @@ namespace Lupus.Chess.Piece
 			{
 				return new Queen
 				{
-					Moved = false,
 					Side = Side.Black,
 					Piece = PieceType.Queen,
 					Position = new Position
@@ -35,7 +34,6 @@ namespace Lupus.Chess.Piece
 			{
 				return new Queen
 				{
-					Moved = false,
 					Side = Side.White,
 					Piece = PieceType.Queen,
 					Position = new Position
@@ -51,7 +49,6 @@ namespace Lupus.Chess.Piece
 		{
 			return new Queen
 			{
-				Moved = Moved,
 				Piece = PieceType.Queen,
 				Position = (Position)Position.Clone(),
 				Side = Side

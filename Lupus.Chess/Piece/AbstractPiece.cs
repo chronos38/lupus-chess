@@ -13,7 +13,6 @@ namespace Lupus.Chess.Piece
 		private Side _side = Side.None;
 		private PieceType _piece = PieceType.Abstract;
 		private Position _position = new Position {File = 'A', Rank = 1};
-		private bool _moved = false;
 
 		public Side Side
 		{
@@ -33,29 +32,24 @@ namespace Lupus.Chess.Piece
 			protected set { _position = value; }
 		}
 
-		public bool Moved
-		{
-			get { return _moved; }
-			protected set { _moved = value; }
-		}
-
 		public void Move(Field field, Position position)
 		{
-			if (!TryMove(field, position))
-				throw new ChessMoveException(new Move()
+			if (!position.Validate())
+				throw new ChessMoveException(new Move
 				{
 					From = Position,
 					To = position,
 					Piece = Piece,
 					Side = Side
 				});
+			Position = position;
 		}
 
-		public bool TryMove(Field field, Position position)
+		public virtual bool TryMove(Field field, Position position)
 		{
 			if (!ValidateMove(field, position)) return false;
 			Position = position;
-			return Moved = true;
+			return true;
 		}
 
 		public bool ValidateMove(Field field, Position position)
