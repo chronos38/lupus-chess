@@ -109,7 +109,7 @@ namespace Lupus.Chess.Piece
 						if (pawn.Position.Rank == position.Rank - 1 && pawn.Position.File == position.File) field.Remove(pawn.Position);
 						break;
 					case Side.Black:
-						if (pawn.Position.Rank == position.Rank - 1 && pawn.Position.File == position.File) field.Remove(pawn.Position);
+						if (pawn.Position.Rank == position.Rank + 1 && pawn.Position.File == position.File) field.Remove(pawn.Position);
 						break;
 				}
 			}
