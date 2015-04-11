@@ -39,24 +39,19 @@ namespace Lupus.Chess.Piece
 			internal set { _moved = value; }
 		}
 
-		public void Move(Field field, Position position)
+		public virtual void Move(Field field, Position position)
 		{
-			if (!position.Validate())
-				throw new ChessMoveException(new Move
-				{
-					From = Position,
-					To = position,
-					Piece = Piece,
-					Side = Side
-				});
+			var opponent = Side == Side.White ? field.BlackPieces : field.WhitePieces;
+			var piece = (from p in opponent where p.Position == position select p).FirstOrDefault();
+			if (piece != null) opponent.Remove(piece);
 			Position = position;
+			Moved = true;
 		}
 
 		public bool TryMove(Field field, Position position)
 		{
 			if (!ValidateMove(field, position)) return false;
-			Position = position;
-			Moved = true;
+			Move(field, position);
 			return true;
 		}
 

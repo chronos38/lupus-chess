@@ -6,8 +6,20 @@ namespace Lupus.Chess
 	[Serializable]
 	public class Position : ICloneable
 	{
-		public char File { get; set; }
-		public int Rank { get; set; }
+		private char _file = 'A';
+		private int _rank = 1;
+
+		public char File
+		{
+			get { return _file; }
+			set { _file = value; }
+		}
+
+		public int Rank
+		{
+			get { return _rank; }
+			set { _rank = value; }
+		}
 
 		public object Clone()
 		{

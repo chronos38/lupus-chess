@@ -112,7 +112,7 @@ namespace Lupus.Chess.Piece
 			if (!rooks.Any()) return CastlingSide.None;
 			// Check if all fields between rook and king are free and not under attack
 			var result = CastlingSide.Both;
-			foreach (var position in rooks.Select(rook => (Position) rook.Position.Clone()))
+			foreach (var position in rooks.Select(rook => rook.Position))
 			{
 				var pos = position;
 
@@ -125,12 +125,18 @@ namespace Lupus.Chess.Piece
 						if (result == CastlingSide.Both) result = CastlingSide.King;
 						if (result == CastlingSide.Queen) return CastlingSide.None;
 					}
+
+					continue;
 				}
 				if (position.File != 'H') return CastlingSide.None;
-				pos = Chess.Move.Left(pos);
-				if (field.IsFree(pos) == Side.None && !underAttack.Contains(pos)) continue;
-				if (result == CastlingSide.Both) result = CastlingSide.Queen;
-				if (result == CastlingSide.King) return CastlingSide.None;
+
+				for (var i = 0; i < 2; i++)
+				{
+					pos = Chess.Move.Left(pos);
+					if (field.IsFree(pos) == Side.None && !underAttack.Contains(pos)) continue;
+					if (result == CastlingSide.Both) result = CastlingSide.Queen;
+					if (result == CastlingSide.King) return CastlingSide.None;
+				}
 			}
 
 			return result;

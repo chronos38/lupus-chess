@@ -1,6 +1,6 @@
 ﻿namespace Lupus.Chess.Interface.Algorithm
 {
-	public interface IMoveGenerator
+	public interface ITreeSearch
 	{
 		IEvaluation Evaluation { get; set; }
 		uint Depth { get; set; }

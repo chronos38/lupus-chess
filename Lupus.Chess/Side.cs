@@ -7,6 +7,7 @@ namespace Lupus.Chess
 	{
 		None,
 		White,
-		Black
+		Black,
+		Both
 	}
 }

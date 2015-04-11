@@ -75,6 +75,8 @@ namespace Lupus.Chess.Piece
 			}
 		}
 
+		public bool EnPassantThread { get; set; }
+
 		internal Pawn()
 		{
 			Piece = PieceType.Pawn;
@@ -93,6 +95,27 @@ namespace Lupus.Chess.Piece
 			Piece = PieceType.Bishop;
 			Side = side;
 			Position = position;
+		}
+
+		public override void Move(Field field, Position position)
+		{
+			var pawn = FindEnPassant(field);
+
+			if (pawn != null)
+			{
+				switch (Side)
+				{
+					case Side.White:
+						if (pawn.Position.Rank == position.Rank - 1 && pawn.Position.File == position.File) field.Remove(pawn.Position);
+						break;
+					case Side.Black:
+						if (pawn.Position.Rank == position.Rank - 1 && pawn.Position.File == position.File) field.Remove(pawn.Position);
+						break;
+				}
+			}
+
+			EnPassantThread = Math.Abs(position.Rank - Position.Rank) == 2;
+			base.Move(field, position);
 		}
 
 		public override object Clone()
@@ -126,6 +149,53 @@ namespace Lupus.Chess.Piece
 			return result;
 		}
 
+		public Pawn FindEnPassant(Field field)
+		{
+			switch (Side)
+			{
+				case Side.White:
+					return FindEnPassantWhite(field);
+				case Side.Black:
+					return FindEnPassantBlack(field);
+				default:
+					return null;
+			}
+		}
+
+		private Pawn FindEnPassantWhite(Field field)
+		{
+			// Check if pawn is on correct rank
+			if (Position.Rank != 5) return null;
+			// Check if a pawn is nearby
+			var left = field.GetPiece(Chess.Move.Left(Position));
+			var right = field.GetPiece(Chess.Move.Right(Position));
+			// Return left pawn if it is valid
+			if (left != null && left.Piece == PieceType.Pawn && left.Side == Side.Black && ((Pawn) left).EnPassantThread)
+				return (Pawn) left;
+			// Return right pawn if it is valid
+			if (right != null && right.Piece == PieceType.Pawn && right.Side == Side.Black && ((Pawn) right).EnPassantThread)
+				return (Pawn) right;
+			// No en passant possible
+			return null;
+		}
+
+		private Pawn FindEnPassantBlack(Field field)
+		{
+			// Check if pawn is on correct rank
+			if (Position.Rank != 4) return null;
+			// Check if a pawn is nearby
+			var left = field.GetPiece(Chess.Move.Left(Position));
+			var right = field.GetPiece(Chess.Move.Right(Position));
+			// Return left pawn if it is valid
+			if (left != null && left.Piece == PieceType.Pawn && left.Side == Side.White && ((Pawn) left).EnPassantThread)
+				return (Pawn) left;
+			// Return right pawn if it is valid
+			if (right != null && right.Piece == PieceType.Pawn && right.Side == Side.White && ((Pawn) right).EnPassantThread)
+				return (Pawn) right;
+			// No en passant possible
+			return null;
+		}
+
 		private static IEnumerable<Position> WhiteMoves(Field field, Pawn pawn)
 		{
 			var result = new Collection<Position>();
@@ -139,6 +209,10 @@ namespace Lupus.Chess.Piece
 			if (pawn.Moved) return result;
 			var overNext = Chess.Move.Up(next);
 			if (field.IsFree(overNext) == Side.None) result.Add(overNext);
+
+			// En passant
+			var enPassant = pawn.FindEnPassant(field);
+			if (enPassant != null) result.Add(new Position {File = enPassant.Position.File, Rank = 6});
 
 			return result;
 		}
@@ -156,6 +230,10 @@ namespace Lupus.Chess.Piece
 			if (pawn.Moved) return result;
 			var overNext = Chess.Move.Down(next);
 			if (field.IsFree(overNext) == Side.None) result.Add(overNext);
+
+			// En passant
+			var enPassant = pawn.FindEnPassant(field);
+			if (enPassant != null) result.Add(new Position { File = enPassant.Position.File, Rank = 3 });
 
 			return result;
 		}

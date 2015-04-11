@@ -13,6 +13,11 @@ namespace Lupus.Chess
 		public ICollection<IPiece> WhitePieces { get; private set; }
 		public ICollection<IPiece> BlackPieces { get; private set; }
 
+		public IPiece this[Position position]
+		{
+			get { return WhitePieces.Concat(BlackPieces).FirstOrDefault(p => p.Position == position); }
+		}
+
 		public object Clone()
 		{
 			return new Field()
@@ -47,6 +52,8 @@ namespace Lupus.Chess
 					return BlackPieces.All(piece => piece.Position != position);
 				case Side.White:
 					return WhitePieces.All(piece => piece.Position != position);
+				case Side.Both:
+					return WhitePieces.Concat(BlackPieces).All(piece => piece.Position != position);
 				default:
 					return true;
 			}
@@ -69,6 +76,27 @@ namespace Lupus.Chess
 						(from whitePiece in WhitePieces from positions in whitePiece.AllowedPositions(this) select positions).ToArray();
 				default:
 					return new Position[] {};
+			}
+		}
+
+		public IPiece GetPiece(Position position)
+		{
+			return WhitePieces.Concat(BlackPieces).FirstOrDefault(p => p.Position == position);
+		}
+
+		public void Remove(Position position)
+		{
+			var piece = WhitePieces.Concat(BlackPieces).FirstOrDefault(p => p.Position == position);
+			if (piece == null) return;
+
+			switch (piece.Side)
+			{
+				case Side.White:
+					WhitePieces.Remove(piece);
+					break;
+				case Side.Black:
+					BlackPieces.Remove(piece);
+					break;
 			}
 		}
 

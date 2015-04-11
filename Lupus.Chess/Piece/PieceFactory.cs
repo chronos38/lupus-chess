@@ -11,7 +11,6 @@ namespace Lupus.Chess.Piece
 	{
 		public static IPiece Create(PieceType type)
 		{
-			IPiece piece;
 			switch (type)
 			{
 				case PieceType.Bishop:
@@ -33,7 +32,6 @@ namespace Lupus.Chess.Piece
 
 		public static IPiece Create(PieceType type, Side side)
 		{
-			IPiece piece;
 			switch (type)
 			{
 				case PieceType.Bishop:
@@ -55,27 +53,20 @@ namespace Lupus.Chess.Piece
 
 		public static IPiece Create(PieceType type, Side side, Position position)
 		{
-			IPiece piece;
 			switch (type)
 			{
 				case PieceType.Bishop:
-					piece = new Bishop(side, position);
-					return piece;
+					return new Bishop(side, position);
 				case PieceType.King:
-					piece = new King(side, position);
-					return piece;
+					return new King(side, position);
 				case PieceType.Knight:
-					piece = new Knight(side, position);
-					return piece;
+					return new Knight(side, position);
 				case PieceType.Pawn:
-					piece = new Pawn(side, position);
-					return piece;
+					return new Pawn(side, position);
 				case PieceType.Queen:
-					piece = new Queen(side, position);
-					return piece;
+					return new Queen(side, position);
 				case PieceType.Rook:
-					piece = new Rook(side, position);
-					return piece;
+					return new Rook(side, position);
 				default:
 					throw new NotSupportedException();
 			}
@@ -83,27 +74,20 @@ namespace Lupus.Chess.Piece
 
 		public static IPiece Create(PieceType type, Side side, Position position, bool moved)
 		{
-			IPiece piece;
 			switch (type)
 			{
 				case PieceType.Bishop:
-					piece = new Bishop(side, position, moved);
-					return piece;
+					return new Bishop(side, position, moved);
 				case PieceType.King:
-					piece = new King(side, position, moved);
-					return piece;
+					return new King(side, position, moved);
 				case PieceType.Knight:
-					piece = new Knight(side, position, moved);
-					return piece;
+					return new Knight(side, position, moved);
 				case PieceType.Pawn:
-					piece = new Pawn(side, position, moved);
-					return piece;
+					return new Pawn(side, position, moved);
 				case PieceType.Queen:
-					piece = new Queen(side, position, moved);
-					return piece;
+					return new Queen(side, position, moved);
 				case PieceType.Rook:
-					piece = new Rook(side, position, moved);
-					return piece;
+					return new Rook(side, position, moved);
 				default:
 					throw new NotSupportedException();
 			}

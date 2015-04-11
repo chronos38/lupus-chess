@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Lupus.Chess.Exception;
 using Lupus.Chess.Piece;
 
@@ -7,19 +8,40 @@ namespace Lupus.Chess
 	[Serializable]
 	public class Move : ICloneable
 	{
+		private PieceType _piece = PieceType.Abstract;
+		private Side _side = Side.None;
+		private CastlingSide _castlingSide = CastlingSide.None;
+
 		public Position From { get; set; }
 		public Position To { get; set; }
-		public PieceType Piece { get; set; }
-		public Side Side { get; set; }
+
+		public PieceType Piece
+		{
+			get { return _piece; }
+			set { _piece = value; }
+		}
+
+		public Side Side
+		{
+			get { return _side; }
+			set { _side = value; }
+		}
+
+		public CastlingSide CastlingSide
+		{
+			get { return _castlingSide; }
+			set { _castlingSide = value; }
+		}
 
 		public object Clone()
 		{
 			return new Move
 			{
-				From = (Position) From.Clone(),
-				To = (Position) To.Clone(),
+				From = From != null ? (Position) From.Clone() : null,
+				To = To != null ? (Position) To.Clone() : null,
 				Piece = Piece,
-				Side = Side
+				Side = Side,
+				CastlingSide = CastlingSide
 			};
 		}
 
@@ -155,10 +177,16 @@ namespace Lupus.Chess
 			}
 		}
 
-		public static void Castling(Field field, King king, Rook rook, CastlingSide side)
+		public static void Castling(Field field, King king, CastlingSide side)
 		{
+			var pieces = king.Side == Side.White ? field.WhitePieces : field.BlackPieces;
+			var rank = king.Side == Side.White ? 1 : 8;
+			var position = side == CastlingSide.King
+				? new Position {File = 'H', Rank = rank}
+				: new Position {File = 'A', Rank = rank};
+			var rook = (Rook) (from p in pieces where p.Position == position select p).First();
 			var allowedSide = king.CanUseCastling(field);
-			if (king.Side != rook.Side && !(allowedSide == CastlingSide.Both || allowedSide == side))
+			if (allowedSide != CastlingSide.Both && allowedSide != side)
 				throw new ChessCastlingException(king.Side, "King cannot use castling.");
 
 			switch (side)
@@ -193,6 +221,53 @@ namespace Lupus.Chess
 					throw new ChessCastlingException(king.Side,
 						"Got invalid castling side. Valid values are CastlingSide.King and CastlingSide.Queen.");
 			}
+		}
+
+		public static bool TryCastling(Field field, King king, CastlingSide side)
+		{
+			var pieces = king.Side == Side.White ? field.WhitePieces : field.BlackPieces;
+			var rank = king.Side == Side.White ? 1 : 8;
+			var position = side == CastlingSide.King
+				? new Position {File = 'H', Rank = rank}
+				: new Position {File = 'A', Rank = rank};
+			var rook = (Rook)(from p in pieces where p.Position == position select p).FirstOrDefault();
+			var allowedSide = king.CanUseCastling(field);
+			if (rook == null) return false;
+			if (allowedSide != CastlingSide.Both && allowedSide != side) return false;
+
+			switch (side)
+			{
+				case CastlingSide.King:
+					switch (king.Side)
+					{
+						case Side.White:
+							rook.Move(field, new Position { File = 'F', Rank = 1 });
+							king.Move(field, new Position { File = 'G', Rank = 1 });
+							break;
+						case Side.Black:
+							rook.Move(field, new Position { File = 'F', Rank = 8 });
+							king.Move(field, new Position { File = 'G', Rank = 8 });
+							break;
+					}
+					break;
+				case CastlingSide.Queen:
+					switch (king.Side)
+					{
+						case Side.White:
+							rook.Move(field, new Position { File = 'D', Rank = 1 });
+							king.Move(field, new Position { File = 'C', Rank = 1 });
+							break;
+						case Side.Black:
+							rook.Move(field, new Position { File = 'D', Rank = 8 });
+							king.Move(field, new Position { File = 'C', Rank = 8 });
+							break;
+					}
+					break;
+				default:
+					return false;
+			}
+
+			return true;
 		}
 	}
 }

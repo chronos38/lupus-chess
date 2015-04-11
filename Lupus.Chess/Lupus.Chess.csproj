@@ -48,8 +48,9 @@
     <Compile Include="Exception\ChessEvaluationException.cs" />
     <Compile Include="Exception\ChessException.cs" />
     <Compile Include="Exception\ChessMoveException.cs" />
+    <Compile Include="Exception\ChessPositionException.cs" />
     <Compile Include="Interface\Algorithm\IEvaluation.cs" />
-    <Compile Include="Interface\Algorithm\IMoveGenerator.cs" />
+    <Compile Include="Interface\Algorithm\ITreeSearch.cs" />
     <Compile Include="Interface\Algorithm\IStrategy.cs" />
     <Compile Include="Piece\AbstractPiece.cs" />
     <Compile Include="PieceType.cs" />

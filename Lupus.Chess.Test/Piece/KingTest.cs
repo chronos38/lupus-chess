@@ -8,8 +8,15 @@ namespace Lupus.Chess.Test.Piece
 	[TestClass]
 	public class KingTest
 	{
-		private readonly Field _emptyField = Field.Create();
-		private readonly Field _startField = Field.Start();
+		private Field _emptyField;
+		private Field _startField;
+
+		[TestInitialize]
+		public void Initialize()
+		{
+			_emptyField = Field.Create();
+			_startField = Field.Start();
+		}
 
 		[TestMethod]
 		public void King_AllowedPositions_EmptyField()
@@ -53,6 +60,100 @@ namespace Lupus.Chess.Test.Piece
 
 			// Assert
 			Assert.AreEqual(0, allowedPositions.Count());
+		}
+
+		[TestMethod]
+		public void King_Castling_AllowedBoth_KingSide()
+		{
+			// Arrange
+			var king = (King) PieceFactory.Create(PieceType.King, Side.White, new Position {File = 'E', Rank = 1});
+			_emptyField.WhitePieces.Add(king);
+			_emptyField.WhitePieces.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'A', Rank = 1}));
+			_emptyField.WhitePieces.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'H', Rank = 1}));
+
+			// Act
+			var canUseCastling = king.CanUseCastling(_emptyField);
+			var rc1 = Move.TryCastling(_emptyField, king, CastlingSide.None);
+			var rc2 = Move.TryCastling(_emptyField, king, CastlingSide.Both);
+			var rc3 = Move.TryCastling(_emptyField, king, CastlingSide.King);
+
+			// Assert
+			Assert.AreEqual(CastlingSide.Both, canUseCastling);
+			Assert.IsFalse(rc1);
+			Assert.IsFalse(rc2);
+			Assert.IsTrue(rc3);
+			Assert.AreEqual(new Position {File = 'G', Rank = 1}, king.Position);
+		}
+
+		[TestMethod]
+		public void King_Castling_AllowedBoth_QueenSide()
+		{
+			// Arrange
+			var king = (King) PieceFactory.Create(PieceType.King, Side.White, new Position {File = 'E', Rank = 1});
+			_emptyField.WhitePieces.Add(king);
+			_emptyField.WhitePieces.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'A', Rank = 1}));
+			_emptyField.WhitePieces.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'H', Rank = 1}));
+
+			// Act
+			var canUseCastling = king.CanUseCastling(_emptyField);
+			var rc1 = Move.TryCastling(_emptyField, king, CastlingSide.None);
+			var rc2 = Move.TryCastling(_emptyField, king, CastlingSide.Both);
+			var rc3 = Move.TryCastling(_emptyField, king, CastlingSide.Queen);
+
+			// Assert
+			Assert.AreEqual(CastlingSide.Both, canUseCastling);
+			Assert.IsFalse(rc1);
+			Assert.IsFalse(rc2);
+			Assert.IsTrue(rc3);
+			Assert.AreEqual(new Position { File = 'C', Rank = 1 }, king.Position);
+		}
+
+		[TestMethod]
+		public void King_Castling_AllowedKing_QueenSide()
+		{
+			// Arrange
+			var king = (King) PieceFactory.Create(PieceType.King, Side.White, new Position {File = 'E', Rank = 1});
+			_emptyField.WhitePieces.Add(king);
+			_emptyField.WhitePieces.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'A', Rank = 1}));
+			_emptyField.WhitePieces.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'H', Rank = 1}));
+			_emptyField.BlackPieces.Add(PieceFactory.Create(PieceType.Rook, Side.Black, new Position {File = 'D', Rank = 8}));
+
+			// Act
+			var canUseCastling = king.CanUseCastling(_emptyField);
+			var rc1 = Move.TryCastling(_emptyField, king, CastlingSide.None);
+			var rc2 = Move.TryCastling(_emptyField, king, CastlingSide.Both);
+			var rc3 = Move.TryCastling(_emptyField, king, CastlingSide.Queen);
+
+			// Assert
+			Assert.AreEqual(CastlingSide.King, canUseCastling);
+			Assert.IsFalse(rc1);
+			Assert.IsFalse(rc2);
+			Assert.IsFalse(rc3);
+			Assert.AreEqual(new Position { File = 'E', Rank = 1 }, king.Position);
+		}
+
+		[TestMethod]
+		public void King_Castling_AllowedNone_KingSide()
+		{
+			// Arrange
+			var king = (King) PieceFactory.Create(PieceType.King, Side.White, new Position {File = 'E', Rank = 1});
+			_emptyField.WhitePieces.Add(king);
+			_emptyField.WhitePieces.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'A', Rank = 1}));
+			_emptyField.WhitePieces.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'H', Rank = 1}));
+			_emptyField.BlackPieces.Add(PieceFactory.Create(PieceType.Queen, Side.Black, new Position {File = 'D', Rank = 4}));
+
+			// Act
+			var canUseCastling = king.CanUseCastling(_emptyField);
+			var rc1 = Move.TryCastling(_emptyField, king, CastlingSide.None);
+			var rc2 = Move.TryCastling(_emptyField, king, CastlingSide.Both);
+			var rc3 = Move.TryCastling(_emptyField, king, CastlingSide.King);
+
+			// Assert
+			Assert.AreEqual(CastlingSide.None, canUseCastling);
+			Assert.IsFalse(rc1);
+			Assert.IsFalse(rc2);
+			Assert.IsFalse(rc3);
+			Assert.AreEqual(new Position { File = 'E', Rank = 1 }, king.Position);
 		}
 	}
 }
