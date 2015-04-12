@@ -2,9 +2,10 @@
 {
 	public interface ITreeSearch
 	{
+		Side AiSide { get; set; }
 		IEvaluation Evaluation { get; set; }
-		uint Depth { get; set; }
+		int Depth { get; set; }
 		Move Execute(Field field);
-		Move Execute(Field field, uint depth);
+		Move Execute(Field field, int depth);
 	}
 }

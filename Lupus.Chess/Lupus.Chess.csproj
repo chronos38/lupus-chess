@@ -63,7 +63,6 @@
     <Compile Include="Piece\Rook.cs" />
     <Compile Include="Side.cs" />
     <Compile Include="Move.cs" />
-    <Compile Include="Interface\INodeComposite.cs" />
     <Compile Include="Field.cs" />
     <Compile Include="Interface\INode.cs" />
     <Compile Include="Interface\IPiece.cs" />
@@ -71,9 +70,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Trait.cs" />
     <Compile Include="Tree\Node.cs" />
-    <Compile Include="Tree\NodeComposite.cs" />
+    <Compile Include="Tree\TreeSearch.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Algorithm\End\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
