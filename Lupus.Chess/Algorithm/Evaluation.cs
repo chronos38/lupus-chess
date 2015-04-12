@@ -8,6 +8,8 @@ namespace Lupus.Chess.Algorithm
 {
 	public class Evaluation : IEvaluation
 	{
+		public static int PawnStrenght { get { return 100; } }
+
 		public ICollection<Tuple<float, IStrategy>> Strategies { get; set; }
 
 		public int Execute(Field field, Side side)

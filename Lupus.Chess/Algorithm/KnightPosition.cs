@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Lupus.Chess.Interface.Algorithm;
+using Lupus.Chess.Interface;
 
 namespace Lupus.Chess.Algorithm
 {
-	public class KnightPosition : IStrategy
+	public class KnightPosition : AbstractStrategy
 	{
-		private const int Value = 20;
+		private const float Value = 12.5f;
 
-		public int Execute(Field field, Side side)
+		public override int Compute(Field field, ICollection<IPiece> pieces)
 		{
-			var pieces = side == Side.White ? field.WhitePieces : field.BlackPieces;
-			return pieces.Where(p => p.Piece == PieceType.Knight).Select(p => p.AllowedPositions(field).Count*Value).Sum();
+			return
+				(int)
+					Math.Round(pieces.Where(p => p.Piece == PieceType.Knight).Select(p => p.AllowedPositions(field).Count*Value).Sum());
 		}
 	}
 }

@@ -40,9 +40,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Algorithm\AbstractStrategy.cs" />
+    <Compile Include="Algorithm\BishopPosition.cs" />
     <Compile Include="Algorithm\Evaluation.cs" />
     <Compile Include="Algorithm\KnightPosition.cs" />
     <Compile Include="Algorithm\Material.cs" />
+    <Compile Include="Algorithm\PawnStructure.cs" />
+    <Compile Include="Algorithm\QueenPosition.cs" />
+    <Compile Include="Algorithm\RookPosition.cs" />
     <Compile Include="Castling.cs" />
     <Compile Include="Direction.cs" />
     <Compile Include="Exception\ChessCastlingException.cs" />

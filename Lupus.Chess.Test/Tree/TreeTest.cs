@@ -22,7 +22,7 @@ namespace Lupus.Chess.Test.Tree
 			var treeSearch = TreeFactory.Create(Side.White);
 
 			// Act
-			var move = treeSearch.Execute(_startField, 1).Result;
+			var move = treeSearch.Execute(_startField);
 
 			// Assert
  			Assert.AreNotEqual(null, move);

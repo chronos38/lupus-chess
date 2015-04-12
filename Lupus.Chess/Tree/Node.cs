@@ -1,8 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using Lupus.Chess.Exception;
 using Lupus.Chess.Interface;
 using Lupus.Chess.Piece;
 
