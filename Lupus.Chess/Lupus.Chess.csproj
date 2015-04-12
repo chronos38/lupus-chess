@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algorithm\Evaluation.cs" />
+    <Compile Include="Algorithm\KnightPosition.cs" />
     <Compile Include="Algorithm\Material.cs" />
     <Compile Include="Castling.cs" />
     <Compile Include="Direction.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Trait.cs" />
     <Compile Include="Tree\Node.cs" />
+    <Compile Include="Tree\TreeFactory.cs" />
     <Compile Include="Tree\TreeSearch.cs" />
   </ItemGroup>
   <ItemGroup>

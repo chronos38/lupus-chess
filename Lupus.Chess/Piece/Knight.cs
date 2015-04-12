@@ -100,7 +100,7 @@ namespace Lupus.Chess.Piece
 			};
 		}
 
-		public override IEnumerable<Position> AllowedPositions(Field field)
+		public override ICollection<Position> AllowedPositions(Field field)
 		{
 			var result = new Collection<Position>();
 			var upperLeft = Chess.Move.UpperLeft(Position);

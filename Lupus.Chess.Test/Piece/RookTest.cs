@@ -35,7 +35,7 @@ namespace Lupus.Chess.Test.Piece
 			};
 
 			// Act
-			var allowedPositions = rook.AllowedPositions(_emptyField).ToArray();
+			var allowedPositions = rook.AllowedPositions(_emptyField).ToList();
 			var intersection = positions.ToList();
 			foreach (var allowedPosition in allowedPositions)
 			{

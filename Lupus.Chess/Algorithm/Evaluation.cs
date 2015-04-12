@@ -12,6 +12,7 @@ namespace Lupus.Chess.Algorithm
 
 		public int Execute(Field field, Side side)
 		{
+			if (Strategies == null || Strategies.Count == 0) return 0;
 			return
 				(int) Math.Round((from pair in Strategies
 					let factor = pair.Item1

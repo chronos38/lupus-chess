@@ -76,25 +76,25 @@ namespace Lupus.Chess.Piece
 			};
 		}
 
-		public override IEnumerable<Position> AllowedPositions(Field field)
+		public override ICollection<Position> AllowedPositions(Field field)
 		{
 			var result = new Collection<Position>();
 			var position = Chess.Move.Direction(Position, Direction.Down);
-			if (position.Validate() && field.IsFree(position, Side) && !IsCheckmate(field, position)) result.Add(position);
+			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
 			position = Chess.Move.Direction(Position, Direction.Left);
-			if (position.Validate() && field.IsFree(position, Side) && !IsCheckmate(field, position)) result.Add(position);
+			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
 			position = Chess.Move.Direction(Position, Direction.LowerLeft);
-			if (position.Validate() && field.IsFree(position, Side) && !IsCheckmate(field, position)) result.Add(position);
+			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
 			position = Chess.Move.Direction(Position, Direction.LowerRight);
-			if (position.Validate() && field.IsFree(position, Side) && !IsCheckmate(field, position)) result.Add(position);
+			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
 			position = Chess.Move.Direction(Position, Direction.Right);
-			if (position.Validate() && field.IsFree(position, Side) && !IsCheckmate(field, position)) result.Add(position);
+			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
 			position = Chess.Move.Direction(Position, Direction.Up);
-			if (position.Validate() && field.IsFree(position, Side) && !IsCheckmate(field, position)) result.Add(position);
+			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
 			position = Chess.Move.Direction(Position, Direction.UpperLeft);
-			if (position.Validate() && field.IsFree(position, Side) && !IsCheckmate(field, position)) result.Add(position);
+			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
 			position = Chess.Move.Direction(Position, Direction.UpperRight);
-			if (position.Validate() && field.IsFree(position, Side) && !IsCheckmate(field, position)) result.Add(position);
+			if (position.Validate() && field.IsFree(position, Side)) result.Add(position);
 			return result;
 		}
 
@@ -103,11 +103,11 @@ namespace Lupus.Chess.Piece
 			// Check if king have moved
 			if (Moved) return CastlingSide.None;
 			// Check if king is in check
-			var underAttack = field.UnderAttack(Side == Side.White ? Side.Black : Side.White).ToArray();
+			var underAttack = field.UnderAttack(Side == Side.White ? Side.Black : Side.White).ToList();
 			if (underAttack.Contains(Position)) return CastlingSide.None;
 			// Search for unmoved rooks
 			var pieces = Side == Side.White ? field.WhitePieces : field.BlackPieces;
-			var rooks = (from piece in pieces where piece.Piece == PieceType.Rook && !((Rook) piece).Moved select piece).ToArray();
+			var rooks = (from piece in pieces where piece.Piece == PieceType.Rook && !((Rook) piece).Moved select piece).ToList();
 			// If there are no rooks available than castling is disallowed
 			if (!rooks.Any()) return CastlingSide.None;
 			// Check if all fields between rook and king are free and not under attack
@@ -122,20 +122,21 @@ namespace Lupus.Chess.Piece
 					{
 						pos = Chess.Move.Right(pos);
 						if (field.IsFree(pos) == Side.None && !underAttack.Contains(pos)) continue;
-						if (result == CastlingSide.Both) result = CastlingSide.King;
+						if (result == CastlingSide.Both) result = rooks.Count == 1 ? CastlingSide.Queen : CastlingSide.King;
 						if (result == CastlingSide.Queen) return CastlingSide.None;
+						if (result == CastlingSide.King) break;
 					}
 
 					continue;
 				}
-				if (position.File != 'H') return CastlingSide.None;
-
+				if (position.File != 'H') continue;
 				for (var i = 0; i < 2; i++)
 				{
 					pos = Chess.Move.Left(pos);
 					if (field.IsFree(pos) == Side.None && !underAttack.Contains(pos)) continue;
-					if (result == CastlingSide.Both) result = CastlingSide.Queen;
+					if (result == CastlingSide.Both) result = rooks.Count == 1 ? CastlingSide.King : CastlingSide.Queen;
 					if (result == CastlingSide.King) return CastlingSide.None;
+					if (result == CastlingSide.Queen) break;
 				}
 			}
 
@@ -156,7 +157,7 @@ namespace Lupus.Chess.Piece
 			return field.UnderAttack(Side == Side.White ? Side.Black : Side.White).Contains(Position);
 		}
 
-		private bool IsCheckmate(Field field, Position position)
+		private bool IsInCheck(Field field, Position position)
 		{
 			return field.UnderAttack(Side == Side.White ? Side.Black : Side.White).Contains(position);
 		}

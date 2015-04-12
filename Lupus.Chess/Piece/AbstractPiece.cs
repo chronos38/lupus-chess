@@ -62,9 +62,9 @@ namespace Lupus.Chess.Piece
 
 		public abstract object Clone();
 
-		public abstract IEnumerable<Position> AllowedPositions(Field field);
+		public abstract ICollection<Position> AllowedPositions(Field field);
 
-		protected static IEnumerable<Position> FindPositions(Field field, Side side, Position position, Direction direction)
+		protected static ICollection<Position> FindPositions(Field field, Side side, Position position, Direction direction)
 		{
 			var pos = position;
 			var result = new Collection<Position>();

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Lupus.Chess.Algorithm;
 using Lupus.Chess.Exception;
@@ -13,7 +11,7 @@ namespace Lupus.Chess.Tree
 {
 	internal class TreeSearch : ITreeSearch
 	{
-		private Side _aiSide = Side.None;
+		private Side _aiSide = Side.White;
 		// TODO: Implement missing values
 		private IEvaluation _evaluation = new Evaluation
 		{
@@ -43,38 +41,47 @@ namespace Lupus.Chess.Tree
 			set { _depth = value; }
 		}
 
-		public Move Execute(Field field)
+		public Task<Move> Execute(Field field)
 		{
 			return Execute(field, Depth);
 		}
 
-		public Move Execute(Field field, int depth)
+		public Task<Move> Execute(Field field, int depth)
 		{
 			if (AiSide != Side.White && AiSide != Side.Black) throw new ChessEvaluationException("AI Side for tree search is missing or invalid.");
-			var moves = Node.AllowedMoves(AiSide, field);
-			var result = Tuple.Create((INode) null, Int32.MinValue);
-			var tasks = moves.Select(move => new Node
+			return Task<Move>.Factory.StartNew(() =>
 			{
-				Field = field, Move = move, PlySide = AiSide
-			}).Select(node => Tuple.Create((INode) node, AlphaBetaMax(node, Int32.MinValue, Int32.MaxValue, depth))).ToList();
+				var moves = Node.AllowedMoves(AiSide, field);
+				var result = Tuple.Create((INode) null, Int32.MinValue);
+				var nodes = new Collection<INode>();
 
-			foreach (var tuple in tasks)
-			{
-				tuple.Item2.Wait();
-				result = tuple.Item2.Result > result.Item2 ? Tuple.Create(tuple.Item1, tuple.Item2.Result) : result;
-			}
-
-			return result.Item1 == null ? null : result.Item1.Move;
+				foreach (var move in moves)
+				{
+					var fieldClone = (Field) field.Clone();
+					var piece = fieldClone.GetPiece(move.From);
+					if (piece == null) return null;
+					piece.Move(fieldClone, move.To);
+					nodes.Add(new Node
+					{
+						Field = fieldClone,
+						Move = move,
+						PlySide = AiSide
+					});
+				}
+				var tasks = nodes.Select(node => Tuple.Create(node, AlphaBetaMax(node, Int32.MinValue, Int32.MaxValue, depth))).ToList();
+				result = tasks.Aggregate(result,
+					(current, tuple) => tuple.Item2.Result > current.Item2 ? Tuple.Create(tuple.Item1, tuple.Item2.Result) : current);
+				return result.Item1 == null ? null : result.Item1.Move;
+			});
 		}
 
 		private async Task<int> AlphaBetaMax(INode node, int alpha, int beta, int depth)
 		{
-			if (depth <= 0) return Evaluation.Execute(node.Field, AiSide);
-			node.Expand();
+			if (depth <= 0 || node.Terminal) return Evaluation.Execute(node.Field, AiSide);
 
-			foreach (var next in node)
+			foreach (var next in node.Where(next => next != null))
 			{
-				alpha = Math.Max(alpha, await AlphaBetaMin(next.First(), alpha, beta, depth - 1));
+				alpha = Math.Max(alpha, await AlphaBetaMin(next, alpha, beta, depth - 1));
 				if (alpha >= beta) return beta;
 			}
 
@@ -83,12 +90,11 @@ namespace Lupus.Chess.Tree
 
 		private async Task<int> AlphaBetaMin(INode node, int alpha, int beta, int depth)
 		{
-			if (depth <= 0) return Evaluation.Execute(node.Field, AiSide);
-			node.Expand();
+			if (depth <= 0 || node.Terminal) return Evaluation.Execute(node.Field, AiSide);
 
-			foreach (var next in node)
+			foreach (var next in node.Where(next => next != null))
 			{
-				beta = Math.Min(beta, await AlphaBetaMax(next.First(), alpha, beta, depth - 1));
+				beta = Math.Min(beta, await AlphaBetaMax(next, alpha, beta, depth - 1));
 				if (beta <= alpha) return alpha;
 			}
 

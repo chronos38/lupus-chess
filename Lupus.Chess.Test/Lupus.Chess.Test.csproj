@@ -59,6 +59,7 @@
     <Compile Include="Piece\KingTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MoveTest.cs" />
+    <Compile Include="Tree\TreeTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lupus.Chess\Lupus.Chess.csproj">

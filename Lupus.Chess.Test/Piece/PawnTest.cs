@@ -33,7 +33,7 @@ namespace Lupus.Chess.Test.Piece
 			};
 
 			// Act
-			var allowedPositions = pawn.AllowedPositions(_emptyField).ToArray();
+			var allowedPositions = pawn.AllowedPositions(_emptyField).ToList();
 			var intersection = positions.ToList();
 			foreach (var allowedPosition in allowedPositions)
 			{
@@ -58,7 +58,7 @@ namespace Lupus.Chess.Test.Piece
 			};
 
 			// Act
-			var allowedPositions = pawn.AllowedPositions(_emptyField).ToArray();
+			var allowedPositions = pawn.AllowedPositions(_emptyField).ToList();
 			var intersection = positions.ToList();
 			foreach (var allowedPosition in allowedPositions)
 			{
@@ -85,7 +85,7 @@ namespace Lupus.Chess.Test.Piece
 			};
 
 			// Act
-			var allowedPositions = pawn.AllowedPositions(_enemyField).ToArray();
+			var allowedPositions = pawn.AllowedPositions(_enemyField).ToList();
 			var intersection = positions.ToList();
 			foreach (var allowedPosition in allowedPositions)
 			{
@@ -112,7 +112,7 @@ namespace Lupus.Chess.Test.Piece
 			};
 
 			// Act
-			var allowedPositions = pawn.AllowedPositions(_enemyField).ToArray();
+			var allowedPositions = pawn.AllowedPositions(_enemyField).ToList();
 			var intersection = positions.ToList();
 			foreach (var allowedPosition in allowedPositions)
 			{

@@ -1,20 +1,26 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
+using Lupus.Chess.Exception;
 using Lupus.Chess.Interface;
-using Lupus.Chess.Interface.Algorithm;
 using Lupus.Chess.Piece;
 
 namespace Lupus.Chess.Tree
 {
 	internal class Node : INode
 	{
+		private IList<Move> _moves;
+
 		public Move Move { get; set; }
 		public Field Field { get; set; }
 		public Side PlySide { get; set; }
-		private IList<Move> Moves { get; set; }
+		public bool Terminal { get; set; }
+
+		private IList<Move> Moves
+		{
+			get { return _moves ?? (_moves = AllowedMoves()); }
+		}
 
 		public IEnumerator<INode> GetEnumerator()
 		{
@@ -28,11 +34,12 @@ namespace Lupus.Chess.Tree
 
 		public INode GetChild(int index)
 		{
-			var nextPlySide = PlySide == Side.White ? Side.Black : Side.White;
-			var pieces = PlySide == Side.White ? Field.WhitePieces : Field.BlackPieces;
+			var nextPlySide = NextPlySide();
+			var pieces = nextPlySide == Side.White ? Field.WhitePieces : Field.BlackPieces;
+			var opponent = nextPlySide == Side.White ? Field.BlackPieces : Field.WhitePieces;
 			var king = (King) (from p in pieces where p.Piece == PieceType.King select p).FirstOrDefault();
 
-			if (king == null) return null;
+			if (king == null) return new Node {Field = Field, Terminal = true};
 			if (index < 0) return null;
 			if (index >= Moves.Count) return null;
 			var move = Moves[index];
@@ -52,6 +59,9 @@ namespace Lupus.Chess.Tree
 			var piece = field.GetPiece(move.From);
 			if (piece == null) return null;
 			piece.Move(field, move.To);
+			// Remove en passant thread
+			foreach (var p in opponent.Where(p => p.Piece == PieceType.Pawn)) ((Pawn) p).EnPassantThread = false;
+
 			return new Node
 			{
 				Field = field,
@@ -65,20 +75,20 @@ namespace Lupus.Chess.Tree
 			return GetChild(0);
 		}
 
-		public void Expand()
-		{
-			Moves = AllowedMoves();
-		}
-
 		private IList<Move> AllowedMoves()
 		{
-			return AllowedMoves(PlySide, Field);
+			return AllowedMoves(NextPlySide(), Field);
+		}
+
+		private Side NextPlySide()
+		{
+			return PlySide == Side.White ? Side.Black : Side.White;
 		}
 
 		public static IList<Move> AllowedMoves(Side side, Field field)
 		{
 			var result = new List<Move>();
-			var pieces = side == Side.White ? field.BlackPieces : field.WhitePieces;
+			var pieces = side == Side.White ? field.WhitePieces : field.BlackPieces;
 			var king = (King) (from piece in pieces where piece.Piece == PieceType.King select piece).FirstOrDefault();
 
 			if (king == null) return new Move[] { };
@@ -118,7 +128,7 @@ namespace Lupus.Chess.Tree
 		private class NodeEnumerator : IEnumerator<INode>
 		{
 			private readonly Node _node;
-			private int _index;
+			private int _index = -1;
 
 			public NodeEnumerator(Node node)
 			{

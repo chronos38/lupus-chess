@@ -96,7 +96,7 @@ namespace Lupus.Chess.Piece
 			};
 		}
 
-		public override IEnumerable<Position> AllowedPositions(Field field)
+		public override ICollection<Position> AllowedPositions(Field field)
 		{
 			var result = new List<Position>();
 			result.AddRange(FindPositions(field, Side, Position, Direction.LowerLeft));

@@ -23,7 +23,7 @@ namespace Lupus.Chess.Interface
 		/// <param name="position">The position to move the piece to.</param>
 		/// <returns>true if the move was successful, otherwise false.</returns>
 		bool TryMove(Field field, Position position);
-		IEnumerable<Position> AllowedPositions(Field field);
+		ICollection<Position> AllowedPositions(Field field);
 		bool ValidateMove(Field field, Position position);
 	}
 }

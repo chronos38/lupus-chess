@@ -34,7 +34,7 @@ namespace Lupus.Chess.Test.Piece
 			};
 
 			// Act
-			var allowedPositions = bishop.AllowedPositions(_emptyField).ToArray();
+			var allowedPositions = bishop.AllowedPositions(_emptyField).ToList();
 			var intersection = positions.ToList();
 			foreach (var allowedPosition in allowedPositions)
 			{

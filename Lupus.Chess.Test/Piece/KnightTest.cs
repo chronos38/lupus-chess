@@ -29,7 +29,7 @@ namespace Lupus.Chess.Test.Piece
 			};
 			
 			// Act
-			var allowedPositions = knight.AllowedPositions(_emptyField).ToArray();
+			var allowedPositions = knight.AllowedPositions(_emptyField).ToList();
 			var intersection = positions.ToList();
 			foreach (var allowedPosition in allowedPositions)
 			{
@@ -54,7 +54,7 @@ namespace Lupus.Chess.Test.Piece
 			};
 
 			// Act
-			var allowedPositions = knight.AllowedPositions(_startField).ToArray();
+			var allowedPositions = knight.AllowedPositions(_startField).ToList();
 			var intersection = positions.ToList();
 			foreach (var allowedPosition in allowedPositions)
 			{

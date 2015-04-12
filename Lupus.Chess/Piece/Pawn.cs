@@ -128,7 +128,7 @@ namespace Lupus.Chess.Piece
 			};
 		}
 
-		public override IEnumerable<Position> AllowedPositions(Field field)
+		public override ICollection<Position> AllowedPositions(Field field)
 		{
 			switch (Side)
 			{
@@ -196,7 +196,7 @@ namespace Lupus.Chess.Piece
 			return null;
 		}
 
-		private static IEnumerable<Position> WhiteMoves(Field field, Pawn pawn)
+		private static ICollection<Position> WhiteMoves(Field field, Pawn pawn)
 		{
 			var result = new Collection<Position>();
 			var next = Chess.Move.Up(pawn.Position);
@@ -217,7 +217,7 @@ namespace Lupus.Chess.Piece
 			return result;
 		}
 
-		private static IEnumerable<Position> BlackMoves(Field field, Pawn pawn)
+		private static ICollection<Position> BlackMoves(Field field, Pawn pawn)
 		{
 			var result = new Collection<Position>();
 			var next = Chess.Move.Down(pawn.Position);

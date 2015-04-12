@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Lupus.Chess.Interface.Algorithm;
 
 namespace Lupus.Chess.Interface
 {
@@ -8,8 +7,8 @@ namespace Lupus.Chess.Interface
 		Field Field { get; set; }
 		Move Move { get; set; }
 		Side PlySide { get; set; }
+		bool Terminal { get; set; }
 		INode GetChild(int index);
 		INode First();
-		void Expand();
 	}
 }

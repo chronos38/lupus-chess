@@ -1,11 +1,11 @@
-﻿namespace Lupus.Chess.Interface.Algorithm
+﻿using System.Threading.Tasks;
+
+namespace Lupus.Chess.Interface.Algorithm
 {
 	public interface ITreeSearch
 	{
-		Side AiSide { get; set; }
 		IEvaluation Evaluation { get; set; }
-		int Depth { get; set; }
-		Move Execute(Field field);
-		Move Execute(Field field, int depth);
+		Task<Move> Execute(Field field);
+		Task<Move> Execute(Field field, int depth);
 	}
 }
