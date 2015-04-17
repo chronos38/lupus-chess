@@ -40,14 +40,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Algorithm\AbstractStrategy.cs" />
-    <Compile Include="Algorithm\BishopPosition.cs" />
-    <Compile Include="Algorithm\Evaluation.cs" />
-    <Compile Include="Algorithm\KnightPosition.cs" />
-    <Compile Include="Algorithm\Material.cs" />
-    <Compile Include="Algorithm\PawnStructure.cs" />
-    <Compile Include="Algorithm\QueenPosition.cs" />
-    <Compile Include="Algorithm\RookPosition.cs" />
+    <Compile Include="Algorithm\Evaluation\AbstractStrategy.cs" />
+    <Compile Include="Algorithm\AlphaBeta.cs" />
+    <Compile Include="Algorithm\AlphaBetaFailHard.cs" />
+    <Compile Include="Algorithm\AlphaBetaFailSoft.cs" />
+    <Compile Include="Algorithm\Evaluation\BishopPosition.cs" />
+    <Compile Include="Algorithm\Evaluation\Evaluation.cs" />
+    <Compile Include="Algorithm\Evaluation\KnightPosition.cs" />
+    <Compile Include="Algorithm\Evaluation\Material.cs" />
+    <Compile Include="Algorithm\Evaluation\PawnStructure.cs" />
+    <Compile Include="Algorithm\Evaluation\QueenPosition.cs" />
+    <Compile Include="Algorithm\Evaluation\RookPosition.cs" />
     <Compile Include="Castling.cs" />
     <Compile Include="Direction.cs" />
     <Compile Include="Exception\ChessCastlingException.cs" />
@@ -55,9 +58,11 @@
     <Compile Include="Exception\ChessException.cs" />
     <Compile Include="Exception\ChessMoveException.cs" />
     <Compile Include="Exception\ChessPositionException.cs" />
+    <Compile Include="Interface\Algorithm\IAlphaBeta.cs" />
     <Compile Include="Interface\Algorithm\IEvaluation.cs" />
     <Compile Include="Interface\Algorithm\ITreeSearch.cs" />
     <Compile Include="Interface\Algorithm\IStrategy.cs" />
+    <Compile Include="LambdaComparer.cs" />
     <Compile Include="Piece\AbstractPiece.cs" />
     <Compile Include="PieceType.cs" />
     <Compile Include="Piece\Bishop.cs" />
@@ -76,7 +81,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Trait.cs" />
     <Compile Include="Tree\Node.cs" />
-    <Compile Include="Tree\TreeFactory.cs" />
     <Compile Include="Tree\TreeSearch.cs" />
   </ItemGroup>
   <ItemGroup>

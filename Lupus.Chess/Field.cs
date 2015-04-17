@@ -3,15 +3,43 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Runtime.ExceptionServices;
+using System.Runtime.Remoting.Messaging;
 using Lupus.Chess.Interface;
 using Lupus.Chess.Piece;
 
 namespace Lupus.Chess
 {
+	[Serializable]
 	public class Field : ICloneable
 	{
-		public ICollection<IPiece> WhitePieces { get; private set; }
-		public ICollection<IPiece> BlackPieces { get; private set; }
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				return ((WhitePieces != null ? WhitePieces.GetHashCode() : 0)*397) ^ (BlackPieces != null ? BlackPieces.GetHashCode() : 0);
+			}
+		}
+
+		public IList<Move> History { get; set; } 
+		public ICollection<IPiece> WhitePieces { get; set; }
+		public ICollection<IPiece> BlackPieces { get; set; }
+
+		public ICollection<IPiece> this[Side side]
+		{
+			get
+			{
+				switch (side)
+				{
+					case Side.White:
+						return WhitePieces;
+					case Side.Black:
+						return BlackPieces;
+					default:
+						throw new ArgumentException("Side should be either Side.White or Wide.Black");
+				}
+			}
+		}
 
 		public IPiece this[Position position]
 		{
@@ -100,12 +128,41 @@ namespace Lupus.Chess
 			}
 		}
 
+		protected bool Equals(Field other)
+		{
+			if (Equals(other, null)) return false;
+			if (WhitePieces.Count != other.WhitePieces.Count) return false;
+			if (BlackPieces.Count != other.BlackPieces.Count) return false;
+			var white = WhitePieces.Intersect(other.WhitePieces, new LambdaComparer<IPiece>(AbstractPiece.Equals)).ToList();
+			var black = BlackPieces.Intersect(other.BlackPieces, new LambdaComparer<IPiece>(AbstractPiece.Equals)).ToList();
+			return white.Count == WhitePieces.Count && black.Count == other.BlackPieces.Count;
+		}
+
+		public override bool Equals(object obj)
+		{
+			if (ReferenceEquals(null, obj)) return false;
+			if (ReferenceEquals(this, obj)) return true;
+			if (obj.GetType() != this.GetType()) return false;
+			return Equals((Field)obj);
+		}
+
+		public static bool operator ==(Field lhs, Field rhs)
+		{
+			return Equals(lhs, rhs);
+		}
+
+		public static bool operator !=(Field lhs, Field rhs)
+		{
+			return !(lhs == rhs);
+		}
+
 		public static Field Create()
 		{
 			return new Field
 			{
 				BlackPieces = new Collection<IPiece>(),
-				WhitePieces = new Collection<IPiece>()
+				WhitePieces = new Collection<IPiece>(),
+				History = new List<Move>()
 			};
 		}
 
@@ -121,6 +178,7 @@ namespace Lupus.Chess
 			pieces.AddRange(King.StartPieces());
 			result.WhitePieces = (from piece in pieces where piece.Side == Side.White select piece).ToList();
 			result.BlackPieces = (from piece in pieces where piece.Side == Side.Black select piece).ToList();
+			result.History = new List<Move>();
 			return result;
 		}
 	}

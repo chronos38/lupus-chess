@@ -72,12 +72,12 @@ namespace Lupus.Chess
 
 		public static bool operator ==(Move lhs, Move rhs)
 		{
-			return ReferenceEquals(null, lhs) ? ReferenceEquals(null, rhs) : lhs.Equals(rhs);
+			return Equals(lhs, rhs);
 		}
 
 		public static bool operator !=(Move lhs, Move rhs)
 		{
-			return ReferenceEquals(null, lhs) ? !ReferenceEquals(null, rhs) : !lhs.Equals(rhs);
+			return !(lhs == rhs);
 		}
 
 		public static Position UpperLeft(Position position)
@@ -268,6 +268,16 @@ namespace Lupus.Chess
 			}
 
 			return true;
+		}
+
+		public static Side InvertSide(Side side)
+		{
+			switch (side)
+			{
+				case Side.Black: return Side.White;
+				case Side.White: return Side.Black;
+				default: throw new ArgumentException("Side should be either Side.White or Wide.Black");
+			}
 		}
 	}
 }

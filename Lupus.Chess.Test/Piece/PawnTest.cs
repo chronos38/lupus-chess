@@ -16,9 +16,9 @@ namespace Lupus.Chess.Test.Piece
 		{
 			_emptyField = Field.Create();
 			_enemyField = Field.Create();
-			_enemyField.BlackPieces.Add(PieceFactory.Create(PieceType.Pawn, Side.Black, new Position {File = 'A', Rank = 5}, true));
-			_enemyField.BlackPieces.Add(PieceFactory.Create(PieceType.Pawn, Side.Black, new Position {File = 'C', Rank = 5}, true));
-			_enemyField.BlackPieces.Add(PieceFactory.Create(PieceType.Pawn, Side.Black, new Position {File = 'E', Rank = 3}, true));
+			_enemyField.BlackPieces.Add(PieceFactory.Create(PieceType.Pawn, Side.Black, new Position {File = 'A', Rank = 5}));
+			_enemyField.BlackPieces.Add(PieceFactory.Create(PieceType.Pawn, Side.Black, new Position {File = 'C', Rank = 5}));
+			_enemyField.BlackPieces.Add(PieceFactory.Create(PieceType.Pawn, Side.Black, new Position {File = 'E', Rank = 3}));
 		}
 
 		[TestMethod]
@@ -51,7 +51,7 @@ namespace Lupus.Chess.Test.Piece
 		public void Pawn_AllowedPosition_EmptyField_Rank4()
 		{
 			// Arrange
-			var pawn = (Pawn) PieceFactory.Create(PieceType.Pawn, Side.White, new Position {File = 'B', Rank = 4}, true);
+			var pawn = (Pawn) PieceFactory.Create(PieceType.Pawn, Side.White, new Position {File = 'B', Rank = 4});
 			var positions = new Collection<Position>
 			{
 				new Position {File = 'B', Rank = 5}
@@ -103,7 +103,7 @@ namespace Lupus.Chess.Test.Piece
 		public void Pawn_AllowedPosition_EmptyField_Rank4_WithEnemy()
 		{
 			// Arrange
-			var pawn = (Pawn)PieceFactory.Create(PieceType.Pawn, Side.White, new Position { File = 'B', Rank = 4 }, true);
+			var pawn = (Pawn)PieceFactory.Create(PieceType.Pawn, Side.White, new Position { File = 'B', Rank = 4 });
 			var positions = new Collection<Position>
 			{
 				new Position {File = 'B', Rank = 5},
@@ -140,7 +140,6 @@ namespace Lupus.Chess.Test.Piece
 			var rc2 = white.TryMove(_emptyField, new Position {File = 'A', Rank = 6});
 
 			// Assert
-			Assert.IsTrue(black.EnPassantThread);
 			Assert.IsTrue(rc1);
 			Assert.IsTrue(rc2);
 			Assert.AreEqual(0, _emptyField.BlackPieces.Count);
@@ -150,14 +149,13 @@ namespace Lupus.Chess.Test.Piece
 		public void Pawn_EnPassantImpossible()
 		{
 			// Arrange
-			var black = (Pawn)PieceFactory.Create(PieceType.Pawn, Side.Black, new Position { File = 'A', Rank = 7 });
+			var black = (Pawn)PieceFactory.Create(PieceType.Pawn, Side.Black, new Position { File = 'A', Rank = 6 });
 			var white = (Pawn)PieceFactory.Create(PieceType.Pawn, Side.White, new Position { File = 'B', Rank = 5 });
 			_emptyField.BlackPieces.Add(black);
 			_emptyField.WhitePieces.Add(white);
 
 			// Act
 			var rc1 = black.TryMove(_emptyField, new Position { File = 'A', Rank = 5 });
-			black.EnPassantThread = false;
 			var rc2 = white.TryMove(_emptyField, new Position { File = 'A', Rank = 6 });
 
 			// Assert

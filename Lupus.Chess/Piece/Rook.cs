@@ -14,7 +14,6 @@ namespace Lupus.Chess.Piece
 				{
 					new Rook
 					{
-						Moved = false,
 						Piece = PieceType.Rook,
 						Side = Side.White,
 						Position = new Position
@@ -25,7 +24,6 @@ namespace Lupus.Chess.Piece
 					},
 					new Rook
 					{
-						Moved = false,
 						Piece = PieceType.Rook,
 						Side = Side.White,
 						Position = new Position
@@ -46,7 +44,6 @@ namespace Lupus.Chess.Piece
 				{
 					new Rook
 					{
-						Moved = false,
 						Piece = PieceType.Rook,
 						Side = Side.Black,
 						Position = new Position
@@ -57,7 +54,6 @@ namespace Lupus.Chess.Piece
 					},
 					new Rook
 					{
-						Moved = false,
 						Piece = PieceType.Rook,
 						Side = Side.Black,
 						Position = new Position
@@ -82,19 +78,10 @@ namespace Lupus.Chess.Piece
 			Position = position;
 		}
 
-		internal Rook(Side side, Position position, bool moved)
-		{
-			Moved = moved;
-			Piece = PieceType.Rook;
-			Side = side;
-			Position = position;
-		}
-
 		public override object Clone()
 		{
 			return new Rook
 			{
-				Moved = Moved,
 				Piece = PieceType.Rook,
 				Position = (Position) Position.Clone(),
 				Side = Side

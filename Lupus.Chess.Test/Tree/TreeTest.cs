@@ -18,14 +18,6 @@ namespace Lupus.Chess.Test.Tree
 		[TestMethod]
 		public void Tree_StartField_AiWhite_DefaultDepth()
 		{
-			// Arrange
-			var treeSearch = TreeFactory.Create(Side.White);
-
-			// Act
-			var move = treeSearch.Execute(_startField);
-
-			// Assert
- 			Assert.AreNotEqual(null, move);
 		}
 	}
 }

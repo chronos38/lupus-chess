@@ -32,6 +32,7 @@ namespace Lupus.Chess.Piece
 
 		public static IPiece Create(PieceType type, Side side)
 		{
+			if (side != Side.White && side != Side.Black) throw new ArgumentException("Side should be either Side.White or Wide.Black");
 			switch (type)
 			{
 				case PieceType.Bishop:
@@ -53,6 +54,8 @@ namespace Lupus.Chess.Piece
 
 		public static IPiece Create(PieceType type, Side side, Position position)
 		{
+			if (side != Side.White && side != Side.Black) throw new ArgumentException("Side should be either Side.White or Wide.Black");
+			if (position == null) throw new ArgumentNullException("position");
 			switch (type)
 			{
 				case PieceType.Bishop:
@@ -67,27 +70,6 @@ namespace Lupus.Chess.Piece
 					return new Queen(side, position);
 				case PieceType.Rook:
 					return new Rook(side, position);
-				default:
-					throw new NotSupportedException();
-			}
-		}
-
-		public static IPiece Create(PieceType type, Side side, Position position, bool moved)
-		{
-			switch (type)
-			{
-				case PieceType.Bishop:
-					return new Bishop(side, position, moved);
-				case PieceType.King:
-					return new King(side, position, moved);
-				case PieceType.Knight:
-					return new Knight(side, position, moved);
-				case PieceType.Pawn:
-					return new Pawn(side, position, moved);
-				case PieceType.Queen:
-					return new Queen(side, position, moved);
-				case PieceType.Rook:
-					return new Rook(side, position, moved);
 				default:
 					throw new NotSupportedException();
 			}

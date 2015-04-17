@@ -4,9 +4,9 @@ namespace Lupus.Chess.Interface.Algorithm
 {
 	public interface ITreeSearch
 	{
-		int Timeout { get; set; }
+		INode Root { get; set; }
 		IEvaluation Evaluation { get; set; }
-		Move Execute(Field field);
-		Move Execute(Field field, int depth);
+		IAlphaBeta AlphaBeta { get; set; }
+		Move Execute(Field currentField, int depth);
 	}
 }

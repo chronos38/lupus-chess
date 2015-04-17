@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Lupus.Chess.Exception;
 using Lupus.Chess.Interface;
 
 namespace Lupus.Chess.Piece
@@ -13,7 +12,6 @@ namespace Lupus.Chess.Piece
 		private Side _side = Side.None;
 		private PieceType _piece = PieceType.Abstract;
 		private Position _position = new Position {File = 'A', Rank = 1};
-		private bool _moved;
 
 		public Side Side
 		{
@@ -33,19 +31,18 @@ namespace Lupus.Chess.Piece
 			internal set { _position = value; }
 		}
 
-		public bool Moved
+		public virtual void Move(Field field, Position next)
 		{
-			get { return _moved; }
-			internal set { _moved = value; }
-		}
-
-		public virtual void Move(Field field, Position position)
-		{
-			var opponent = Side == Side.White ? field.BlackPieces : field.WhitePieces;
-			var piece = (from p in opponent where p.Position == position select p).FirstOrDefault();
-			if (piece != null) opponent.Remove(piece);
-			Position = position;
-			Moved = true;
+			var previous = Position;
+			field.Remove(next);
+			Position = next;
+			field.History.Add(new Move
+			{
+				From = (Position) previous.Clone(),
+				To = (Position) next.Clone(),
+				Side = Side,
+				Piece = Piece
+			});
 		}
 
 		public bool TryMove(Field field, Position position)
@@ -63,6 +60,18 @@ namespace Lupus.Chess.Piece
 		public abstract object Clone();
 
 		public abstract ICollection<Position> AllowedPositions(Field field);
+
+		public virtual ICollection<Move> AllowedMoves(Field field)
+		{
+			return AllowedPositions(field).Select(p => new Move {From = Position, To = p, Side = Side, Piece = Piece}).ToList();
+		}
+
+		public static bool Equals(IPiece lhs, IPiece rhs)
+		{
+			return lhs.Position == rhs.Position
+			       && lhs.Side == rhs.Side
+			       && lhs.Piece == rhs.Piece;
+		}
 
 		protected static ICollection<Position> FindPositions(Field field, Side side, Position position, Direction direction)
 		{

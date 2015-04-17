@@ -2,7 +2,7 @@
 using System.Linq;
 using Lupus.Chess.Interface;
 
-namespace Lupus.Chess.Algorithm
+namespace Lupus.Chess.Algorithm.Evaluation
 {
 	public class QueenPosition : AbstractStrategy
 	{

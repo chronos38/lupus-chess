@@ -60,12 +60,12 @@ namespace Lupus.Chess
 
 		public static bool operator ==(Position lhs, Position rhs)
 		{
-			return ReferenceEquals(null, lhs) ? ReferenceEquals(null, rhs) : lhs.Equals(rhs);
+			return Equals(lhs, rhs);
 		}
 
 		public static bool operator !=(Position lhs, Position rhs)
 		{
-			return ReferenceEquals(null, lhs) ? !ReferenceEquals(null, rhs) : !lhs.Equals(rhs);
+			return !(lhs == rhs);
 		}
 	}
 }

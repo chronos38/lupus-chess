@@ -15,7 +15,6 @@ namespace Lupus.Chess.Piece
 			{
 				return new King
 				{
-					Moved = false,
 					Side = Side.Black,
 					Piece = PieceType.King,
 					Position = new Position
@@ -33,7 +32,6 @@ namespace Lupus.Chess.Piece
 			{
 				return new King
 				{
-					Moved = false,
 					Side = Side.White,
 					Piece = PieceType.King,
 					Position = new Position
@@ -57,23 +55,23 @@ namespace Lupus.Chess.Piece
 			Position = position;
 		}
 
-		internal King(Side side, Position position, bool moved)
-		{
-			Moved = moved;
-			Piece = PieceType.King;
-			Side = side;
-			Position = position;
-		}
-
 		public override object Clone()
 		{
 			return new King
 			{
-				Moved = Moved,
 				Piece = PieceType.King,
 				Position = (Position) Position.Clone(),
 				Side = Side
 			};
+		}
+
+		public override ICollection<Move> AllowedMoves(Field field)
+		{
+			var result = new List<Move>();
+			var positions = AllowedPositions(field);
+			AddCastling(result, CanUseCastling(field));
+			result.AddRange(positions.Select(p => new Move {From = Position, To = p, Side = Side, Piece = Piece}));
+			return result;
 		}
 
 		public override ICollection<Position> AllowedPositions(Field field)
@@ -100,17 +98,17 @@ namespace Lupus.Chess.Piece
 
 		public CastlingSide CanUseCastling(Field field)
 		{
+			var pieces = field[Side];
 			// Check if king have moved
-			if (Moved) return CastlingSide.None;
+			if (field.History.Any(m => m.Piece == PieceType.King && m.Side == Side)) return CastlingSide.None;
 			// Check if king is in check
-			var underAttack = field.UnderAttack(Side == Side.White ? Side.Black : Side.White).ToList();
-			if (underAttack.Contains(Position)) return CastlingSide.None;
+			if (IsInCheck(field)) return CastlingSide.None;
 			// Search for unmoved rooks
-			var pieces = Side == Side.White ? field.WhitePieces : field.BlackPieces;
-			var rooks = (from piece in pieces where piece.Piece == PieceType.Rook && !((Rook) piece).Moved select piece).ToList();
+			var rooks = (from piece in pieces where piece.Piece == PieceType.Rook select piece).ToList();
 			// If there are no rooks available than castling is disallowed
 			if (!rooks.Any()) return CastlingSide.None;
 			// Check if all fields between rook and king are free and not under attack
+			var underAttack = field.UnderAttack(Chess.Move.InvertSide(Side)).ToArray();
 			var result = CastlingSide.Both;
 			foreach (var position in rooks.Select(rook => rook.Position))
 			{
@@ -143,6 +141,25 @@ namespace Lupus.Chess.Piece
 			return result;
 		}
 
+		public static void AddCastling(ICollection<Move> moves, CastlingSide castling)
+		{
+			switch (castling)
+			{
+				case CastlingSide.Both:
+					moves.Add(new Move { CastlingSide = CastlingSide.King });
+					moves.Add(new Move { CastlingSide = CastlingSide.Queen });
+					break;
+
+				case CastlingSide.King:
+					moves.Add(new Move { CastlingSide = CastlingSide.King });
+					break;
+
+				case CastlingSide.Queen:
+					moves.Add(new Move { CastlingSide = CastlingSide.Queen });
+					break;
+			}
+		}
+
 		public static IEnumerable<IPiece> StartPieces()
 		{
 			return new Collection<IPiece>
@@ -154,12 +171,12 @@ namespace Lupus.Chess.Piece
 
 		public bool IsInCheck(Field field)
 		{
-			return field.UnderAttack(Side == Side.White ? Side.Black : Side.White).Contains(Position);
+			return IsInCheck(field, Position, Chess.Move.InvertSide(Side));
 		}
 
-		private bool IsInCheck(Field field, Position position)
+		public static bool IsInCheck(Field field, Position kingPosition, Side attackingSide)
 		{
-			return field.UnderAttack(Side == Side.White ? Side.Black : Side.White).Contains(position);
+			return field.UnderAttack(attackingSide).Contains(kingPosition);
 		}
 	}
 }

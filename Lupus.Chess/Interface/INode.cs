@@ -2,13 +2,13 @@
 
 namespace Lupus.Chess.Interface
 {
-	public interface INode : IEnumerable<INode>
+	public interface INode : ICollection<INode>
 	{
-		Field Field { get; set; }
-		Move Move { get; set; }
-		Side PlySide { get; set; }
+		Field Field { get; }
+		Move Move { get; }
+		IEnumerable<Move> AllowedMoves { get; } 
+		long Value { get; set; }
+		int Depth { get; set; }
 		bool Terminal { get; set; }
-		INode GetChild(int index);
-		INode First();
 	}
 }

@@ -82,14 +82,6 @@ namespace Lupus.Chess.Piece
 			Position = position;
 		}
 
-		internal Knight(Side side, Position position, bool moved)
-		{
-			Moved = moved;
-			Piece = PieceType.Knight;
-			Side = side;
-			Position = position;
-		}
-
 		public override object Clone()
 		{
 			return new Knight

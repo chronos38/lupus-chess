@@ -78,14 +78,6 @@ namespace Lupus.Chess.Piece
 			Position = position;
 		}
 
-		internal Bishop(Side side, Position position, bool moved)
-		{
-			Moved = moved;
-			Piece = PieceType.Bishop;
-			Side = side;
-			Position = position;
-		}
-
 		public override object Clone()
 		{
 			return new Bishop

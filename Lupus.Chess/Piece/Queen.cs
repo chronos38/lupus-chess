@@ -59,7 +59,6 @@ namespace Lupus.Chess.Piece
 
 		internal Queen(Side side, Position position, bool moved)
 		{
-			Moved = moved;
 			Piece = PieceType.Queen;
 			Side = side;
 			Position = position;

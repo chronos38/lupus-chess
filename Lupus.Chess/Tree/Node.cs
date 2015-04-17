@@ -1,28 +1,30 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Lupus.Chess.Interface;
 using Lupus.Chess.Piece;
 
 namespace Lupus.Chess.Tree
 {
-	internal class Node : INode
+	public class Node : INode
 	{
-		private IList<Move> _moves;
+		private readonly ICollection<INode> _nodes = new Collection<INode>();
 
-		public Move Move { get; set; }
-		public Field Field { get; set; }
-		public Side PlySide { get; set; }
-		public bool Terminal { get; set; }
-
-		private IList<Move> Moves
+		public Node(Field field, Move move, int depth)
 		{
-			get { return _moves ?? (_moves = AllowedMoves()); }
+			Field = field;
+			Move = move;
+			Depth = depth;
+			Value = 0;
+			Terminal = field.WhitePieces.Concat(field.BlackPieces).Count(p => p.Piece == PieceType.King) != 2;
+			AllowedMoves = ComputeAllowedMoves(Move.InvertSide(move.Side), field);
 		}
 
 		public IEnumerator<INode> GetEnumerator()
 		{
-			return new NodeEnumerator(this);
+			return _nodes.GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
@@ -30,133 +32,43 @@ namespace Lupus.Chess.Tree
 			return GetEnumerator();
 		}
 
-		public INode GetChild(int index)
+		public void Add(INode item)
 		{
-			var nextPlySide = NextPlySide();
-			var pieces = nextPlySide == Side.White ? Field.WhitePieces : Field.BlackPieces;
-			var opponent = nextPlySide == Side.White ? Field.BlackPieces : Field.WhitePieces;
-			var king = (King) (from p in pieces where p.Piece == PieceType.King select p).FirstOrDefault();
-
-			if (king == null) return new Node {Field = Field, Terminal = true};
-			if (index < 0) return null;
-			if (index >= Moves.Count) return null;
-			var move = Moves[index];
-			var field = (Field) Field.Clone();
-
-			if (move.CastlingSide != CastlingSide.None)
-			{
-				Move.Castling(field, king, move.CastlingSide);
-				return new Node
-				{
-					Field = field,
-					Move = move,
-					PlySide = nextPlySide
-				};
-			}
-
-			var piece = field.GetPiece(move.From);
-			if (piece == null) return null;
-			piece.Move(field, move.To);
-			// Remove en passant thread
-			foreach (var p in opponent.Where(p => p.Piece == PieceType.Pawn)) ((Pawn) p).EnPassantThread = false;
-
-			return new Node
-			{
-				Field = field,
-				Move = move,
-				PlySide = nextPlySide
-			};
+			_nodes.Add(item);
 		}
 
-		public INode First()
+		public void Clear()
 		{
-			return GetChild(0);
+			_nodes.Clear();
 		}
 
-		private IList<Move> AllowedMoves()
+		public bool Contains(INode item)
 		{
-			return AllowedMoves(NextPlySide(), Field);
+			return _nodes.Contains(item);
 		}
 
-		private Side NextPlySide()
+		public void CopyTo(INode[] array, int arrayIndex)
 		{
-			return PlySide == Side.White ? Side.Black : Side.White;
+			_nodes.CopyTo(array, arrayIndex);
 		}
 
-		public static IList<Move> AllowedMoves(Side side, Field field)
+		public bool Remove(INode item)
 		{
-			var result = new List<Move>();
-			var pieces = side == Side.White ? field.WhitePieces : field.BlackPieces;
-			var king = (King) (from piece in pieces where piece.Piece == PieceType.King select piece).FirstOrDefault();
-
-			if (king == null) return new Move[] { };
-			AddCastling(result, king.CanUseCastling(field));
-
-			result.AddRange((from piece in pieces
-				from position in piece.AllowedPositions(field)
-				select new Move
-				{
-					From = piece.Position,
-					To = position,
-					Piece = piece.Piece,
-					Side = piece.Side
-				}));
-			return result;
+			return _nodes.Remove(item);
 		}
 
-		private static void AddCastling(ICollection<Move> moves,  CastlingSide castling)
+		public int Count { get { return _nodes.Count; } }
+		public bool IsReadOnly { get { return false; } }
+		public Field Field { get; set; }
+		public Move Move { get; set; }
+		public IEnumerable<Move> AllowedMoves { get; set; }
+		public long Value { get; set; }
+		public int Depth { get; set; }
+		public bool Terminal { get; set; }
+
+		public static IEnumerable<Move> ComputeAllowedMoves(Side side, Field field)
 		{
-			switch (castling)
-			{
-				case CastlingSide.Both:
-					moves.Add(new Move {CastlingSide = CastlingSide.King});
-					moves.Add(new Move {CastlingSide = CastlingSide.Queen});
-					break;
-
-				case CastlingSide.King:
-					moves.Add(new Move {CastlingSide = CastlingSide.King});
-					break;
-
-				case CastlingSide.Queen:
-					moves.Add(new Move {CastlingSide = CastlingSide.Queen});
-					break;
-			}
-		}
-
-		private class NodeEnumerator : IEnumerator<INode>
-		{
-			private readonly Node _node;
-			private int _index = -1;
-
-			public NodeEnumerator(Node node)
-			{
-				_node = node;
-			}
-
-			public void Dispose()
-			{
-				// Do nothing
-			}
-
-			public bool MoveNext()
-			{
-				return ++_index < _node.Moves.Count;
-			}
-
-			public void Reset()
-			{
-				_index = 0;
-			}
-
-			public INode Current
-			{
-				get { return _node.GetChild(_index); }
-			}
-
-			object IEnumerator.Current
-			{
-				get { return Current; }
-			}
+			return (from piece in field[side] from move in piece.AllowedMoves(field) select move).ToList();
 		}
 	}
 }
