@@ -37,7 +37,7 @@ namespace Lupus.Chess.Piece
 			if (Side != move.Side || Piece != move.Piece || Position != move.From) throw new ChessMoveException(move);
 			field.Remove(move.To);
 			Position = move.To;
-			field.History.Add(move);
+			History.Instance.Add(move);
 		}
 
 		public bool TryMove(Field field, Move move)

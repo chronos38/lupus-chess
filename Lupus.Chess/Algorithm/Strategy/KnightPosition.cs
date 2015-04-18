@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Lupus.Chess.Interface;
 
-namespace Lupus.Chess.Algorithm.Evaluation
+namespace Lupus.Chess.Algorithm.Strategy
 {
 	public class KnightPosition : AbstractStrategy
 	{
-		private const float Value = 12.5f;
+		private const float Value = 2;
 
 		public override int Compute(Field field, ICollection<IPiece> pieces)
 		{

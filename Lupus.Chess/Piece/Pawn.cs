@@ -96,7 +96,7 @@ namespace Lupus.Chess.Piece
 			{
 				field.Remove(enPassant);
 				Position = move.To;
-				field.History.Add(move);
+				History.Instance.Add(move);
 			}
 			else
 			{
@@ -134,7 +134,7 @@ namespace Lupus.Chess.Piece
 		public static Position EnPassanExist(Field field, Side forSide, Position fromPosition)
 		{
 			var rank = Chess.Move.InvertSide(forSide) == Side.White ? 2 : 7;
-			var lastMove = field.History.Count > 0 ? field.History[field.History.Count - 1] : null;
+			var lastMove = History.Instance.Count > 0 ? History.Instance[History.Instance.Count - 1] : null;
 			if (lastMove != null && lastMove.Piece == PieceType.Pawn && lastMove.From.Rank == rank &&
 			    Math.Abs(lastMove.From.Rank - lastMove.To.Rank) == 2 && lastMove.To.Rank == fromPosition.Rank &&
 			    (lastMove.To.File == fromPosition.File - 1 || lastMove.To.File == fromPosition.File + 1))

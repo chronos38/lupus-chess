@@ -8,67 +8,29 @@ using Lupus.Chess.Piece;
 
 namespace Lupus.Chess.Tree
 {
-	public class Node : INode
+	public class Node : Collection<INode>, INode
 	{
-		private readonly ICollection<INode> _nodes = new Collection<INode>();
-
-		public Node(Field field, Move move, int depth)
-		{
-			Field = field;
-			Move = move;
-			Depth = depth;
-			Value = 0;
-			Terminal = field.WhitePieces.Concat(field.BlackPieces).Count(p => p.Piece == PieceType.King) != 2;
-			AllowedMoves = ComputeAllowedMoves(Move.InvertSide(move.Side), field);
-		}
-
-		public IEnumerator<INode> GetEnumerator()
-		{
-			return _nodes.GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-
-		public void Add(INode item)
-		{
-			_nodes.Add(item);
-		}
-
-		public void Clear()
-		{
-			_nodes.Clear();
-		}
-
-		public bool Contains(INode item)
-		{
-			return _nodes.Contains(item);
-		}
-
-		public void CopyTo(INode[] array, int arrayIndex)
-		{
-			_nodes.CopyTo(array, arrayIndex);
-		}
-
-		public bool Remove(INode item)
-		{
-			return _nodes.Remove(item);
-		}
-
-		public int Count { get { return _nodes.Count; } }
-		public bool IsReadOnly { get { return false; } }
 		public Field Field { get; set; }
-		public Move Move { get; set; }
-		public IEnumerable<Move> AllowedMoves { get; set; }
 		public long Value { get; set; }
-		public int Depth { get; set; }
 		public bool Terminal { get; set; }
 
-		public static IEnumerable<Move> ComputeAllowedMoves(Side side, Field field)
+		public IEnumerable<Move> AllowedMoves()
 		{
-			return (from piece in field[side] from move in piece.AllowedMoves(field) select move).ToList();
+			return (from p in Field[Side.Both] from m in p.AllowedMoves(Field) select m);
+		}
+
+		public IEnumerable<Move> AllowedMoves(Side side)
+		{
+			return (from p in Field[side] from m in p.AllowedMoves(Field) select m);
+		}
+
+		public IEnumerable<Move> AvailableCaptures(Side fromSide)
+		{
+			var moves = (from p in Field[fromSide] from m in p.AllowedMoves(Field) select m).ToList();
+			return
+				Field[Move.InvertSide(fromSide)].Select(p => moves.FirstOrDefault(m => m.To == p.Position))
+					.Where(m => m != null)
+					.ToList();
 		}
 	}
 }

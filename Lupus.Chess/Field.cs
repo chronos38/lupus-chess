@@ -22,7 +22,6 @@ namespace Lupus.Chess
 			}
 		}
 
-		public IList<Move> History { get; set; } 
 		public ICollection<IPiece> WhitePieces { get; set; }
 		public ICollection<IPiece> BlackPieces { get; set; }
 
@@ -36,8 +35,10 @@ namespace Lupus.Chess
 						return WhitePieces;
 					case Side.Black:
 						return BlackPieces;
+					case Side.Both:
+						return WhitePieces.Concat(BlackPieces).ToList();
 					default:
-						throw new ArgumentException("Side should be either Side.White or Wide.Black");
+						return new List<IPiece>();
 				}
 			}
 		}
@@ -129,6 +130,12 @@ namespace Lupus.Chess
 			}
 		}
 
+		public void ExecuteMove(Move move)
+		{
+			var piece = this[move.Side].FirstOrDefault(p => p.Piece == move.Piece && p.Position == move.From);
+			if (piece != null) piece.Move(this, move);
+		}
+
 		protected bool Equals(Field other)
 		{
 			if (Equals(other, null)) return false;
@@ -162,8 +169,7 @@ namespace Lupus.Chess
 			return new Field
 			{
 				BlackPieces = new Collection<IPiece>(),
-				WhitePieces = new Collection<IPiece>(),
-				History = new List<Move>()
+				WhitePieces = new Collection<IPiece>()
 			};
 		}
 
@@ -179,7 +185,6 @@ namespace Lupus.Chess
 			pieces.AddRange(King.StartPieces());
 			result.WhitePieces = (from piece in pieces where piece.Side == Side.White select piece).ToList();
 			result.BlackPieces = (from piece in pieces where piece.Side == Side.Black select piece).ToList();
-			result.History = new List<Move>();
 			return result;
 		}
 	}

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Lupus.Chess.Interface;
 
-namespace Lupus.Chess.Algorithm.Evaluation
+namespace Lupus.Chess.Algorithm.Strategy
 {
 	public class RookPosition : AbstractStrategy
 	{
-		private const int Rank = 10;
-		private const int Value = 10;
+		private const int Rank = 1;
+		private const int Value = 1;
 
 		public override int Compute(Field field, ICollection<IPiece> pieces)
 		{

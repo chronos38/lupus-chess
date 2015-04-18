@@ -9,24 +9,31 @@ namespace Lupus.Chess.Interface
 		/// </summary>
 		Field Field { get; }
 		/// <summary>
-		/// The move that leads to the field.
-		/// </summary>
-		Move Move { get; }
-		/// <summary>
-		/// Allowed moves from this node on.
-		/// </summary>
-		IEnumerable<Move> AllowedMoves { get; } 
-		/// <summary>
 		/// Evaluation value of this node.
 		/// </summary>
 		long Value { get; set; }
 		/// <summary>
-		/// Tree depth of this node.
-		/// </summary>
-		int Depth { get; set; }
-		/// <summary>
 		/// true if one of the kings is captured, otherwise false.
 		/// </summary>
 		bool Terminal { get; set; }
+		/// <summary>
+		/// Computes all allowed moves.
+		/// Complexity is O(n) for n the number of pieces on the field.
+		/// </summary>
+		/// <returns>Enumerator containing all allowed moves.</returns>
+		IEnumerable<Move> AllowedMoves();
+		/// <summary>
+		/// Computes all moves for given side.
+		/// Complexity is O(n) for n the number of pieces for the given side on the field.
+		/// </summary>
+		/// <param name="fromSide">Either Side.White or Side.Black.</param>
+		/// <returns>Enumerator containing all allowed moves.</returns>
+		IEnumerable<Move> AllowedMoves(Side fromSide);
+		/// <summary>
+		/// Computes all possible caputres.
+		/// </summary>
+		/// <param name="fromSide">Determines that can execute the captures.</param>
+		/// <returns>All capture moves.</returns>
+		IEnumerable<Move> AvailableCaptures(Side fromSide);
 	}
 }

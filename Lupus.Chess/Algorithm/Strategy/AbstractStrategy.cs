@@ -2,7 +2,7 @@
 using Lupus.Chess.Interface;
 using Lupus.Chess.Interface.Algorithm;
 
-namespace Lupus.Chess.Algorithm.Evaluation
+namespace Lupus.Chess.Algorithm.Strategy
 {
 	public abstract class AbstractStrategy : IStrategy
 	{

@@ -114,7 +114,7 @@ namespace Lupus.Chess.Piece
 		{
 			var pieces = field[Side];
 			// Check if king have moved
-			if (field.History.Any(m => m.Piece == PieceType.King && m.Side == Side)) return CastlingSide.None;
+			if (History.Instance.Any(m => m.Piece == PieceType.King && m.Side == Side)) return CastlingSide.None;
 			// If king is in check, castling is not allowed
 			if (IsInCheck(field)) return CastlingSide.None;
 			var rank = Side == Side.White ? 1 : 8;
@@ -123,7 +123,7 @@ namespace Lupus.Chess.Piece
 			var king = new Position {File = 'H', Rank = rank};
 			// Check if queen side rook has moved
 			if (
-				field.History.Any(
+				History.Instance.Any(
 					p => p.Side == Side && p.Piece == PieceType.Rook && p.From == queen))
 			{
 				result = CastlingSide.King;
@@ -131,7 +131,7 @@ namespace Lupus.Chess.Piece
 			}
 			// Check if king side rook has moved
 			if (
-				field.History.Any(
+				History.Instance.Any(
 					p => p.Side == Side && p.Piece == PieceType.Rook && p.From == king))
 			{
 				if (result == CastlingSide.King) return CastlingSide.None;
