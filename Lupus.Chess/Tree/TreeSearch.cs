@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net;
+using System.Net.Mime;
 using Lupus.Chess.Algorithm;
 using Lupus.Chess.Algorithm.Evaluation;
 using Lupus.Chess.Exception;
@@ -11,56 +14,63 @@ namespace Lupus.Chess.Tree
 {
 	internal class TreeSearch : ITreeSearch
 	{
-		// TODO: Dependency inject this code
-		private IEvaluation _evaluation = new Evaluation
-		{
-			Strategies = new Collection<IStrategy>
-			{
-				new Material(),
-				new BishopPosition(),
-				new KnightPosition(),
-				new RookPosition(),
-				new QueenPosition(),
-				new PawnStructure()
-			}
-		};
-
-		// TODO: Dependency inject this code
-		private IAlphaBeta _alphaBeta = new AlphaBetaFailSoft();
-
 		public INode Root { get; set; }
+		public IEvaluation Evaluation { get; set; }
+		public IAlphaBeta AlphaBeta { get; set; }
+		public IDictionary<Field, INode> TranspositionTable { get; set; }
 
-		public IEvaluation Evaluation
+		internal TreeSearch(INode root)
 		{
-			get { return _evaluation; }
-			set { _evaluation = value; }
+			if (root == null) throw new ArgumentNullException("root");
+
+			Root = root;
+			TranspositionTable = new Dictionary<Field, INode>();
+			Evaluation = new Evaluation
+			{
+				Strategies = new Collection<IStrategy>
+				{
+					new Material(),
+					new BishopPosition(),
+					new KnightPosition(),
+					new RookPosition(),
+					new QueenPosition(),
+					new PawnStructure()
+				}
+			};
+			AlphaBeta = new AlphaBetaFailSoft
+			{
+				Evaluation = Evaluation,
+				TranspositionTable = TranspositionTable
+			};
 		}
 
-		public IAlphaBeta AlphaBeta
+		internal TreeSearch(INode root, IEvaluation evaluation, IAlphaBeta alphaBeta)
 		{
-			get { return _alphaBeta; }
-			set { _alphaBeta = value; }
+			if (root == null) throw new ArgumentNullException("root");
+			if (evaluation == null) throw new ArgumentNullException("evaluation");
+			if (alphaBeta == null) throw new ArgumentNullException("alphaBeta");
+
+			Root = root;
+			TranspositionTable = new Dictionary<Field, INode>();
+			Evaluation = evaluation;
+			AlphaBeta = alphaBeta;
 		}
 
 		public Move Execute(Field currentField, int depth)
 		{
-			IterativeDeepening(FindCorrespondingNode(Root, currentField), AlphaBeta, Evaluation, depth);
-			Root = FindBestValue(Root);
-			return Root.Move;
+			var node = IterativeDeepening(FindCorrespondingNode(Root, currentField), AlphaBeta, Evaluation, depth);
+			return FindBestValue(node).Move;
 		}
 
 		/// <summary>
-		/// Finds the child node for the move the opponent made.
+		/// Finds the node that corresponds to the given field.
 		/// </summary>
-		/// <param name="root">Current root node.</param>
+		/// <param name="root">Root node.</param>
 		/// <param name="currentField">Field one ply ahead of root.</param>
 		/// <returns>The new root node.</returns>
-		public static INode FindCorrespondingNode(INode root, Field currentField)
+		public INode FindCorrespondingNode(INode root, Field currentField)
 		{
-			if (currentField.History.Count == 0) return root;
-			var lastMove = currentField.History[currentField.History.Count - 1];
-			var node = root.FirstOrDefault(n => n.Move == lastMove);
-			return node ?? root;
+			return TranspositionTable[currentField] ?? root;
 		}
 
 		/// <summary>
@@ -73,7 +83,7 @@ namespace Lupus.Chess.Tree
 			return root.Aggregate((current, node) => current == null ? node : (node.Value > current.Value ? node : current));
 		}
 
-		public static void IterativeDeepening(INode root, IAlphaBeta alphaBeta, IEvaluation evaluation, int depth)
+		public static INode IterativeDeepening(INode root, IAlphaBeta alphaBeta, IEvaluation evaluation, int depth)
 		{
 			throw new NotImplementedException();
 			/*
@@ -83,7 +93,7 @@ namespace Lupus.Chess.Tree
 			 */
 			while (depth > 0)
 			{
-				alphaBeta.Execute(root, int.MinValue, int.MaxValue, 2, evaluation);
+				alphaBeta.Execute(root, int.MinValue, int.MaxValue, 2);
 				depth -= 1;
 			}
 		}

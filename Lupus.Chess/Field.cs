@@ -17,7 +17,8 @@ namespace Lupus.Chess
 		{
 			unchecked
 			{
-				return ((WhitePieces != null ? WhitePieces.GetHashCode() : 0)*397) ^ (BlackPieces != null ? BlackPieces.GetHashCode() : 0);
+				return ((WhitePieces != null ? WhitePieces.GetHashCode() : 0)*397) ^
+				       (BlackPieces != null ? BlackPieces.GetHashCode() : 0);
 			}
 		}
 
@@ -135,8 +136,7 @@ namespace Lupus.Chess
 			if (BlackPieces.Count != other.BlackPieces.Count) return false;
 			var white = WhitePieces.Intersect(other.WhitePieces, new LambdaComparer<IPiece>(AbstractPiece.Equals)).ToList();
 			var black = BlackPieces.Intersect(other.BlackPieces, new LambdaComparer<IPiece>(AbstractPiece.Equals)).ToList();
-			var history = History.Intersect(other.History, new LambdaComparer<Move>(((move, move1) => move == move1))).ToList();
-			return white.Count == WhitePieces.Count && black.Count == other.BlackPieces.Count && history.Count == History.Count;
+			return white.Count == WhitePieces.Count && black.Count == other.BlackPieces.Count;
 		}
 
 		public override bool Equals(object obj)

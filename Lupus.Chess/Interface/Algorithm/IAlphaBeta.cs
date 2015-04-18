@@ -1,7 +1,11 @@
-﻿namespace Lupus.Chess.Interface.Algorithm
+﻿using System.Collections.Generic;
+
+namespace Lupus.Chess.Interface.Algorithm
 {
 	public interface IAlphaBeta
 	{
-		 long Execute(INode node, long alpha, long beta, int depth, IEvaluation evaluation);
+		IEvaluation Evaluation { get; set; }
+		IDictionary<Field, INode> TranspositionTable { get; set; }
+		long Execute(INode node, long alpha, long beta, int depth);
 	}
 }

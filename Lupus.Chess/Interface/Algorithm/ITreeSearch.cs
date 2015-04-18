@@ -1,12 +1,15 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Lupus.Chess.Interface.Algorithm
 {
 	public interface ITreeSearch
 	{
-		INode Root { get; set; }
-		IEvaluation Evaluation { get; set; }
-		IAlphaBeta AlphaBeta { get; set; }
+		INode Root { get; }
+		IEvaluation Evaluation { get; }
+		IAlphaBeta AlphaBeta { get; }
+		IDictionary<Field, INode> TranspositionTable { get; }
 		Move Execute(Field currentField, int depth);
 	}
 }

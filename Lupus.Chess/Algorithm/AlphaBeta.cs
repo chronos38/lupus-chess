@@ -10,7 +10,7 @@ namespace Lupus.Chess.Algorithm
 {
 	public abstract class AlphaBeta : IAlphaBeta
 	{
-		public abstract long Execute(INode node, long alpha, long beta, int depth, IEvaluation evaluation);
+		public abstract long Execute(INode node, long alpha, long beta, int depth);
 
 		/// <summary>
 		/// Adds a new node to the tree.
@@ -27,5 +27,8 @@ namespace Lupus.Chess.Algorithm
 			parentNode.Add(node);
 			return node;
 		}
+
+		public IEvaluation Evaluation { get; set; }
+		public IDictionary<Field, INode> TranspositionTable { get; set; }
 	}
 }
