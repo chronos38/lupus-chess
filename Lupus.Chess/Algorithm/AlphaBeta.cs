@@ -23,18 +23,22 @@ namespace Lupus.Chess.Algorithm
 			var field = (Field) parentNode.Field.Clone();
 			var piece = field.GetPiece(nextMove.From);
 			piece.Move(field, nextMove);
-			var node = new Node
-			{
-				Value = 0,
-				Field = field,
-				Terminal = field[Side.Both].Count(p => p.Piece == PieceType.King) != 2
-			};
+
+			var node = TranspositionTable.Instance.ContainsKey(field)
+				? TranspositionTable.Instance[field]
+				: new Node
+				{
+					Value = 0,
+					Field = field,
+					Terminal = field[Side.Both].Count(p => p.Piece == PieceType.King) != 2
+				};
+
 			parentNode.Add(node);
 			return node;
 		}
 
 		/// <summary>
-		/// Searches for all possible captures.
+		/// Searches for all possible captures so the AI does not lose through a silly move.
 		/// </summary>
 		/// <param name="node">The node to evaluate.</param>
 		/// <param name="plySide">The current ply side.</param>
@@ -44,17 +48,12 @@ namespace Lupus.Chess.Algorithm
 		public static long QuescenceSearch(INode node, Side plySide, long alpha, long beta)
 		{
 			// TODO: Add delta pruning
-			var standPat = Evaluation.Instance.Execute(node.Field);
-			if (standPat >= beta) return beta;
-			if (alpha < standPat) alpha = standPat;
+			var evaluation = Evaluation.Instance.Execute(node.Field);
+			if (evaluation >= beta) return beta;
+			if (evaluation > alpha) alpha = evaluation;
 
-			var captures = node.AvailableCaptures(plySide);
-
-			foreach (var capture in captures)
+			foreach (var capture in node.AvailableCaptures(plySide))
 			{
-				var field = (Field) node.Field.Clone();
-				field.ExecuteMove(capture);
-
 				var child = CreateNode(node, capture);
 				var value = -QuescenceSearch(child, Move.InvertSide(plySide), -beta, -alpha);
 

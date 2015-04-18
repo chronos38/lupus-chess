@@ -37,7 +37,9 @@ namespace Lupus.Chess.Tree
 		/// <returns>The new root node.</returns>
 		public INode FindCorrespondingNode(INode root, Field currentField)
 		{
-			return TranspositionTable.Instance[currentField] ?? root;
+			return TranspositionTable.Instance.ContainsKey(currentField)
+				? TranspositionTable.Instance[currentField]
+				: root;
 		}
 
 		/// <summary>
