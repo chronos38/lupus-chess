@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Lupus.Chess.Algorithm;
 using Lupus.Chess.Algorithm.Evaluation;
 using Lupus.Chess.Exception;
@@ -43,22 +44,36 @@ namespace Lupus.Chess.Tree
 
 		public Move Execute(Field currentField, int depth)
 		{
-			Root = FindCorrespondingNode(Root, currentField);
-			var node = IterativeDeepening(Root, AlphaBeta, Evaluation, depth);
-			return FindBestValue(node);
+			IterativeDeepening(FindCorrespondingNode(Root, currentField), AlphaBeta, Evaluation, depth);
+			Root = FindBestValue(Root);
+			return Root.Move;
 		}
 
+		/// <summary>
+		/// Finds the child node for the move the opponent made.
+		/// </summary>
+		/// <param name="root">Current root node.</param>
+		/// <param name="currentField">Field one ply ahead of root.</param>
+		/// <returns>The new root node.</returns>
 		public static INode FindCorrespondingNode(INode root, Field currentField)
 		{
-			throw new NotImplementedException();
+			if (currentField.History.Count == 0) return root;
+			var lastMove = currentField.History[currentField.History.Count - 1];
+			var node = root.FirstOrDefault(n => n.Move == lastMove);
+			return node ?? root;
 		}
 
-		public static Move FindBestValue(INode node)
+		/// <summary>
+		/// Searches for the best possible move.
+		/// </summary>
+		/// <param name="root">The current root node.</param>
+		/// <returns>Node with the best evaluated move.</returns>
+		public static INode FindBestValue(INode root)
 		{
-			throw new NotImplementedException();
+			return root.Aggregate((current, node) => current == null ? node : (node.Value > current.Value ? node : current));
 		}
 
-		public static INode IterativeDeepening(INode root, IAlphaBeta alphaBeta, IEvaluation evaluation, int depth)
+		public static void IterativeDeepening(INode root, IAlphaBeta alphaBeta, IEvaluation evaluation, int depth)
 		{
 			throw new NotImplementedException();
 			/*

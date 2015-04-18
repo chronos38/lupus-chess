@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Lupus.Chess.Exception;
 using Lupus.Chess.Interface;
 
 namespace Lupus.Chess.Piece
@@ -31,30 +32,31 @@ namespace Lupus.Chess.Piece
 			internal set { _position = value; }
 		}
 
-		public virtual void Move(Field field, Position next)
+		public virtual void Move(Field field, Move move)
 		{
-			var previous = Position;
-			field.Remove(next);
-			Position = next;
-			field.History.Add(new Move
+			if (Side != move.Side || Piece != move.Piece || Position != move.From) throw new ChessMoveException(move);
+			field.Remove(move.To);
+			Position = move.To;
+			field.History.Add(move);
+		}
+
+		public bool TryMove(Field field, Move move)
+		{
+			try
 			{
-				From = (Position) previous.Clone(),
-				To = (Position) next.Clone(),
-				Side = Side,
-				Piece = Piece
-			});
+				if (!AllowedPositions(field).Contains(move.To)) return false;
+				Move(field, move);
+				return true;
+			}
+			catch (System.Exception)
+			{
+				return false;
+			}
 		}
 
-		public bool TryMove(Field field, Position position)
+		public bool ValidateMove(Field field, Move move)
 		{
-			if (!ValidateMove(field, position)) return false;
-			Move(field, position);
-			return true;
-		}
-
-		public bool ValidateMove(Field field, Position position)
-		{
-			return AllowedPositions(field).Contains(position);
+			return AllowedMoves(field).Contains(move);
 		}
 
 		public abstract object Clone();

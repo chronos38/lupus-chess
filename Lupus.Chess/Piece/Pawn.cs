@@ -86,27 +86,21 @@ namespace Lupus.Chess.Piece
 			Position = position;
 		}
 
-		public override void Move(Field field, Position next)
+		public override void Move(Field field, Move move)
 		{
+			if (Side != move.Side || Piece != move.Piece || Position != move.From) throw new ChessMoveException(move);
 			var rank = Side == Side.White ? -1 : 1;
 			var enPassant = EnPassanExist(field, Side.White, Position);
 
-			if (enPassant != null && enPassant.File == next.File && enPassant.Rank == next.Rank + rank)
+			if (enPassant != null && enPassant.File == move.To.File && enPassant.Rank == move.To.Rank + rank)
 			{
-				var previous = Position;
 				field.Remove(enPassant);
-				Position = next;
-				field.History.Add(new Move
-				{
-					From = (Position)previous.Clone(),
-					To = (Position)next.Clone(),
-					Side = Side,
-					Piece = Piece
-				});
+				Position = move.To;
+				field.History.Add(move);
 			}
 			else
 			{
-				base.Move(field, next);
+				base.Move(field, move);
 			}
 		}
 

@@ -18,16 +18,16 @@ namespace Lupus.Chess.Interface
 		/// <summary>
 		/// This method is intended for internal usage only. Do not use it.
 		/// </summary>
-		/// <param name="field"></param>
-		/// <param name="position"></param>
-		void Move(Field field, Position position);
+		/// <param name="field">The current field.</param>
+		/// <param name="move">The move to execute.</param>
+		void Move(Field field, Move move);
 		/// <summary>
-		/// Tries to move the piece to the supplied position.
+		/// Tries to execute the given move.
 		/// </summary>
 		/// <param name="field">The current field.</param>
-		/// <param name="position">The position to move the piece to.</param>
-		/// <returns>true if the move was successful, otherwise false.</returns>
-		bool TryMove(Field field, Position position);
+		/// <param name="move">The move to execute.</param>
+		/// <returns>true if move was successful, otherwise false.</returns>
+		bool TryMove(Field field, Move move);
 		/// <summary>
 		/// Returns all allowed moves for this instance.
 		/// </summary>
@@ -44,8 +44,8 @@ namespace Lupus.Chess.Interface
 		/// Validates a move if it is possible.
 		/// </summary>
 		/// <param name="field">The current field.</param>
-		/// <param name="position">The position to validate.</param>
+		/// <param name="move">The move to validate.</param>
 		/// <returns>true if the move is valid, otherwise false.</returns>
-		bool ValidateMove(Field field, Position position);
+		bool ValidateMove(Field field, Move move);
 	}
 }

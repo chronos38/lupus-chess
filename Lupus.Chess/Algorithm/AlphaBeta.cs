@@ -12,13 +12,19 @@ namespace Lupus.Chess.Algorithm
 	{
 		public abstract long Execute(INode node, long alpha, long beta, int depth, IEvaluation evaluation);
 
-		public static INode CreateNode(INode previous, Move nextMove)
+		/// <summary>
+		/// Adds a new node to the tree.
+		/// </summary>
+		/// <param name="parentNode">Parent were to add the new node.</param>
+		/// <param name="nextMove">The move to execute for the new node.</param>
+		/// <returns>The new node.</returns>
+		public static INode CreateNode(INode parentNode, Move nextMove)
 		{
-			var field = (Field) previous.Field.Clone();
+			var field = (Field) parentNode.Field.Clone();
 			var piece = field.GetPiece(nextMove.From);
-			piece.Move(field, nextMove.To);
-			var node = new Node(field, nextMove, previous.Depth + 1);
-			previous.Add(node);
+			piece.Move(field, nextMove);
+			var node = new Node(field, nextMove, parentNode.Depth + 1);
+			parentNode.Add(node);
 			return node;
 		}
 	}

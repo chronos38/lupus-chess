@@ -9,7 +9,7 @@ namespace Lupus.Chess.Algorithm
 	{
 		public override long Execute(INode node, long alpha, long beta, int depth, IEvaluation evaluation)
 		{
-			if (depth == 0 || node.Terminal) return evaluation.Execute(node.Field, Move.InvertSide(node.Move.Side));
+			if (depth <= 0 || node.Terminal) return evaluation.Execute(node.Field, Move.InvertSide(node.Move.Side));
 
 			var moves = node.AllowedMoves;
 

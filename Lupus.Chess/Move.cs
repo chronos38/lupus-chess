@@ -47,7 +47,8 @@ namespace Lupus.Chess
 
 		protected bool Equals(Move other)
 		{
-			return Equals(From, other.From) && Equals(To, other.To) && Piece == other.Piece && Side == other.Side;
+			return (Equals(From, other.From) && Equals(To, other.To) && Piece == other.Piece && Side == other.Side &&
+			        CastlingSide == other.CastlingSide);
 		}
 
 		public override bool Equals(object obj)
@@ -195,12 +196,12 @@ namespace Lupus.Chess
 					switch (king.Side)
 					{
 						case Side.White:
-							rook.Move(field, new Position {File = 'F', Rank = 1});
-							king.Move(field, new Position {File = 'G', Rank = 1});
+							rook.Position = new Position {File = 'F', Rank = 1};
+							king.Position = new Position {File = 'G', Rank = 1};
 							break;
 						case Side.Black:
-							rook.Move(field, new Position {File = 'F', Rank = 8});
-							king.Move(field, new Position {File = 'G', Rank = 8});
+							rook.Position = new Position {File = 'F', Rank = 8};
+							king.Position = new Position {File = 'G', Rank = 8};
 							break;
 					}
 					break;
@@ -208,12 +209,12 @@ namespace Lupus.Chess
 					switch (king.Side)
 					{
 						case Side.White:
-							rook.Move(field, new Position {File = 'D', Rank = 1});
-							king.Move(field, new Position {File = 'C', Rank = 1});
+							rook.Position = new Position {File = 'D', Rank = 1};
+							king.Position = new Position {File = 'C', Rank = 1};
 							break;
 						case Side.Black:
-							rook.Move(field, new Position {File = 'D', Rank = 8});
-							king.Move(field, new Position {File = 'C', Rank = 8});
+							rook.Position = new Position {File = 'D', Rank = 8};
+							king.Position = new Position {File = 'C', Rank = 8};
 							break;
 					}
 					break;
@@ -225,49 +226,15 @@ namespace Lupus.Chess
 
 		public static bool TryCastling(Field field, King king, CastlingSide side)
 		{
-			var pieces = king.Side == Side.White ? field.WhitePieces : field.BlackPieces;
-			var rank = king.Side == Side.White ? 1 : 8;
-			var position = side == CastlingSide.King
-				? new Position {File = 'H', Rank = rank}
-				: new Position {File = 'A', Rank = rank};
-			var rook = (Rook)(from p in pieces where p.Position == position select p).FirstOrDefault();
-			var allowedSide = king.CanUseCastling(field);
-			if (rook == null) return false;
-			if (allowedSide != CastlingSide.Both && allowedSide != side) return false;
-
-			switch (side)
+			try
 			{
-				case CastlingSide.King:
-					switch (king.Side)
-					{
-						case Side.White:
-							rook.Move(field, new Position { File = 'F', Rank = 1 });
-							king.Move(field, new Position { File = 'G', Rank = 1 });
-							break;
-						case Side.Black:
-							rook.Move(field, new Position { File = 'F', Rank = 8 });
-							king.Move(field, new Position { File = 'G', Rank = 8 });
-							break;
-					}
-					break;
-				case CastlingSide.Queen:
-					switch (king.Side)
-					{
-						case Side.White:
-							rook.Move(field, new Position { File = 'D', Rank = 1 });
-							king.Move(field, new Position { File = 'C', Rank = 1 });
-							break;
-						case Side.Black:
-							rook.Move(field, new Position { File = 'D', Rank = 8 });
-							king.Move(field, new Position { File = 'C', Rank = 8 });
-							break;
-					}
-					break;
-				default:
-					return false;
+				Castling(field, king, side);
+				return true;
 			}
-
-			return true;
+			catch (System.Exception)
+			{
+				return false;
+			}
 		}
 
 		public static Side InvertSide(Side side)

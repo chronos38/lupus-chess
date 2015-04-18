@@ -135,7 +135,8 @@ namespace Lupus.Chess
 			if (BlackPieces.Count != other.BlackPieces.Count) return false;
 			var white = WhitePieces.Intersect(other.WhitePieces, new LambdaComparer<IPiece>(AbstractPiece.Equals)).ToList();
 			var black = BlackPieces.Intersect(other.BlackPieces, new LambdaComparer<IPiece>(AbstractPiece.Equals)).ToList();
-			return white.Count == WhitePieces.Count && black.Count == other.BlackPieces.Count;
+			var history = History.Intersect(other.History, new LambdaComparer<Move>(((move, move1) => move == move1))).ToList();
+			return white.Count == WhitePieces.Count && black.Count == other.BlackPieces.Count && history.Count == History.Count;
 		}
 
 		public override bool Equals(object obj)

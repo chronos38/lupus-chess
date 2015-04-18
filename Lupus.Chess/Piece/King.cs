@@ -55,6 +55,20 @@ namespace Lupus.Chess.Piece
 			Position = position;
 		}
 
+		public override void Move(Field field, Move move)
+		{
+			switch (move.CastlingSide)
+			{
+				case CastlingSide.King:
+				case CastlingSide.Queen:
+					Chess.Move.Castling(field, this, move.CastlingSide);
+					break;
+				default:
+					base.Move(field, move);
+					break;
+			}
+		}
+
 		public override object Clone()
 		{
 			return new King
@@ -101,15 +115,35 @@ namespace Lupus.Chess.Piece
 			var pieces = field[Side];
 			// Check if king have moved
 			if (field.History.Any(m => m.Piece == PieceType.King && m.Side == Side)) return CastlingSide.None;
-			// Check if king is in check
+			// If king is in check, castling is not allowed
 			if (IsInCheck(field)) return CastlingSide.None;
-			// Search for unmoved rooks
-			var rooks = (from piece in pieces where piece.Piece == PieceType.Rook select piece).ToList();
+			var rank = Side == Side.White ? 1 : 8;
+			var result = CastlingSide.Both;
+			var queen = new Position {File = 'A', Rank = rank};
+			var king = new Position {File = 'H', Rank = rank};
+			// Check if queen side rook has moved
+			if (
+				field.History.Any(
+					p => p.Side == Side && p.Piece == PieceType.Rook && p.From == queen))
+			{
+				result = CastlingSide.King;
+				queen = null;
+			}
+			// Check if king side rook has moved
+			if (
+				field.History.Any(
+					p => p.Side == Side && p.Piece == PieceType.Rook && p.From == king))
+			{
+				if (result == CastlingSide.King) return CastlingSide.None;
+				result = CastlingSide.Queen;
+				king = null;
+			}
+			// Select unmoved rooks
+			var rooks = (from p in pieces where p.Piece == PieceType.Rook && (p.Position == queen || p.Position == king) select p).ToList();
 			// If there are no rooks available than castling is disallowed
 			if (!rooks.Any()) return CastlingSide.None;
 			// Check if all fields between rook and king are free and not under attack
 			var underAttack = field.UnderAttack(Chess.Move.InvertSide(Side)).ToArray();
-			var result = CastlingSide.Both;
 			foreach (var position in rooks.Select(rook => rook.Position))
 			{
 				var pos = position;
