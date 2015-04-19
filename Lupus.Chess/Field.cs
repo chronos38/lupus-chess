@@ -5,38 +5,35 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Runtime.Remoting.Messaging;
+using Lupus.Chess.Exception;
 using Lupus.Chess.Interface;
 using Lupus.Chess.Piece;
 
 namespace Lupus.Chess
 {
 	[Serializable]
-	public class Field : ICloneable
+	public class Field : List<IPiece>, ICloneable
 	{
 		public override int GetHashCode()
 		{
 			unchecked
 			{
-				return ((WhitePieces != null ? WhitePieces.GetHashCode() : 0)*397) ^
-				       (BlackPieces != null ? BlackPieces.GetHashCode() : 0);
+				return this.Aggregate(19, (current, p) => current*31 + p.GetHashCode());
 			}
 		}
 
-		public ICollection<IPiece> WhitePieces { get; set; }
-		public ICollection<IPiece> BlackPieces { get; set; }
-
-		public ICollection<IPiece> this[Side side]
+		public IEnumerable<IPiece> this[Side side]
 		{
 			get
 			{
 				switch (side)
 				{
 					case Side.White:
-						return WhitePieces;
+						return this.Where(p => p.Side == Side.White);
 					case Side.Black:
-						return BlackPieces;
+						return this.Where(p => p.Side == Side.Black);
 					case Side.Both:
-						return WhitePieces.Concat(BlackPieces).ToList();
+						return this;
 					default:
 						return new List<IPiece>();
 				}
@@ -45,16 +42,14 @@ namespace Lupus.Chess
 
 		public IPiece this[Position position]
 		{
-			get { return WhitePieces.Concat(BlackPieces).FirstOrDefault(p => p.Position == position); }
+			get { return this.FirstOrDefault(p => p.Position == position); }
 		}
 
 		public object Clone()
 		{
-			return new Field()
-			{
-				WhitePieces = (from piece in WhitePieces select (IPiece) piece.Clone()).ToList(),
-				BlackPieces = (from piece in BlackPieces select (IPiece) piece.Clone()).ToList()
-			};
+			var clone = new Field();
+			clone.AddRange(this.Select(p => (IPiece) p.Clone()));
+			return clone;
 		}
 
 		/// <summary>
@@ -64,8 +59,8 @@ namespace Lupus.Chess
 		/// <returns>Side which is occupying this position or undefined if it is free.</returns>
 		public Side IsFree(Position position)
 		{
-			var piece = (from p in WhitePieces.Concat(BlackPieces) where p.Position == position select p).FirstOrDefault();
-			return piece == null ? Side.None : piece.Side;
+			var p = this[position];
+			return p == null ? Side.None : p.Side;
 		}
 
 		/// <summary>
@@ -79,11 +74,11 @@ namespace Lupus.Chess
 			switch (side)
 			{
 				case Side.Black:
-					return BlackPieces.All(piece => piece.Position != position);
+					return this[Side.Black].All(p => p.Position != position);
 				case Side.White:
-					return WhitePieces.All(piece => piece.Position != position);
+					return this[Side.White].All(p => p.Position != position);
 				case Side.Both:
-					return WhitePieces.Concat(BlackPieces).All(piece => piece.Position != position);
+					return this.All(p => p.Position != position);
 				default:
 					return true;
 			}
@@ -99,11 +94,9 @@ namespace Lupus.Chess
 			switch (fromSide)
 			{
 				case Side.Black:
-					return
-						(from blackPiece in BlackPieces from positions in blackPiece.AllowedPositions(this) select positions).ToList();
+					return (from p in this[Side.Black] from pos in p.AllowedPositions(this) select pos).ToList();
 				case Side.White:
-					return
-						(from whitePiece in WhitePieces from positions in whitePiece.AllowedPositions(this) select positions).ToList();
+					return (from p in this[Side.White] from pos in p.AllowedPositions(this) select pos).ToList();
 				default:
 					return new Position[] {};
 			}
@@ -111,39 +104,27 @@ namespace Lupus.Chess
 
 		public IPiece GetPiece(Position position)
 		{
-			return WhitePieces.Concat(BlackPieces).FirstOrDefault(p => p.Position == position);
+			return this[position];
 		}
 
 		public void Remove(Position position)
 		{
-			var piece = WhitePieces.Concat(BlackPieces).FirstOrDefault(p => p.Position == position);
-			if (piece == null) return;
-
-			switch (piece.Side)
-			{
-				case Side.White:
-					WhitePieces.Remove(piece);
-					break;
-				case Side.Black:
-					BlackPieces.Remove(piece);
-					break;
-			}
+			Remove(this[position]);
 		}
 
 		public void ExecuteMove(Move move)
 		{
 			var piece = this[move.Side].FirstOrDefault(p => p.Piece == move.Piece && p.Position == move.From);
 			if (piece != null) piece.Move(this, move);
+			throw new ChessMoveException(move, "Piece does not exist.");
 		}
 
 		protected bool Equals(Field other)
 		{
 			if (Equals(other, null)) return false;
-			if (WhitePieces.Count != other.WhitePieces.Count) return false;
-			if (BlackPieces.Count != other.BlackPieces.Count) return false;
-			var white = WhitePieces.Intersect(other.WhitePieces, new LambdaComparer<IPiece>(AbstractPiece.Equals)).ToList();
-			var black = BlackPieces.Intersect(other.BlackPieces, new LambdaComparer<IPiece>(AbstractPiece.Equals)).ToList();
-			return white.Count == WhitePieces.Count && black.Count == other.BlackPieces.Count;
+			if (Count != other.Count) return false;
+			var pieces = this.Intersect(other, new LambdaComparer<IPiece>(AbstractPiece.Equals)).ToList();
+			return Count == pieces.Count;
 		}
 
 		public override bool Equals(object obj)
@@ -164,27 +145,15 @@ namespace Lupus.Chess
 			return !(lhs == rhs);
 		}
 
-		public static Field Create()
-		{
-			return new Field
-			{
-				BlackPieces = new Collection<IPiece>(),
-				WhitePieces = new Collection<IPiece>()
-			};
-		}
-
 		public static Field Start()
 		{
 			var result = new Field();
-			var pieces = new List<IPiece>();
-			pieces.AddRange(Pawn.StartPieces());
-			pieces.AddRange(Knight.StartPieces());
-			pieces.AddRange(Bishop.StartPieces());
-			pieces.AddRange(Rook.StartPieces());
-			pieces.AddRange(Queen.StartPieces());
-			pieces.AddRange(King.StartPieces());
-			result.WhitePieces = (from piece in pieces where piece.Side == Side.White select piece).ToList();
-			result.BlackPieces = (from piece in pieces where piece.Side == Side.Black select piece).ToList();
+			result.AddRange(Pawn.StartPieces());
+			result.AddRange(Knight.StartPieces());
+			result.AddRange(Bishop.StartPieces());
+			result.AddRange(Rook.StartPieces());
+			result.AddRange(Queen.StartPieces());
+			result.AddRange(King.StartPieces());
 			return result;
 		}
 	}

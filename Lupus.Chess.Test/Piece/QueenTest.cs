@@ -8,7 +8,7 @@ namespace Lupus.Chess.Test.Piece
 	[TestClass]
 	public class QueenTest
 	{
-		private readonly Field _emptyField = Field.Create();
+		private readonly Field _emptyField = new Field();
 		private readonly Field _startField = Field.Start();
 
 		[TestMethod]
@@ -65,7 +65,7 @@ namespace Lupus.Chess.Test.Piece
 		public void Queen_AllowedPositions_StartField()
 		{
 			// Arrange
-			var queen = _startField.WhitePieces.First(p => p.Piece == PieceType.Queen);
+			var queen = _startField[Side.White].First(p => p.Piece == PieceType.Queen);
 
 			// Act
 			var allowedPositions = queen.AllowedPositions(_startField);

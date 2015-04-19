@@ -8,7 +8,7 @@ namespace Lupus.Chess.Test.Piece
 	[TestClass]
 	public class KnightTest
 	{
-		private readonly Field _emptyField = Field.Create();
+		private readonly Field _emptyField = new Field();
 		private readonly Field _startField = Field.Start();
 
 		[TestMethod]
@@ -46,7 +46,7 @@ namespace Lupus.Chess.Test.Piece
 		public void Knight_AllowedPositions_StartField()
 		{
 			// Arrange
-			var knight = _startField.WhitePieces.First(p => p.Piece == PieceType.Knight && p.Position.File == 'B');
+			var knight = _startField[Side.White].First(p => p.Piece == PieceType.Knight && p.Position.File == 'B');
 			var positions = new Collection<Position>
 			{
 				new Position {File = 'A', Rank = 3},

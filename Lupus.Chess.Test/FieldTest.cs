@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Lupus.Chess.Test
@@ -19,8 +20,8 @@ namespace Lupus.Chess.Test
 		[TestMethod]
 		public void Field_CheckSideCount()
 		{
-			Assert.AreEqual(16, _field.WhitePieces.Count);
-			Assert.AreEqual(16, _field.BlackPieces.Count);
+			Assert.AreEqual(16, _field[Side.White].Count());
+			Assert.AreEqual(16, _field[Side.Black].Count());
 		}
 
 		[TestMethod]
@@ -35,7 +36,7 @@ namespace Lupus.Chess.Test
 			var pawn = 8;
 
 			// Act
-			foreach (var whitePiece in _field.WhitePieces)
+			foreach (var whitePiece in _field[Side.White])
 			{
 				switch (whitePiece.Piece)
 				{
@@ -81,7 +82,7 @@ namespace Lupus.Chess.Test
 			var pawn = 8;
 
 			// Act
-			foreach (var blackPiece in _field.BlackPieces)
+			foreach (var blackPiece in _field[Side.Black])
 			{
 				switch (blackPiece.Piece)
 				{
@@ -120,7 +121,7 @@ namespace Lupus.Chess.Test
 		{
 			// Arrange
 			var set = new HashSet<char>();
-			var pieces = _field.WhitePieces;
+			var pieces = _field[Side.White];
 			var pieceCount = new Dictionary<PieceType, int>
 			{
 				{PieceType.King, 0},
@@ -177,7 +178,7 @@ namespace Lupus.Chess.Test
 		{
 			// Arrange
 			var set = new HashSet<char>();
-			var pieces = _field.BlackPieces;
+			var pieces = _field[Side.Black];
 			var pieceCount = new Dictionary<PieceType, int>
 			{
 				{PieceType.King, 0},

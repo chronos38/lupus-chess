@@ -114,7 +114,7 @@ namespace Lupus.Chess.Piece
 			};
 		}
 
-		public override ICollection<Position> AllowedPositions(Field field)
+		public override IEnumerable<Position> AllowedPositions(Field field)
 		{
 			var result = new Collection<Position>();
 			var enPassant = EnPassanExist(field, Side, Position);

@@ -10,7 +10,7 @@ namespace Lupus.Chess.Algorithm.Strategy
 
 		public override int Compute(Field field, ICollection<IPiece> pieces)
 		{
-			return pieces.Where(p => p.Piece == PieceType.Bishop).Select(p => p.AllowedPositions(field).Count*Value).Sum();
+			return pieces.Where(p => p.Piece == PieceType.Bishop).Select(p => p.AllowedPositions(field).Count()*Value).Sum();
 		}
 	}
 }

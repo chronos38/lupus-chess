@@ -61,11 +61,11 @@ namespace Lupus.Chess.Piece
 
 		public abstract object Clone();
 
-		public abstract ICollection<Position> AllowedPositions(Field field);
+		public abstract IEnumerable<Position> AllowedPositions(Field field);
 
-		public virtual ICollection<Move> AllowedMoves(Field field)
+		public virtual IEnumerable<Move> AllowedMoves(Field field)
 		{
-			return AllowedPositions(field).Select(p => new Move {From = Position, To = p, Side = Side, Piece = Piece}).ToList();
+			return AllowedPositions(field).Select(p => new Move {From = Position, To = p, Side = Side, Piece = Piece});
 		}
 
 		public static bool Equals(IPiece lhs, IPiece rhs)

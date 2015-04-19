@@ -13,7 +13,7 @@ namespace Lupus.Chess.Algorithm.Strategy
 		{
 			return
 				(int)
-					Math.Round(pieces.Where(p => p.Piece == PieceType.Knight).Select(p => p.AllowedPositions(field).Count*Value).Sum());
+					Math.Round(pieces.Where(p => p.Piece == PieceType.Knight).Select(p => p.AllowedPositions(field).Count()*Value).Sum());
 		}
 	}
 }

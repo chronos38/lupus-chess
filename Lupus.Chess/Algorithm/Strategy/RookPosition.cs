@@ -14,7 +14,7 @@ namespace Lupus.Chess.Algorithm.Strategy
 		{
 			var rooks = pieces.Where(p => p.Piece == PieceType.Rook);
 			var enumerable = rooks as IPiece[] ?? rooks.ToArray();
-			return enumerable.Select(r => r.AllowedPositions(field).Count*Value).Sum()*
+			return enumerable.Select(r => r.AllowedPositions(field).Count()*Value).Sum()*
 			       enumerable.Select(r => r.Side == Side.White ? (r.Position.Rank - 1)*Rank : Math.Abs(r.Position.Rank - 8)*Rank)
 				       .Sum();
 		}

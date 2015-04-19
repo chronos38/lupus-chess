@@ -79,7 +79,7 @@ namespace Lupus.Chess.Piece
 			};
 		}
 
-		public override ICollection<Move> AllowedMoves(Field field)
+		public override IEnumerable<Move> AllowedMoves(Field field)
 		{
 			var result = new List<Move>();
 			var positions = AllowedPositions(field);
@@ -88,7 +88,7 @@ namespace Lupus.Chess.Piece
 			return result;
 		}
 
-		public override ICollection<Position> AllowedPositions(Field field)
+		public override IEnumerable<Position> AllowedPositions(Field field)
 		{
 			var result = new Collection<Position>();
 			var position = Chess.Move.Direction(Position, Direction.Down);

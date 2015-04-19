@@ -8,7 +8,7 @@ namespace Lupus.Chess.Test.Piece
 	[TestClass]
 	public class RookTest
 	{
-		private readonly Field _emptyField = Field.Create();
+		private readonly Field _emptyField = new Field();
 		private readonly Field _startField = Field.Start();
 
 		[TestMethod]
@@ -52,7 +52,7 @@ namespace Lupus.Chess.Test.Piece
 		public void Rook_AllowedPositions_StartField()
 		{
 			// Arrange
-			var rook = _startField.WhitePieces.First(p => p.Piece == PieceType.Rook && p.Position.File == 'A');
+			var rook = _startField[Side.White].First(p => p.Piece == PieceType.Rook && p.Position.File == 'A');
 
 			// Act
 			var allowedPositions = rook.AllowedPositions(_startField);

@@ -33,13 +33,13 @@ namespace Lupus.Chess.Interface
 		/// </summary>
 		/// <param name="field">The current field.</param>
 		/// <returns>Collection containing all legal moves.</returns>
-		ICollection<Move> AllowedMoves(Field field);
+		IEnumerable<Move> AllowedMoves(Field field);
 		/// <summary>
 		/// Returns all possible positions from this instance.
 		/// </summary>
 		/// <param name="field">The current field.</param>
 		/// <returns>Collection containing all legal positions.</returns>
-		ICollection<Position> AllowedPositions(Field field);
+		IEnumerable<Position> AllowedPositions(Field field);
 		/// <summary>
 		/// Validates a move if it is possible.
 		/// </summary>

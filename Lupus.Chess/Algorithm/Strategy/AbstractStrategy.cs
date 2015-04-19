@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Lupus.Chess.Interface;
 using Lupus.Chess.Interface.Algorithm;
 
@@ -11,9 +12,9 @@ namespace Lupus.Chess.Algorithm.Strategy
 			switch (side)
 			{
 				case Side.Black:
-					return Compute(field, field.BlackPieces) - Compute(field, field.WhitePieces);
+					return Compute(field, field[Side.Black].ToArray()) - Compute(field, field[Side.White].ToArray());
 				case Side.White:
-					return Compute(field, field.WhitePieces) - Compute(field, field.BlackPieces);
+					return Compute(field, field[Side.White].ToArray()) - Compute(field, field[Side.Black].ToArray());
 			}
 
 			return 0;

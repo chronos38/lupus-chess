@@ -26,12 +26,7 @@ namespace Lupus.Chess.Algorithm
 
 			var node = TranspositionTable.Instance.ContainsKey(field)
 				? TranspositionTable.Instance[field]
-				: new Node
-				{
-					Value = 0,
-					Field = field,
-					Terminal = field[Side.Both].Count(p => p.Piece == PieceType.King) != 2
-				};
+				: new Node(field);
 
 			parentNode.Add(node);
 			return node;

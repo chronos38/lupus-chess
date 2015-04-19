@@ -180,7 +180,7 @@ namespace Lupus.Chess
 
 		public static void Castling(Field field, King king, CastlingSide side)
 		{
-			var pieces = king.Side == Side.White ? field.WhitePieces : field.BlackPieces;
+			var pieces = field[king.Side];
 			var rank = king.Side == Side.White ? 1 : 8;
 			var position = side == CastlingSide.King
 				? new Position {File = 'H', Rank = rank}

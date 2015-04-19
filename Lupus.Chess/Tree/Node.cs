@@ -14,6 +14,13 @@ namespace Lupus.Chess.Tree
 		public long Value { get; set; }
 		public bool Terminal { get; set; }
 
+		public Node(Field field)
+		{
+			Field = field;
+			Value = long.MinValue;
+			Terminal = field[Side.Both].Count(p => p.Piece == PieceType.King) != 2;
+		}
+
 		public IEnumerable<Move> AllowedMoves()
 		{
 			return (from p in Field[Side.Both] from m in p.AllowedMoves(Field) select m);

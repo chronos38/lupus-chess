@@ -14,11 +14,13 @@ namespace Lupus.Chess.Test.Piece
 		[TestInitialize]
 		public void Initialize()
 		{
-			_emptyField = Field.Create();
-			_enemyField = Field.Create();
-			_enemyField.BlackPieces.Add(PieceFactory.Create(PieceType.Pawn, Side.Black, new Position {File = 'A', Rank = 5}));
-			_enemyField.BlackPieces.Add(PieceFactory.Create(PieceType.Pawn, Side.Black, new Position {File = 'C', Rank = 5}));
-			_enemyField.BlackPieces.Add(PieceFactory.Create(PieceType.Pawn, Side.Black, new Position {File = 'E', Rank = 3}));
+			_emptyField = new Field();
+			_enemyField = new Field
+			{
+				PieceFactory.Create(PieceType.Pawn, Side.Black, new Position {File = 'A', Rank = 5}),
+				PieceFactory.Create(PieceType.Pawn, Side.Black, new Position {File = 'C', Rank = 5}),
+				PieceFactory.Create(PieceType.Pawn, Side.Black, new Position {File = 'E', Rank = 3})
+			};
 		}
 
 		[TestMethod]
@@ -132,8 +134,8 @@ namespace Lupus.Chess.Test.Piece
 			// Arrange
 			var black = (Pawn) PieceFactory.Create(PieceType.Pawn, Side.Black, new Position {File = 'A', Rank = 7});
 			var white = (Pawn) PieceFactory.Create(PieceType.Pawn, Side.White, new Position {File = 'B', Rank = 5});
-			_emptyField.BlackPieces.Add(black);
-			_emptyField.WhitePieces.Add(white);
+			_emptyField.Add(black);
+			_emptyField.Add(white);
 
 			// Act
 			var rc1 = black.TryMove(_emptyField, new Move
@@ -154,7 +156,7 @@ namespace Lupus.Chess.Test.Piece
 			// Assert
 			Assert.IsTrue(rc1);
 			Assert.IsTrue(rc2);
-			Assert.AreEqual(0, _emptyField.BlackPieces.Count);
+			Assert.AreEqual(0, _emptyField[Side.Black].Count());
 		}
 
 		[TestMethod]
@@ -163,8 +165,8 @@ namespace Lupus.Chess.Test.Piece
 			// Arrange
 			var black = (Pawn)PieceFactory.Create(PieceType.Pawn, Side.Black, new Position { File = 'A', Rank = 6 });
 			var white = (Pawn)PieceFactory.Create(PieceType.Pawn, Side.White, new Position { File = 'B', Rank = 5 });
-			_emptyField.BlackPieces.Add(black);
-			_emptyField.WhitePieces.Add(white);
+			_emptyField.Add(black);
+			_emptyField.Add(white);
 
 			// Act
 			var rc1 = black.TryMove(_emptyField, new Move
@@ -185,7 +187,7 @@ namespace Lupus.Chess.Test.Piece
 			// Assert
 			Assert.IsTrue(rc1);
 			Assert.IsFalse(rc2);
-			Assert.AreEqual(1, _emptyField.BlackPieces.Count);
+			Assert.AreEqual(1, _emptyField[Side.Black].Count());
 		}
 	}
 }

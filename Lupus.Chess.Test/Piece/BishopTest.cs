@@ -8,7 +8,7 @@ namespace Lupus.Chess.Test.Piece
 	[TestClass]
 	public class BishopTest
 	{
-		private readonly Field _emptyField = Field.Create();
+		private readonly Field _emptyField = new Field();
 		private readonly Field _startField = Field.Start();
 
 		[TestMethod]
@@ -51,7 +51,7 @@ namespace Lupus.Chess.Test.Piece
 		public void Bishop_AllowedPositions_StartField()
 		{
 			// Arrange
-			var bishop = _startField.WhitePieces.First(p => p.Piece == PieceType.Bishop && p.Position.File == 'C');
+			var bishop = _startField[Side.White].First(p => p.Piece == PieceType.Bishop && p.Position.File == 'C');
 
 			// Act
 			var allowedPositions = bishop.AllowedPositions(_startField);

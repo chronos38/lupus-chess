@@ -14,7 +14,7 @@ namespace Lupus.Chess.Test.Piece
 		[TestInitialize]
 		public void Initialize()
 		{
-			_emptyField = Field.Create();
+			_emptyField = new Field();
 			_startField = Field.Start();
 		}
 
@@ -53,7 +53,7 @@ namespace Lupus.Chess.Test.Piece
 		public void King_AllowedPositions_StartField()
 		{
 			// Arrange
-			var king = _startField.WhitePieces.First(p => p.Piece == PieceType.King);
+			var king = _startField[Side.White].First(p => p.Piece == PieceType.King);
 
 			// Act
 			var allowedPositions = king.AllowedPositions(_startField);
@@ -67,9 +67,9 @@ namespace Lupus.Chess.Test.Piece
 		{
 			// Arrange
 			var king = (King) PieceFactory.Create(PieceType.King, Side.White, new Position {File = 'E', Rank = 1});
-			_emptyField.WhitePieces.Add(king);
-			_emptyField.WhitePieces.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'A', Rank = 1}));
-			_emptyField.WhitePieces.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'H', Rank = 1}));
+			_emptyField.Add(king);
+			_emptyField.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'A', Rank = 1}));
+			_emptyField.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'H', Rank = 1}));
 
 			// Act
 			var canUseCastling = king.CanUseCastling(_emptyField);
@@ -90,9 +90,9 @@ namespace Lupus.Chess.Test.Piece
 		{
 			// Arrange
 			var king = (King) PieceFactory.Create(PieceType.King, Side.White, new Position {File = 'E', Rank = 1});
-			_emptyField.WhitePieces.Add(king);
-			_emptyField.WhitePieces.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'A', Rank = 1}));
-			_emptyField.WhitePieces.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'H', Rank = 1}));
+			_emptyField.Add(king);
+			_emptyField.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'A', Rank = 1}));
+			_emptyField.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'H', Rank = 1}));
 
 			// Act
 			var canUseCastling = king.CanUseCastling(_emptyField);
@@ -113,10 +113,10 @@ namespace Lupus.Chess.Test.Piece
 		{
 			// Arrange
 			var king = (King) PieceFactory.Create(PieceType.King, Side.White, new Position {File = 'E', Rank = 1});
-			_emptyField.WhitePieces.Add(king);
-			_emptyField.WhitePieces.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'A', Rank = 1}));
-			_emptyField.WhitePieces.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'H', Rank = 1}));
-			_emptyField.BlackPieces.Add(PieceFactory.Create(PieceType.Rook, Side.Black, new Position {File = 'D', Rank = 8}));
+			_emptyField.Add(king);
+			_emptyField.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'A', Rank = 1}));
+			_emptyField.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'H', Rank = 1}));
+			_emptyField.Add(PieceFactory.Create(PieceType.Rook, Side.Black, new Position {File = 'D', Rank = 8}));
 
 			// Act
 			var canUseCastling = king.CanUseCastling(_emptyField);
@@ -137,10 +137,10 @@ namespace Lupus.Chess.Test.Piece
 		{
 			// Arrange
 			var king = (King) PieceFactory.Create(PieceType.King, Side.White, new Position {File = 'E', Rank = 1});
-			_emptyField.WhitePieces.Add(king);
-			_emptyField.WhitePieces.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'A', Rank = 1}));
-			_emptyField.WhitePieces.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'H', Rank = 1}));
-			_emptyField.BlackPieces.Add(PieceFactory.Create(PieceType.Queen, Side.Black, new Position {File = 'D', Rank = 4}));
+			_emptyField.Add(king);
+			_emptyField.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'A', Rank = 1}));
+			_emptyField.Add(PieceFactory.Create(PieceType.Rook, Side.White, new Position {File = 'H', Rank = 1}));
+			_emptyField.Add(PieceFactory.Create(PieceType.Queen, Side.Black, new Position {File = 'D', Rank = 4}));
 
 			// Act
 			var canUseCastling = king.CanUseCastling(_emptyField);
