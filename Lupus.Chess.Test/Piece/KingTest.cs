@@ -155,5 +155,7 @@ namespace Lupus.Chess.Test.Piece
 			Assert.IsFalse(rc3);
 			Assert.AreEqual(new Position { File = 'E', Rank = 1 }, king.Position);
 		}
+
+		// TODO: Test history and castling
 	}
 }

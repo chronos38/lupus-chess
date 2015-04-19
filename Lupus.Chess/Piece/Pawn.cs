@@ -94,9 +94,9 @@ namespace Lupus.Chess.Piece
 
 			if (enPassant != null && enPassant.File == move.To.File && enPassant.Rank == move.To.Rank + rank)
 			{
-				field.Remove(enPassant);
+				var capture = field[enPassant];
+				if (field.Remove(capture)) move.Captured = capture;
 				Position = move.To;
-				History.Instance.Add(move);
 			}
 			else
 			{
@@ -123,18 +123,18 @@ namespace Lupus.Chess.Piece
 			switch (Side)
 			{
 				case Side.White:
-					return WhiteMoves(field, this).Concat(result).ToList();
+					return WhiteMoves(field, this).Concat(result);
 				case Side.Black:
-					return BlackMoves(field, this).Concat(result).ToList();
+					return BlackMoves(field, this).Concat(result);
 				default:
 					throw new ChessException("Side should be either Side.White or Wide.Black");
 			}
 		}
 
-		public static Position EnPassanExist(Field field, Side forSide, Position fromPosition)
+		public Position EnPassanExist(Field field, Side forSide, Position fromPosition)
 		{
 			var rank = Chess.Move.InvertSide(forSide) == Side.White ? 2 : 7;
-			var lastMove = History.Instance.Count > 0 ? History.Instance[History.Instance.Count - 1] : null;
+			var lastMove = PastMoves.Count > 0 ? PastMoves[PastMoves.Count - 1] : null;
 			if (lastMove != null && lastMove.Piece == PieceType.Pawn && lastMove.From.Rank == rank &&
 			    Math.Abs(lastMove.From.Rank - lastMove.To.Rank) == 2 && lastMove.To.Rank == fromPosition.Rank &&
 			    (lastMove.To.File == fromPosition.File - 1 || lastMove.To.File == fromPosition.File + 1))
@@ -153,7 +153,7 @@ namespace Lupus.Chess.Piece
 			return result;
 		}
 
-		private static ICollection<Position> WhiteMoves(Field field, IPiece pawn)
+		private static IEnumerable<Position> WhiteMoves(Field field, IPiece pawn)
 		{
 			var result = new Collection<Position>();
 			var next = Chess.Move.Up(pawn.Position);
@@ -170,7 +170,7 @@ namespace Lupus.Chess.Piece
 			return result;
 		}
 
-		private static ICollection<Position> BlackMoves(Field field, IPiece pawn)
+		private static IEnumerable<Position> BlackMoves(Field field, IPiece pawn)
 		{
 			var result = new Collection<Position>();
 			var next = Chess.Move.Down(pawn.Position);

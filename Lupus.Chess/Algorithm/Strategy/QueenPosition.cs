@@ -8,7 +8,7 @@ namespace Lupus.Chess.Algorithm.Strategy
 	{
 		private const int Value = 1;
 
-		public override int Compute(Field field, ICollection<IPiece> pieces)
+		public override int Compute(Field field, IEnumerable<IPiece> pieces)
 		{
 			return pieces.Where(p => p.Piece == PieceType.Queen).Select(p => p.AllowedPositions(field).Count()*Value).Sum();
 		}

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Lupus.Chess.Exception;
+using Lupus.Chess.Interface;
 using Lupus.Chess.Piece;
 
 namespace Lupus.Chess
@@ -33,6 +34,8 @@ namespace Lupus.Chess
 			set { _castlingSide = value; }
 		}
 
+		public IPiece Captured { get; set; }
+
 		public object Clone()
 		{
 			return new Move
@@ -55,8 +58,7 @@ namespace Lupus.Chess
 		{
 			if (ReferenceEquals(null, obj)) return false;
 			if (ReferenceEquals(this, obj)) return true;
-			if (obj.GetType() != GetType()) return false;
-			return Equals((Move)obj);
+			return obj.GetType() == GetType() && Equals((Move) obj);
 		}
 
 		public override int GetHashCode()
@@ -224,6 +226,39 @@ namespace Lupus.Chess
 			}
 		}
 
+		public static void UndoCastling(Field field, King king, CastlingSide side)
+		{
+			switch (side)
+			{
+				case CastlingSide.King:
+					switch (king.Side)
+					{
+						case Side.White:
+							field[new Position {File = 'F', Rank = 1}].Position = new Position {File = 'H', Rank = 1};
+							field[new Position {File = 'G', Rank = 1}].Position = new Position {File = 'E', Rank = 1};
+							break;
+						case Side.Black:
+							field[new Position {File = 'F', Rank = 1}].Position = new Position {File = 'H', Rank = 8};
+							field[new Position {File = 'G', Rank = 1}].Position = new Position {File = 'E', Rank = 8};
+							break;
+					}
+					break;
+				case CastlingSide.Queen:
+					switch (king.Side)
+					{
+						case Side.White:
+							field[new Position {File = 'D', Rank = 1}].Position = new Position {File = 'A', Rank = 1};
+							field[new Position {File = 'C', Rank = 1}].Position = new Position {File = 'E', Rank = 1};
+							break;
+						case Side.Black:
+							field[new Position {File = 'D', Rank = 1}].Position = new Position {File = 'A', Rank = 8};
+							field[new Position {File = 'C', Rank = 1}].Position = new Position {File = 'E', Rank = 8};
+							break;
+					}
+					break;
+			}
+		}
+
 		public static bool TryCastling(Field field, King king, CastlingSide side)
 		{
 			try
@@ -244,6 +279,37 @@ namespace Lupus.Chess
 				case Side.Black: return Side.White;
 				case Side.White: return Side.Black;
 				default: throw new ArgumentException("Side should be either Side.White or Wide.Black");
+			}
+		}
+
+		public static void Do(Field field, Move move)
+		{
+			switch (move.CastlingSide)
+			{
+				case CastlingSide.King:
+				case CastlingSide.Queen:
+					var king = (King) field[move.Side].First(p => p.Piece == PieceType.King);
+					Castling(field, king, move.CastlingSide);
+					break;
+				default:
+					var piece = field[move.From];
+					piece.Move(field, move);
+					break;
+			}
+		}
+
+		public static void Undo(Field field, Move move)
+		{
+			switch (move.CastlingSide)
+			{
+				case CastlingSide.King:
+				case CastlingSide.Queen:
+					UndoCastling(field, (King) field[move.Side].First(p => p.Piece == PieceType.King), move.CastlingSide);
+					break;
+				default:
+					if (move.Captured != null) field.Add(move.Captured);
+					field[move.To].Position = move.From;
+					break;
 			}
 		}
 	}

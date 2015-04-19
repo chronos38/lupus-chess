@@ -9,7 +9,7 @@ namespace Lupus.Chess.Algorithm.Strategy
 	{
 		private const float Value = 2;
 
-		public override int Compute(Field field, ICollection<IPiece> pieces)
+		public override int Compute(Field field, IEnumerable<IPiece> pieces)
 		{
 			return
 				(int)

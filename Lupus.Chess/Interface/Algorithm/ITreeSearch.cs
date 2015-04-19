@@ -6,8 +6,11 @@ namespace Lupus.Chess.Interface.Algorithm
 {
 	public interface ITreeSearch
 	{
+		ICollection<Task> Tasks { get; }
 		INode Root { get; }
 		IAlphaBeta AlphaBeta { get; }
-		Move Execute(Field currentField, int depth);
+		IEnumerable<Move> Execute(int depth);
+		IEnumerable<Move> Execute(int depth, int timeout);
+		IEnumerable<Move> Execute(int depth, int timeout, INode root);
 	}
 }

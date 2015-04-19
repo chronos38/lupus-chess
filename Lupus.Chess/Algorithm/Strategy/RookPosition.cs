@@ -10,12 +10,11 @@ namespace Lupus.Chess.Algorithm.Strategy
 		private const int Rank = 1;
 		private const int Value = 1;
 
-		public override int Compute(Field field, ICollection<IPiece> pieces)
+		public override int Compute(Field field, IEnumerable<IPiece> pieces)
 		{
-			var rooks = pieces.Where(p => p.Piece == PieceType.Rook);
-			var enumerable = rooks as IPiece[] ?? rooks.ToArray();
-			return enumerable.Select(r => r.AllowedPositions(field).Count()*Value).Sum()*
-			       enumerable.Select(r => r.Side == Side.White ? (r.Position.Rank - 1)*Rank : Math.Abs(r.Position.Rank - 8)*Rank)
+			var rooks = pieces.Where(p => p.Piece == PieceType.Rook).ToArray();
+			return rooks.Select(r => r.AllowedPositions(field).Count() * Value).Sum() *
+				   rooks.Select(r => r.Side == Side.White ? (r.Position.Rank - 1) * Rank : Math.Abs(r.Position.Rank - 8) * Rank)
 				       .Sum();
 		}
 	}

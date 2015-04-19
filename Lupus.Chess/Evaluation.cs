@@ -15,7 +15,8 @@ namespace Lupus.Chess
 
 		private Evaluation()
 		{
-			Strategies = new List<IStrategy>()
+			ForSide = Side.White;
+			Strategies = new List<IStrategy>
 			{
 				new Material(),
 				new BishopPosition(),
@@ -29,7 +30,7 @@ namespace Lupus.Chess
 		public static int PawnStrenght { get { return 100; } }
 
 		public Side ForSide { get; set; }
-		public ICollection<IStrategy> Strategies { get; private set; }
+		public IEnumerable<IStrategy> Strategies { get; private set; }
 
 		public int Execute(Field field)
 		{
@@ -38,8 +39,6 @@ namespace Lupus.Chess
 
 		public int Execute(Field field, Side side)
 		{
-			if (Strategies == null) throw new NullReferenceException("Evaluation.Strategies is null");
-			if (Strategies.Count == 0) throw new InvalidOperationException("Evaluation.Strategies is empty.");
 			return (from strategy in Strategies select strategy.Execute(field, ForSide)).Sum();
 		}
 	}

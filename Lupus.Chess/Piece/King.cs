@@ -84,7 +84,7 @@ namespace Lupus.Chess.Piece
 			var result = new List<Move>();
 			var positions = AllowedPositions(field);
 			AddCastling(result, CanUseCastling(field));
-			result.AddRange(positions.Select(p => new Move {From = Position, To = p, Side = Side, Piece = Piece}));
+			result.AddRange(positions.Select(p => new Move {From = Position, To = p, Side = Side, Piece = Piece}).ToArray());
 			return result;
 		}
 
@@ -114,7 +114,7 @@ namespace Lupus.Chess.Piece
 		{
 			var pieces = field[Side];
 			// Check if king have moved
-			if (History.Instance.Any(m => m.Piece == PieceType.King && m.Side == Side)) return CastlingSide.None;
+			if (PastMoves.Any(m => m.Piece == PieceType.King && m.Side == Side)) return CastlingSide.None;
 			// If king is in check, castling is not allowed
 			if (IsInCheck(field)) return CastlingSide.None;
 			var rank = Side == Side.White ? 1 : 8;
@@ -123,7 +123,7 @@ namespace Lupus.Chess.Piece
 			var king = new Position {File = 'H', Rank = rank};
 			// Check if queen side rook has moved
 			if (
-				History.Instance.Any(
+				PastMoves.Any(
 					p => p.Side == Side && p.Piece == PieceType.Rook && p.From == queen))
 			{
 				result = CastlingSide.King;
@@ -131,7 +131,7 @@ namespace Lupus.Chess.Piece
 			}
 			// Check if king side rook has moved
 			if (
-				History.Instance.Any(
+				PastMoves.Any(
 					p => p.Side == Side && p.Piece == PieceType.Rook && p.From == king))
 			{
 				if (result == CastlingSide.King) return CastlingSide.None;
@@ -139,11 +139,11 @@ namespace Lupus.Chess.Piece
 				king = null;
 			}
 			// Select unmoved rooks
-			var rooks = (from p in pieces where p.Piece == PieceType.Rook && (p.Position == queen || p.Position == king) select p).ToList();
+			var rooks = (from p in pieces where p.Piece == PieceType.Rook && (p.Position == queen || p.Position == king) select p);
 			// If there are no rooks available than castling is disallowed
 			if (!rooks.Any()) return CastlingSide.None;
 			// Check if all fields between rook and king are free and not under attack
-			var underAttack = field.UnderAttack(Chess.Move.InvertSide(Side)).ToArray();
+			var underAttack = field.UnderAttack(Chess.Move.InvertSide(Side));
 			foreach (var position in rooks.Select(rook => rook.Position))
 			{
 				var pos = position;
@@ -154,7 +154,7 @@ namespace Lupus.Chess.Piece
 					{
 						pos = Chess.Move.Right(pos);
 						if (field.IsFree(pos) == Side.None && !underAttack.Contains(pos)) continue;
-						if (result == CastlingSide.Both) result = rooks.Count == 1 ? CastlingSide.Queen : CastlingSide.King;
+						if (result == CastlingSide.Both) result = rooks.Count() == 1 ? CastlingSide.Queen : CastlingSide.King;
 						if (result == CastlingSide.Queen) return CastlingSide.None;
 						if (result == CastlingSide.King) break;
 					}
@@ -166,7 +166,7 @@ namespace Lupus.Chess.Piece
 				{
 					pos = Chess.Move.Left(pos);
 					if (field.IsFree(pos) == Side.None && !underAttack.Contains(pos)) continue;
-					if (result == CastlingSide.Both) result = rooks.Count == 1 ? CastlingSide.King : CastlingSide.Queen;
+					if (result == CastlingSide.Both) result = rooks.Count() == 1 ? CastlingSide.King : CastlingSide.Queen;
 					if (result == CastlingSide.King) return CastlingSide.None;
 					if (result == CastlingSide.Queen) break;
 				}

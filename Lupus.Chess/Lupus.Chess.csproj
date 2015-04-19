@@ -63,6 +63,7 @@
     <Compile Include="Interface\Algorithm\ITreeSearch.cs" />
     <Compile Include="Interface\Algorithm\IStrategy.cs" />
     <Compile Include="LambdaComparer.cs" />
+    <Compile Include="Order.cs" />
     <Compile Include="Piece\AbstractPiece.cs" />
     <Compile Include="PieceType.cs" />
     <Compile Include="Piece\Bishop.cs" />
@@ -82,7 +83,6 @@
     <Compile Include="TranspositionTable.cs" />
     <Compile Include="Tree\Node.cs" />
     <Compile Include="Tree\TreeSearch.cs" />
-    <Compile Include="TpvTable.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Algorithm\End\" />

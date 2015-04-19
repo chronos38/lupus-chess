@@ -14,7 +14,14 @@ namespace Lupus.Chess.Interface
 		/// What kind of piece is this instance.
 		/// </summary>
 		PieceType Piece { get; }
-		Position Position { get; }
+		/// <summary>
+		/// Position of this piece.
+		/// </summary>
+		Position Position { get; set; }
+		/// <summary>
+		/// Inject the previous moves for allowed moves computation.
+		/// </summary>
+		History PastMoves { get; set; }
 		/// <summary>
 		/// This method is intended for internal usage only. Do not use it.
 		/// </summary>

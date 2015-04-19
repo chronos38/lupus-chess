@@ -94,9 +94,9 @@ namespace Lupus.Chess
 			switch (fromSide)
 			{
 				case Side.Black:
-					return (from p in this[Side.Black] from pos in p.AllowedPositions(this) select pos).ToList();
+					return (from p in this[Side.Black] from pos in p.AllowedPositions(this) select pos);
 				case Side.White:
-					return (from p in this[Side.White] from pos in p.AllowedPositions(this) select pos).ToList();
+					return (from p in this[Side.White] from pos in p.AllowedPositions(this) select pos);
 				default:
 					return new Position[] {};
 			}
@@ -123,8 +123,7 @@ namespace Lupus.Chess
 		{
 			if (Equals(other, null)) return false;
 			if (Count != other.Count) return false;
-			var pieces = this.Intersect(other, new LambdaComparer<IPiece>(AbstractPiece.Equals)).ToList();
-			return Count == pieces.Count;
+			return Count == this.Intersect(other, new LambdaComparer<IPiece>(AbstractPiece.Equals)).Count();
 		}
 
 		public override bool Equals(object obj)

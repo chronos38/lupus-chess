@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lupus.Chess", "Lupus.Chess\Lupus.Chess.csproj", "{C81EF2B4-A802-4867-9D77-A4A60FF50AE4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lupus.Chess.Test", "Lupus.Chess.Test\Lupus.Chess.Test.csproj", "{9ACF9CDB-CA57-4191-BD25-C6A7BC3B6EC6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B0CBD1A6-FEAE-4034-8706-EB5398845ECC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -138,20 +138,26 @@ namespace Lupus.Chess.Test.Piece
 			_emptyField.Add(white);
 
 			// Act
-			var rc1 = black.TryMove(_emptyField, new Move
+			var move = new Move
 			{
 				Piece = PieceType.Pawn,
 				From = black.Position,
 				To = new Position {File = 'A', Rank = 5},
 				Side = Side.Black
-			});
-			var rc2 = white.TryMove(_emptyField, new Move
+			};
+			var rc1 = black.TryMove(_emptyField, move);
+			black.PastMoves.Add(move);
+			white.PastMoves.Add(move);
+			move = new Move
 			{
 				Piece = PieceType.Pawn,
 				From = white.Position,
-				To = new Position { File = 'A', Rank = 6 },
+				To = new Position {File = 'A', Rank = 6},
 				Side = Side.White
-			});
+			};
+			var rc2 = white.TryMove(_emptyField, move);
+			black.PastMoves.Add(move);
+			white.PastMoves.Add(move);
 
 			// Assert
 			Assert.IsTrue(rc1);
@@ -169,20 +175,26 @@ namespace Lupus.Chess.Test.Piece
 			_emptyField.Add(white);
 
 			// Act
-			var rc1 = black.TryMove(_emptyField, new Move
+			var move = new Move
 			{
 				Piece = PieceType.Pawn,
 				From = black.Position,
-				To = new Position { File = 'A', Rank = 5 },
+				To = new Position {File = 'A', Rank = 5},
 				Side = Side.Black
-			});
-			var rc2 = white.TryMove(_emptyField, new Move
+			};
+			var rc1 = black.TryMove(_emptyField, move);
+			black.PastMoves.Add(move);
+			white.PastMoves.Add(move);
+			move = new Move
 			{
 				Piece = PieceType.Pawn,
 				From = white.Position,
-				To = new Position { File = 'A', Rank = 6 },
+				To = new Position {File = 'A', Rank = 6},
 				Side = Side.White
-			});
+			};
+			var rc2 = white.TryMove(_emptyField, move);
+			black.PastMoves.Add(move);
+			white.PastMoves.Add(move);
 
 			// Assert
 			Assert.IsTrue(rc1);

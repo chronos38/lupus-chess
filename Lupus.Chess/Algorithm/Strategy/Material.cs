@@ -16,10 +16,11 @@ namespace Lupus.Chess.Algorithm.Strategy
 			{ PieceType.Pawn, 100 }
 		};
 
-		public override int Compute(Field field, ICollection<IPiece> pieces)
+		public override int Compute(Field field, IEnumerable<IPiece> pieces)
 		{
-			var bishop = pieces.Count(p => p.Piece == PieceType.Bishop) >= 2 ? 50 : 0;
-			return bishop + (from piece in pieces select LookupTable[piece.Piece]).Sum();
+			var enumerable = pieces as IPiece[] ?? pieces.ToArray();
+			var bishop = enumerable.Count(p => p.Piece == PieceType.Bishop) >= 2 ? 50 : 0;
+			return bishop + (from piece in enumerable select LookupTable[piece.Piece]).Sum();
 		}
 	}
 }

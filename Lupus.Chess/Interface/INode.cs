@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Lupus.Chess.Interface
 {
@@ -11,17 +12,15 @@ namespace Lupus.Chess.Interface
 		/// <summary>
 		/// Evaluation value of this node.
 		/// </summary>
-		long Value { get; set; }
+		long? Value { get; set; }
 		/// <summary>
 		/// true if one of the kings is captured, otherwise false.
 		/// </summary>
 		bool Terminal { get; set; }
 		/// <summary>
-		/// Computes all allowed moves.
-		/// Complexity is O(n) for n the number of pieces on the field.
+		/// Inject the previous moves for allowed moves computation.
 		/// </summary>
-		/// <returns>Enumerator containing all allowed moves.</returns>
-		IEnumerable<Move> AllowedMoves();
+		History PastMoves { get; set; }
 		/// <summary>
 		/// Computes all moves for given side.
 		/// Complexity is O(n) for n the number of pieces for the given side on the field.
@@ -35,5 +34,10 @@ namespace Lupus.Chess.Interface
 		/// <param name="fromSide">Determines that can execute the captures.</param>
 		/// <returns>All capture moves.</returns>
 		IEnumerable<Move> AvailableCaptures(Side fromSide);
+		/// <summary>
+		/// Sorts the elements in the entire INode using the specified order.
+		/// </summary>
+		/// <param name="order">Either ascending or descending.</param>
+		void Sort(Order order);
 	}
 }

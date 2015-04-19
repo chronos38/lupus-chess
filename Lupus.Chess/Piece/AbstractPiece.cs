@@ -13,6 +13,7 @@ namespace Lupus.Chess.Piece
 		private Side _side = Side.None;
 		private PieceType _piece = PieceType.Abstract;
 		private Position _position = new Position {File = 'A', Rank = 1};
+		private History _pastMoves = new History();
 
 		public Side Side
 		{
@@ -29,15 +30,21 @@ namespace Lupus.Chess.Piece
 		public Position Position
 		{
 			get { return _position; }
-			internal set { _position = value; }
+			set { _position = value; }
+		}
+
+		public History PastMoves
+		{
+			get { return _pastMoves; }
+			set { _pastMoves = value; }
 		}
 
 		public virtual void Move(Field field, Move move)
 		{
 			if (Side != move.Side || Piece != move.Piece || Position != move.From) throw new ChessMoveException(move);
-			field.Remove(move.To);
+			var capture = field[move.To];
+			if (field.Remove(capture)) move.Captured = capture;
 			Position = move.To;
-			History.Instance.Add(move);
 		}
 
 		public bool TryMove(Field field, Move move)
@@ -65,7 +72,7 @@ namespace Lupus.Chess.Piece
 
 		public virtual IEnumerable<Move> AllowedMoves(Field field)
 		{
-			return AllowedPositions(field).Select(p => new Move {From = Position, To = p, Side = Side, Piece = Piece});
+			return AllowedPositions(field).Select(p => new Move {From = Position, To = p, Side = Side, Piece = Piece}).ToArray();
 		}
 
 		public static bool Equals(IPiece lhs, IPiece rhs)
@@ -75,7 +82,7 @@ namespace Lupus.Chess.Piece
 			       && lhs.Piece == rhs.Piece;
 		}
 
-		protected static ICollection<Position> FindPositions(Field field, Side side, Position position, Direction direction)
+		protected static IEnumerable<Position> FindPositions(Field field, Side side, Position position, Direction direction)
 		{
 			var pos = position;
 			var result = new Collection<Position>();

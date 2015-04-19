@@ -1,35 +1,37 @@
-﻿using System.Xml.Schema;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using Lupus.Chess.Interface;
-using Lupus.Chess.Interface.Algorithm;
-using Lupus.Chess.Tree;
 
 namespace Lupus.Chess.Algorithm
 {
 	public class AlphaBetaFailHard : AlphaBeta
 	{
-		public override long Execute(INode node, Side plySide, long alpha, long beta, int depth, int ply, int pvIndex)
+		public override long Execute(INode node, Side plySide, long alpha, long beta, int depth, History history)
 		{
-			if (depth <= 0 || node.Terminal)
+			var array = node.AllowedMoves(plySide).ToArray();
+
+			if (array.Length == 0 || depth <= 0 || node.Terminal)
 			{
-				var evaluation = QuescenceSearch(node, plySide, alpha, beta);
-				TranspositionTable.Instance[node.Field] = node;
-				node.Value = evaluation;
+				var evaluation = QuescenceSearch(node, plySide, alpha, beta, history);
+				TranspositionTable.Add(node);
 				return evaluation;
 			}
 
-			TpvTable.Instance[pvIndex] = null;
-			var pvNextIndex = pvIndex + TpvTable.N - ply;
+			var moves = Sort(node.Field, array);
+			node.PastMoves = history;
 
-			foreach (var move in node.AllowedMoves(plySide))
+			foreach (var move in moves)
 			{
-				var child = CreateNode(node, move);
-				var value = -Execute(child, plySide, -beta, -alpha, depth - 1, ply + 1, pvNextIndex);
+				var h = (History) history.Clone();
+				var child = CreateNode(node, move, h);
+				var value = -Execute(child, Move.InvertSide(plySide), -beta, -alpha, depth - 1, h);
 
 				if (value >= beta) return beta; // hard beta cutoff
 				if (value <= alpha) continue;
 				alpha = value;
-				TpvTable.Instance[pvIndex] = move;
-				TpvTable.Instance.MoveCopy(pvIndex + 1, pvNextIndex, TpvTable.N - ply - 1);
+				TranspositionTable.Instance[node.Field].Item2.Add(move);
 			}
 
 			return alpha;
