@@ -13,9 +13,7 @@ void zobrist_initialize()
         std::numeric_limits<uint64_t>::max());
 
     for (auto&& entry : zobrist_table)
-    {
         entry = dis(gen);
-    }
 }
 
 
@@ -28,7 +26,7 @@ uint64_t zobrist_hash(const board& board)
         if (board[i])
         {
             auto j = board[i] - 1;
-            hash = hash ^ zobrist_table[i * 64 + j];
+            hash = hash ^ zobrist_table[i * 12 + j];
         }
     }
 

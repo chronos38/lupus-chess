@@ -1,5 +1,4 @@
 #pragma once
-
 #include "board.h"
 
 void zobrist_initialize();
