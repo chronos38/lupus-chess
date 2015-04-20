@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lupus.Chess.Client", "Lupus.Chess.Client\Lupus.Chess.Client.vcxproj", "{AFE81B9A-79E4-4BEA-A1CD-1340EBD32650}"
+	ProjectSection(ProjectDependencies) = postProject
+		{408E4FFB-F794-464A-9160-55169E472A4B} = {408E4FFB-F794-464A-9160-55169E472A4B}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lupus.Chess.Library", "Lupus.Chess.Library\Lupus.Chess.Library.vcxproj", "{408E4FFB-F794-464A-9160-55169E472A4B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lupus.Chess.Test", "Lupus.Chess.Test\Lupus.Chess.Test.vcxproj", "{CD247318-E8CD-4F49-9D93-D5B42C753212}"
+	ProjectSection(ProjectDependencies) = postProject
+		{408E4FFB-F794-464A-9160-55169E472A4B} = {408E4FFB-F794-464A-9160-55169E472A4B}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AFE81B9A-79E4-4BEA-A1CD-1340EBD32650}.Debug|Win32.ActiveCfg = Debug|Win32
+		{AFE81B9A-79E4-4BEA-A1CD-1340EBD32650}.Debug|Win32.Build.0 = Debug|Win32
+		{AFE81B9A-79E4-4BEA-A1CD-1340EBD32650}.Release|Win32.ActiveCfg = Release|Win32
+		{AFE81B9A-79E4-4BEA-A1CD-1340EBD32650}.Release|Win32.Build.0 = Release|Win32
+		{408E4FFB-F794-464A-9160-55169E472A4B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{408E4FFB-F794-464A-9160-55169E472A4B}.Debug|Win32.Build.0 = Debug|Win32
+		{408E4FFB-F794-464A-9160-55169E472A4B}.Release|Win32.ActiveCfg = Release|Win32
+		{408E4FFB-F794-464A-9160-55169E472A4B}.Release|Win32.Build.0 = Release|Win32
+		{CD247318-E8CD-4F49-9D93-D5B42C753212}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CD247318-E8CD-4F49-9D93-D5B42C753212}.Debug|Win32.Build.0 = Debug|Win32
+		{CD247318-E8CD-4F49-9D93-D5B42C753212}.Release|Win32.ActiveCfg = Release|Win32
+		{CD247318-E8CD-4F49-9D93-D5B42C753212}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
