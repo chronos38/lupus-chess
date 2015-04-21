@@ -88,6 +88,10 @@ board make_board(const char* fen)
     return result;
 }
 
+std::shared_ptr<board> make_shared_board(const char* fen) {
+    return std::make_shared<board>(std::move(make_board(fen)));
+}
+
 board::board() {
     memset(field_, 0, sizeof(field_));
     memset(castling_, 0, sizeof(castling_));
@@ -152,6 +156,7 @@ int board::count() {
 }
 
 std::string board::to_fen() const {
+    // XXX: Check memory access since there is something wrong.
     std::string result;
     result.reserve(128);
 

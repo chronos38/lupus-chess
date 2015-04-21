@@ -2,8 +2,10 @@
 #include <cstdint>
 #include <string>
 #include "piece.h"
+#include <memory>
 
 class board make_board(const char* fen);
+class std::shared_ptr<board> make_shared_board(const char* fen);
 
 enum castling {
     both_sides,
