@@ -70,10 +70,10 @@ board make_board(const char* fen) {
     }
 
     // Castling
-    copy(result.castling_);
+    copy(result.castling_.get());
 
     // En passant
-    copy(result.en_passant_);
+    copy(result.en_passant_.get());
 
     // Halfmove clock
     result.halfmove_ = convert();
@@ -89,34 +89,53 @@ std::shared_ptr<board> make_shared_board(const char* fen) {
 }
 
 board::board() {
-    memset(field_, 0, sizeof(field_));
-    memset(castling_, 0, sizeof(castling_));
-    memset(en_passant_, 0, sizeof(en_passant_));
+    field_ = std::make_unique<uint8_t[]>(64);
+    castling_ = std::make_unique<char[]>(5);
+    en_passant_ = std::make_unique<char[]>(3);
+    memset(field_.get(), 0, 64);
+    memset(castling_.get(), 0, 5);
+    memset(en_passant_.get(), 0, 3);
 }
 
-board::board(board&& board) {
-    memmove(field_, board.field_, sizeof(field_));
-    memmove(castling_, board.castling_, sizeof(castling_));
-    memmove(en_passant_, board.en_passant_, sizeof(en_passant_));
-    active_ = board.active_;
-    halfmove_ = board.halfmove_;
-    fullmove_ = board.fullmove_;
+board::board(board&& other) : board() {
+    field_.swap(other.field_);
+    castling_.swap(other.castling_);
+    en_passant_.swap(other.en_passant_);
+    active_ = other.active_;
+    halfmove_ = other.halfmove_;
+    fullmove_ = other.fullmove_;
+
+    other.active_ = white;
+    other.halfmove_ = 0;
+    other.fullmove_ = 1;
+    other.field_.reset(nullptr);
+    other.castling_.reset(nullptr);
+    other.en_passant_.reset(nullptr);
+}
+
+board::board(const board& other) : board() {
+    memcpy(field_.get(), other.field_.get(), 64);
+    memcpy(castling_.get(), other.castling_.get(), 5);
+    memcpy(en_passant_.get(), other.en_passant_.get(), 3);
+    active_ = other.active_;
+    halfmove_ = other.halfmove_;
+    fullmove_ = other.fullmove_;
 }
 
 uint8_t* board::begin() {
-    return field_;
+    return field_.get();
 }
 
 const uint8_t* board::begin() const {
-    return field_;
+    return field_.get();
 }
 
 uint8_t* board::end() {
-    return field_ + sizeof(field_);
+    return field_.get() + 64;
 }
 
 const uint8_t* board::end() const {
-    return field_ + sizeof(field_);
+    return field_.get() + 64;
 }
 
 uint8_t board::get(char file, int rank) const {
@@ -139,14 +158,13 @@ void board::set(const char* position, uint8_t value) {
 
 int board::count() {
     auto result = 0;
-    for (auto&& position : field_)
-        if (position)
+    for (auto i = 63; i >= 0; i--)
+        if (field_[i])
             result++;
     return result;
 }
 
 std::string board::to_fen() const {
-    // XXX: Check memory access since there is something wrong.
     std::string result;
     result.reserve(128);
 
@@ -180,9 +198,9 @@ std::string board::to_fen() const {
     result.back() = ' ';
     result += active_ == white ? 'w' : 'b';
     result += ' ';
-    result += castling_;
+    result += castling_.get();
     result += ' ';
-    result += en_passant_;
+    result += en_passant_.get();
     result += ' ';
     result += std::to_string(halfmove_);
     result += ' ';
@@ -201,28 +219,31 @@ void board::toggle_active_color() {
 }
 
 const char* board::castling() const {
-    return castling_;
+    return castling_.get();
 }
 
 void board::set_castling(const char* value) {
     auto length = strlen(value);
+    if (length > 4)
+        length = 4;
 
     if (length < sizeof(castling_)) {
-        memcpy(castling_, value, length);
+        memcpy(castling_.get(), value, length);
     } else {
         throw std::length_error("board::set_castling(const char* value) allows a maximum string length of 4.");
     }
 }
 
 const char* board::en_passant() const {
-    return en_passant_;
+    return en_passant_.get();
 }
 
 void board::set_en_passant(const char* value) {
     auto length = strlen(value);
+    if (length > 2) length = 2;
 
     if (length < sizeof(en_passant_)) {
-        memcpy(en_passant_, value, length);
+        memcpy(en_passant_.get(), value, length);
     } else {
         throw std::length_error("board::set_castling(const char* value) allows a maximum string length of 2.");
     }
@@ -242,6 +263,36 @@ uint8_t& board::operator[](int index) {
 
 const uint8_t& board::operator[](int index) const {
     return field_[index];
+}
+
+board& board::operator=(board&& other) {
+    if (this != &other) {
+        field_.swap(other.field_);
+        castling_.swap(other.castling_);
+        en_passant_.swap(other.en_passant_);
+        active_ = other.active_;
+        halfmove_ = other.halfmove_;
+        fullmove_ = other.fullmove_;
+
+        other.active_ = white;
+        other.halfmove_ = 0;
+        other.fullmove_ = 1;
+        other.field_.reset(nullptr);
+        other.castling_.reset(nullptr);
+        other.en_passant_.reset(nullptr);
+    }
+
+    return *this;
+}
+
+board& board::operator=(const board& other) {
+    memcpy(field_.get(), other.field_.get(), 64);
+    memcpy(castling_.get(), other.castling_.get(), 5);
+    memcpy(en_passant_.get(), other.en_passant_.get(), 3);
+    active_ = other.active_;
+    halfmove_ = other.halfmove_;
+    fullmove_ = other.fullmove_;
+    return *this;
 }
 
 board board::create_starting_board() {

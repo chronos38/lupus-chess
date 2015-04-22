@@ -6,7 +6,7 @@ move::move(move&& move) {
     std::swap(value_, move.value_);
 }
 
-move::move(std::shared_ptr<board> board, const char* string) {
+move::move(board* board, const char* string) {
     auto length = strlen(string);
 
     if (length >= sizeof(value_)) {

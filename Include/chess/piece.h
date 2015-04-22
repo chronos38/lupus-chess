@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <cstdint>
+#include <memory>
 
 enum piece_value {
     white_king = 'K',
@@ -30,7 +31,20 @@ enum piece_type {
     pawn
 };
 
+class piece_state {
+public:
+};
+
 class piece {
 public:
+    piece() = delete;
+    explicit piece(piece_value value);
+    piece(piece_color color, piece_type type);
+    piece(piece&& other);
+    piece(const piece& other);
     virtual ~piece() = default;
+    piece& operator=(piece&& other);
+    piece& operator=(const piece& other);
+private:
+    std::unique_ptr<piece_state> state_;
 };

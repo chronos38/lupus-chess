@@ -17,8 +17,8 @@ enum castling {
 class board {
 public:
     board();
-    board(board&& board);
-    board(const board&) = default;
+    board(board&& other);
+    board(const board& other);
     virtual ~board() = default;
     uint8_t* begin();
     const uint8_t* begin() const;
@@ -40,14 +40,16 @@ public:
     uint8_t fullmove() const;
     uint8_t& operator[](int index);
     const uint8_t& operator[](int index) const;
+    board& operator=(board&& other);
+    board& operator=(const board& other);
     static board create_starting_board();
 private:
     friend board make_board(const char*);
     void set(int row, int column, uint8_t value);
-    uint8_t field_[64];
+    std::unique_ptr<uint8_t[]> field_;
+    std::unique_ptr<char[]> castling_;
+    std::unique_ptr<char[]> en_passant_;
     piece_color active_ = white;
-    char castling_[5];
-    char en_passant_[3];
     uint8_t halfmove_ = 0;
     uint8_t fullmove_ = 0;
 };
