@@ -34,10 +34,8 @@ void zobrist_initialize() {
 uint64_t zobrist_hash(const board& board) {
     uint64_t hash = 0;
 
-    for (auto i = 0; i < 64; i++)
-    {
-        if (board[i])
-        {
+    for (auto i = 0; i < 64; i++) {
+        if (board[i]) {
             auto j = piece_value_map[board[i]];
             hash = hash ^ zobrist_table[i * 12 + j];
         }

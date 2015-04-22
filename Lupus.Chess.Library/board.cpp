@@ -3,14 +3,13 @@
 #include <locale>
 #include <algorithm>
 
-board make_board(const char* fen)
-{
+board make_board(const char* fen) {
     board result;
     auto file = 'a';
     auto rank = 8;
     auto length = strlen(fen);
     auto space = std::find(fen, fen + length, ' ');
-    static auto copy = [&] (char* ref) {
+    auto copy = [&] (char* ref) {
         if (*(space += 2) != '-') {
             auto find = std::find(space, fen + length, ' ');
             memcpy(ref, space, find - space);
@@ -19,7 +18,7 @@ board make_board(const char* fen)
             ref[0] = '-';
         }
     };
-    static auto convert = [&] () {
+    auto convert = [&] () {
         auto tenner = *(space += 2) - '0';
         
         if (space + 1 < fen + length && isdigit(*(space + 1))) {
@@ -30,7 +29,7 @@ board make_board(const char* fen)
     };
     
     // Board
-    for (auto it = fen, end = fen + length; it < end; it++) {
+    for (auto it = fen, end = fen + length; it < end && it != space; it++) {
         auto ch = *it;
 
         if (ch == '/') {
@@ -38,9 +37,6 @@ board make_board(const char* fen)
                 break;
             file = 'a';
             continue;
-        }
-        if (ch == ' ') {
-            break;
         }
 
         switch (ch) {
@@ -99,12 +95,12 @@ board::board() {
 }
 
 board::board(board&& board) {
-    std::swap(field_, board.field_);
-    std::swap(active_, board.active_);
-    std::swap(castling_, board.castling_);
-    std::swap(en_passant_, board.en_passant_);
-    std::swap(halfmove_, board.halfmove_);
-    std::swap(fullmove_, board.fullmove_);
+    memmove(field_, board.field_, sizeof(field_));
+    memmove(castling_, board.castling_, sizeof(castling_));
+    memmove(en_passant_, board.en_passant_, sizeof(en_passant_));
+    active_ = board.active_;
+    halfmove_ = board.halfmove_;
+    fullmove_ = board.fullmove_;
 }
 
 uint8_t* board::begin() {
@@ -124,27 +120,21 @@ const uint8_t* board::end() const {
 }
 
 uint8_t board::get(char file, int rank) const {
-    rank -= 1;
     auto index = tolower(file) - 'a';
-    return field_[rank * 8 + index];
+    return field_[--rank * 8 + index];
 }
 
 uint8_t board::get(const char* position) const {
-    auto rank = std::stoi(std::string(1, position[1])) - 1;
-    auto index = tolower(position[0]) - 'a';
-    return field_[rank * 8 + index];
+    return get(position[0], position[1] - '0');
 }
 
 void board::set(char file, int rank, uint8_t value) {
-    rank -= 1;
     auto index = tolower(file) - 'a';
-    field_[rank * 8 + index] = value;
+    field_[--rank * 8 + index] = value;
 }
 
 void board::set(const char* position, uint8_t value) {
-    auto rank = std::stoi(std::string(1, position[1])) - 1;
-    auto index = tolower(position[0]) - 'a';
-    field_[rank * 8 + index] = value;
+    set(position[0], position[1] - '0', value);
 }
 
 int board::count() {
