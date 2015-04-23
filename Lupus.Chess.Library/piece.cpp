@@ -104,7 +104,7 @@ private:
     piece_color color_;
 };
 
-piece::piece(std::shared_ptr<board> board, piece_value value) : board_(board) {
+piece::piece(std::shared_ptr<::board> board, piece_value value) : board_(board) {
     switch (value) {
     case white_king:
         break;
@@ -133,7 +133,7 @@ piece::piece(std::shared_ptr<board> board, piece_value value) : board_(board) {
     }
 }
 
-piece::piece(std::shared_ptr<board> board, piece_color color, piece_type type) {
+piece::piece(std::shared_ptr<::board> board, piece_color color, piece_type type) {
 }
 
 piece::piece(piece&& other) {
@@ -178,7 +178,11 @@ piece_color piece::color() const {
     return state_->color(this);
 }
 
-void piece::set_board(std::shared_ptr<board> value) {
+std::shared_ptr<board> piece::board() const {
+    return board_;
+}
+
+void piece::set_board(std::shared_ptr<::board> value) {
     board_ = value;
 }
 

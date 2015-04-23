@@ -65,10 +65,11 @@ public:
     piece_value value() const;
     piece_type type() const;
     piece_color color() const;
-    void set_board(std::shared_ptr<board> value);
+    std::shared_ptr<board> board() const;
+    void set_board(std::shared_ptr<::board> value);
     piece& operator=(piece&& other);
     piece& operator=(const piece& other);
 private:
-    std::shared_ptr<board> board_;
+    std::shared_ptr<::board> board_;
     std::unique_ptr<piece_state> state_;
 };

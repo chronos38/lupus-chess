@@ -70,10 +70,10 @@ board make_board(const char* fen) {
     }
 
     // Castling
-    copy(result.castling_.get());
+    copy(result.castling_.data());
 
     // En passant
-    copy(result.en_passant_.get());
+    copy(result.en_passant_.data());
 
     // Halfmove clock
     result.halfmove_ = convert();
@@ -89,18 +89,15 @@ std::shared_ptr<board> make_shared_board(const char* fen) {
 }
 
 board::board() {
-    field_ = std::make_unique<uint8_t[]>(64);
-    castling_ = std::make_unique<char[]>(5);
-    en_passant_ = std::make_unique<char[]>(3);
-    memset(field_.get(), 0, 64);
-    memset(castling_.get(), 0, 5);
-    memset(en_passant_.get(), 0, 3);
+    field_.fill(0);
+    castling_.fill(0);
+    en_passant_.fill(0);
 }
 
 board::board(board&& other) : board() {
-    field_.swap(other.field_);
-    castling_.swap(other.castling_);
-    en_passant_.swap(other.en_passant_);
+    swap(field_, other.field_);
+    swap(castling_, other.castling_);
+    swap(en_passant_, other.en_passant_);
     active_ = other.active_;
     halfmove_ = other.halfmove_;
     fullmove_ = other.fullmove_;
@@ -108,34 +105,31 @@ board::board(board&& other) : board() {
     other.active_ = white;
     other.halfmove_ = 0;
     other.fullmove_ = 1;
-    other.field_.reset(nullptr);
-    other.castling_.reset(nullptr);
-    other.en_passant_.reset(nullptr);
 }
 
 board::board(const board& other) : board() {
-    memcpy(field_.get(), other.field_.get(), 64);
-    memcpy(castling_.get(), other.castling_.get(), 5);
-    memcpy(en_passant_.get(), other.en_passant_.get(), 3);
+    field_ = other.field_;
+    castling_ = other.castling_;
+    en_passant_ = other.en_passant_;
     active_ = other.active_;
     halfmove_ = other.halfmove_;
     fullmove_ = other.fullmove_;
 }
 
-uint8_t* board::begin() {
-    return field_.get();
+std::array<uint8_t, 64>::iterator board::begin() {
+    return field_.begin();
 }
 
-const uint8_t* board::begin() const {
-    return field_.get();
+std::array<uint8_t, 64>::const_iterator board::begin() const {
+    return field_.begin();
 }
 
-uint8_t* board::end() {
-    return field_.get() + 64;
+std::array<uint8_t, 64>::iterator board::end() {
+    return field_.end();
 }
 
-const uint8_t* board::end() const {
-    return field_.get() + 64;
+std::array<uint8_t, 64>::const_iterator board::end() const {
+    return field_.end();
 }
 
 uint8_t board::get(char file, int rank) const {
@@ -198,9 +192,9 @@ std::string board::to_fen() const {
     result.back() = ' ';
     result += active_ == white ? 'w' : 'b';
     result += ' ';
-    result += castling_.get();
+    result += castling_.data();
     result += ' ';
-    result += en_passant_.get();
+    result += en_passant_.data();
     result += ' ';
     result += std::to_string(halfmove_);
     result += ' ';
@@ -219,31 +213,32 @@ void board::toggle_active_color() {
 }
 
 const char* board::castling() const {
-    return castling_.get();
+    return castling_.data();
 }
 
 void board::set_castling(const char* value) {
     auto length = strlen(value);
-    if (length > 4)
-        length = 4;
+    if (length > castling_.max_size() - 1)
+        length = castling_.max_size() - 1;
 
     if (length < sizeof(castling_)) {
-        memcpy(castling_.get(), value, length);
+        memcpy(castling_.data(), value, length);
     } else {
         throw std::length_error("board::set_castling(const char* value) allows a maximum string length of 4.");
     }
 }
 
 const char* board::en_passant() const {
-    return en_passant_.get();
+    return en_passant_.data();
 }
 
 void board::set_en_passant(const char* value) {
     auto length = strlen(value);
-    if (length > 2) length = 2;
+    if (length > en_passant_.max_size() - 1) 
+        length = en_passant_.max_size() - 1;
 
     if (length < sizeof(en_passant_)) {
-        memcpy(en_passant_.get(), value, length);
+        memcpy(en_passant_.data(), value, length);
     } else {
         throw std::length_error("board::set_castling(const char* value) allows a maximum string length of 2.");
     }
@@ -267,9 +262,9 @@ const uint8_t& board::operator[](int index) const {
 
 board& board::operator=(board&& other) {
     if (this != &other) {
-        field_.swap(other.field_);
-        castling_.swap(other.castling_);
-        en_passant_.swap(other.en_passant_);
+        swap(field_, other.field_);
+        swap(castling_, other.castling_);
+        swap(en_passant_, other.en_passant_);
         active_ = other.active_;
         halfmove_ = other.halfmove_;
         fullmove_ = other.fullmove_;
@@ -277,18 +272,18 @@ board& board::operator=(board&& other) {
         other.active_ = white;
         other.halfmove_ = 0;
         other.fullmove_ = 1;
-        other.field_.reset(nullptr);
-        other.castling_.reset(nullptr);
-        other.en_passant_.reset(nullptr);
+        other.field_.fill(0);
+        other.castling_.fill(0);
+        other.en_passant_.fill(0);
     }
 
     return *this;
 }
 
 board& board::operator=(const board& other) {
-    memcpy(field_.get(), other.field_.get(), 64);
-    memcpy(castling_.get(), other.castling_.get(), 5);
-    memcpy(en_passant_.get(), other.en_passant_.get(), 3);
+    field_ = other.field_;
+    castling_ = other.castling_;
+    en_passant_ = other.en_passant_;
     active_ = other.active_;
     halfmove_ = other.halfmove_;
     fullmove_ = other.fullmove_;

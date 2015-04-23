@@ -2,19 +2,15 @@
 #include "move.h"
 #include <set>
 
-move::move(move&& move) {
-    std::swap(value_, move.value_);
+move::move() {
+    memset(from_, 0, sizeof(from_));
+    memset(to_, 0, sizeof(to_));
 }
 
-move::move(board* board, const char* string) {
-    auto length = strlen(string);
+move::move(move&& move) {
+}
 
-    if (length >= sizeof(value_)) {
-        throw std::length_error("move does support only strings with a maximum length of 8.");
-    }
-
-    memcpy(value_, string, length);
-    board_ = board;
+move::move(std::shared_ptr<piece> piece, const char* from, const char* to) {
 }
 
 void move::execute() {
@@ -25,6 +21,14 @@ void move::undo() {
     throw std::exception("move::undo not implemented");
 }
 
-bool move::validate() const {
-    throw std::exception("move::validate not implemented");
+std::string move::to_string() const {
+    throw std::exception("move::to_string not implemented");
+}
+
+move& move::operator=(move&& other) {
+    return *this;
+}
+
+move& move::operator=(const move& other) {
+    return *this;
 }

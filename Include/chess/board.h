@@ -3,6 +3,7 @@
 #include <string>
 #include "piece.h"
 #include <memory>
+#include <array>
 
 class board make_board(const char* fen);
 class std::shared_ptr<board> make_shared_board(const char* fen);
@@ -20,10 +21,10 @@ public:
     board(board&& other);
     board(const board& other);
     virtual ~board() = default;
-    uint8_t* begin();
-    const uint8_t* begin() const;
-    uint8_t* end();
-    const uint8_t* end() const;
+    std::array<uint8_t, 64>::iterator begin();
+    std::array<uint8_t, 64>::const_iterator begin() const;
+    std::array<uint8_t, 64>::iterator end();
+    std::array<uint8_t, 64>::const_iterator end() const;
     uint8_t get(char file, int rank) const;
     uint8_t get(const char* position) const;
     void set(char file, int rank, uint8_t value);
@@ -46,9 +47,9 @@ public:
 private:
     friend board make_board(const char*);
     void set(int row, int column, uint8_t value);
-    std::unique_ptr<uint8_t[]> field_;
-    std::unique_ptr<char[]> castling_;
-    std::unique_ptr<char[]> en_passant_;
+    std::array<uint8_t, 64> field_;
+    std::array<char, 5> castling_;
+    std::array<char, 3> en_passant_;
     piece_color active_ = white;
     uint8_t halfmove_ = 0;
     uint8_t fullmove_ = 0;
