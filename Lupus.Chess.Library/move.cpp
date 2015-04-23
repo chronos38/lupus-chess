@@ -38,15 +38,15 @@ move::move(std::shared_ptr<piece> piece, const char* from, const char* to) : pie
 }
 
 void move::execute() {
-    throw std::exception("move::exectue not implemented");
+    throw std::exception("void move::exectue() not implemented");
 }
 
 void move::undo() {
-    throw std::exception("move::undo not implemented");
+    throw std::exception("void move::undo() not implemented");
 }
 
 std::string move::to_string() const {
-    throw std::exception("move::to_string not implemented");
+    throw std::exception("std::string move::to_string() not implemented");
     std::string result;
     result.reserve(16);
 

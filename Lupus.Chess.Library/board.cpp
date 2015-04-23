@@ -217,6 +217,7 @@ void board::set_castling(const char* value) {
     auto length = strlen(value);
     if (length >= castling_.max_size())
         length = castling_.max_size() - 1;
+    memset(castling_.data(), 0, length + 1);
     memcpy(castling_.data(), value, length);
 }
 
@@ -228,6 +229,7 @@ void board::set_en_passant(const char* value) {
     auto length = strlen(value);
     if (length >= en_passant_.max_size()) 
         length = en_passant_.max_size() - 1;
+    memset(en_passant_.data(), 0, length + 1);
     memcpy(en_passant_.data(), value, length);
 }
 
@@ -235,8 +237,16 @@ uint8_t board::halfmove() const {
     return halfmove_;
 }
 
+void board::set_halfmove(uint8_t value) {
+    halfmove_ = value;
+}
+
 uint8_t board::fullmove() const {
     return fullmove_;
+}
+
+void board::set_fullmove(uint8_t value) {
+    fullmove_ = value;
 }
 
 uint8_t& board::operator[](int index) {

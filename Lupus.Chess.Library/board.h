@@ -4,6 +4,8 @@
 #include <memory>
 #include <array>
 
+class move;
+
 class board make_board(const char* fen);
 class std::shared_ptr<board> make_shared_board(const char* fen);
 
@@ -30,7 +32,9 @@ public:
     const char* en_passant() const;
     void set_en_passant(const char* value);
     uint8_t halfmove() const;
+    void set_halfmove(uint8_t value);
     uint8_t fullmove() const;
+    void set_fullmove(uint8_t value);
     uint8_t& operator[](int index);
     const uint8_t& operator[](int index) const;
     board& operator=(board&& other);

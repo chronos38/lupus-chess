@@ -105,6 +105,7 @@ private:
 };
 
 piece::piece(std::shared_ptr<::board> board, piece_value value) : board_(board) {
+    throw std::exception("piece::piece(std::shared_ptr<::board> board, piece_value value) not implemented");
     switch (value) {
         case white_king:
             break;
