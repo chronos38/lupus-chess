@@ -106,30 +106,30 @@ private:
 
 piece::piece(std::shared_ptr<::board> board, piece_value value) : board_(board) {
     switch (value) {
-    case white_king:
-        break;
-    case white_queen:
-        break;
-    case white_rook:
-        break;
-    case white_bishop:
-        break;
-    case white_knight:
-        break;
-    case white_pawn:
-        break;
-    case black_king:
-        break;
-    case black_queen:
-        break;
-    case black_rook:
-        break;
-    case black_bishop:
-        break;
-    case black_knight:
-        break;
-    case black_pawn:
-        break;
+        case white_king:
+            break;
+        case white_queen:
+            break;
+        case white_rook:
+            break;
+        case white_bishop:
+            break;
+        case white_knight:
+            break;
+        case white_pawn:
+            break;
+        case black_king:
+            break;
+        case black_queen:
+            break;
+        case black_rook:
+            break;
+        case black_bishop:
+            break;
+        case black_knight:
+            break;
+        case black_pawn:
+            break;
     }
 }
 

@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "command.h"
+#include "enum.h"
 #include <memory>
+#include <array>
 
 class board;
 class piece;
@@ -10,6 +12,7 @@ public:
     move();
     move(move&& other);
     move(const move& other);
+    explicit move(std::shared_ptr<piece> piece, castling castling);
     explicit move(std::shared_ptr<piece> piece, const char* from, const char* to);
     virtual ~move() = default;
     virtual void execute() override;
@@ -20,6 +23,7 @@ public:
 private:
     std::shared_ptr<piece> piece_;
     std::shared_ptr<board> board_;
-    char from_[3];
-    char to_[3];
+    std::array<char, 3> from_;
+    std::array<char, 3> to_;
+    castling castling_ = no_side;
 };

@@ -1,19 +1,11 @@
 ﻿#pragma once
-#include <cstdint>
+#include "enum.h"
 #include <string>
-#include "piece.h"
 #include <memory>
 #include <array>
 
 class board make_board(const char* fen);
 class std::shared_ptr<board> make_shared_board(const char* fen);
-
-enum castling {
-    both_sides,
-    king_side,
-    queen_side,
-    no_side
-};
 
 class board {
 public:

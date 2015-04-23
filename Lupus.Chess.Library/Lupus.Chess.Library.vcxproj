@@ -19,6 +19,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="board.h" />
+    <ClInclude Include="enum.h" />
     <ClInclude Include="hash.h" />
     <ClInclude Include="command.h" />
     <ClInclude Include="move.h" />

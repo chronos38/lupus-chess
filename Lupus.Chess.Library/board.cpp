@@ -1,7 +1,4 @@
 ﻿#include "board.h"
-#include <exception>
-#include <locale>
-#include <algorithm>
 
 board make_board(const char* fen) {
     board result;
@@ -40,25 +37,25 @@ board make_board(const char* fen) {
         }
 
         switch (ch) {
-        case white_pawn:
-        case black_pawn:
-        case white_bishop:
-        case black_bishop:
-        case white_knight:
-        case black_knight:
-        case white_rook:
-        case black_rook:
-        case white_king:
-        case black_king:
-        case white_queen:
-        case black_queen:
-            result.set(file, rank, ch);
-            file += 1;
-            break;
-        default:
-            if (isdigit(ch))
-                file += ch - '0';
-            break;
+            case white_pawn:
+            case black_pawn:
+            case white_bishop:
+            case black_bishop:
+            case white_knight:
+            case black_knight:
+            case white_rook:
+            case black_rook:
+            case white_king:
+            case black_king:
+            case white_queen:
+            case black_queen:
+                result.set(file, rank, ch);
+                file += 1;
+                break;
+            default:
+                if (isdigit(ch))
+                    file += ch - '0';
+                break;
         }
     }
 
@@ -218,14 +215,9 @@ const char* board::castling() const {
 
 void board::set_castling(const char* value) {
     auto length = strlen(value);
-    if (length > castling_.max_size() - 1)
+    if (length >= castling_.max_size())
         length = castling_.max_size() - 1;
-
-    if (length < sizeof(castling_)) {
-        memcpy(castling_.data(), value, length);
-    } else {
-        throw std::length_error("board::set_castling(const char* value) allows a maximum string length of 4.");
-    }
+    memcpy(castling_.data(), value, length);
 }
 
 const char* board::en_passant() const {
@@ -234,14 +226,9 @@ const char* board::en_passant() const {
 
 void board::set_en_passant(const char* value) {
     auto length = strlen(value);
-    if (length > en_passant_.max_size() - 1) 
+    if (length >= en_passant_.max_size()) 
         length = en_passant_.max_size() - 1;
-
-    if (length < sizeof(en_passant_)) {
-        memcpy(en_passant_.data(), value, length);
-    } else {
-        throw std::length_error("board::set_castling(const char* value) allows a maximum string length of 2.");
-    }
+    memcpy(en_passant_.data(), value, length);
 }
 
 uint8_t board::halfmove() const {
