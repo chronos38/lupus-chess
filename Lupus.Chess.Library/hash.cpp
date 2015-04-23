@@ -1,7 +1,9 @@
 #include "hash.h"
+#include "board.h"
 #include <random>
 #include <limits>
 #include <unordered_map>
+#include <unordered_set>
 
 static uint64_t zobrist_table[768];
 static std::unordered_map<uint8_t, int> piece_value_map = {
@@ -20,23 +22,43 @@ static std::unordered_map<uint8_t, int> piece_value_map = {
 };
 
 void zobrist_initialize() {
+    std::unordered_set<uint64_t> set;
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<uint64_t> dis(
         std::numeric_limits<uint64_t>::min(),
         std::numeric_limits<uint64_t>::max());
 
-    for (auto&& entry : zobrist_table)
-        entry = dis(gen);
+    for (auto&& entry : zobrist_table) {
+        auto random = dis(gen);
+        if (set.find(random) != std::end(set))
+            continue;
+        set.insert(random);
+        entry = random;
+    }
 }
 
 
 uint64_t zobrist_hash(const board& board) {
     uint64_t hash = 0;
 
-    for (auto i = 0; i < 64; i++) {
+    for (auto i = 63; i >= 0; i--) {
         if (board[i]) {
             auto j = piece_value_map[board[i]];
+            hash = hash ^ zobrist_table[i * 12 + j];
+        }
+    }
+
+    return hash;
+}
+
+uint64_t zobrist_hash(std::shared_ptr<board> board) {
+    uint64_t hash = 0;
+
+    for (auto i = 63; i >= 0; i--) {
+        auto value = (*board)[i];
+        if (value) {
+            auto j = piece_value_map[value];
             hash = hash ^ zobrist_table[i * 12 + j];
         }
     }
