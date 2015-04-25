@@ -14,5 +14,4 @@ public:
     MOCK_CONST_METHOD0(color, piece_color());
     MOCK_CONST_METHOD0(position, const char*());
     MOCK_CONST_METHOD0(board, std::shared_ptr<::board>());
-    std::shared_ptr<::board> board_;
 };

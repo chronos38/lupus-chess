@@ -19,14 +19,15 @@ public:
 
         switch (castling_) {
             case king_side: {
-                auto match = find(begin(castling), end(castling), king);
+                auto match = castling.find(king);
 
-                if (match != end(castling)) {
-                    remove(begin(castling), end(castling), king);
+                if (match != castling.npos) {
+                    castling.erase(match, 1);
                     removed_ += king;
+                    match = castling.find(queen);
 
-                    if (castling.find(queen) != castling.npos) {
-                        remove(begin(castling), end(castling), queen);
+                    if (match != castling.npos) {
+                        castling.erase(match, 1);
                         removed_ += queen;
                     }
 
@@ -39,14 +40,15 @@ public:
                 break;
             }
             case queen_side: {
-                auto match = find(begin(castling), end(castling), queen);
+                auto match = castling.find(king);
 
-                if (match != end(castling)) {
-                    remove(begin(castling), end(castling), queen);
+                if (match != castling.npos) {
+                    castling.erase(match, 1);
                     removed_ += queen;
+                    match = castling.find(queen);
 
-                    if (castling.find(king) != castling.npos) {
-                        remove(begin(castling), end(castling), king);
+                    if (match != castling.npos) {
+                        castling.erase(match, 1);
                         removed_ += king;
                     }
 
