@@ -2,6 +2,8 @@
 #include <chess/board.h>
 #include <chess/piece.h>
 
+using namespace chess;
+
 class board_test : public ::testing::Test
 {
 public:

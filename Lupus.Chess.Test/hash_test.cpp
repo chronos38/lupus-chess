@@ -2,6 +2,8 @@
 #include <chess/hash.h>
 #include <chess/board.h>
 
+using namespace chess;
+
 class hash_test : public ::testing::Test
 {
 public:

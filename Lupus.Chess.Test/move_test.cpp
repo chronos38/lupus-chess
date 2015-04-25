@@ -3,6 +3,8 @@
 #include <chess/board.h>
 #include "mock_piece.h"
 
+using namespace chess;
+
 class move_test : public ::testing::Test {
 public:
     virtual void SetUp() override {
@@ -313,6 +315,21 @@ TEST_F(move_test, en_passant_possible) {
     ASSERT_EQ(ep1, "-");
 }
 
+TEST_F(move_test, en_passant_to_string) {
+    // Arrange
+    prepare_pawn_en_passant(this);
+    auto b = std::make_shared<move>(pawn_2_, "a7", "a5");
+
+    // Act
+    b->execute();
+    auto w = std::make_shared<move>(pawn_1_, "b5", "a6");
+    w->execute();
+    auto string = w->to_string();
+
+    // Assert
+    ASSERT_EQ("bxa6e.p.", string);
+}
+
 TEST_F(move_test, en_passant_execute_and_reset) {
     // Arrange
     prepare_pawn_en_passant(this);
@@ -438,4 +455,42 @@ TEST_F(move_test, if_rook_moves_disable_castling_undo) {
     ASSERT_EQ(ep3.npos, ep3.find('Q'));
     ASSERT_NE(ep4.npos, ep4.find('K'));
     ASSERT_NE(ep4.npos, ep4.find('Q'));
+}
+
+TEST_F(move_test, if_king_moves_disable_castling) {
+    // Arrange
+    prepare_castling(this);
+    auto k = std::make_shared<move>(king_, "e1", "e2");
+
+    // Act
+    std::string ep = board_->castling();
+    k->execute();
+    std::string ep1 = board_->castling();
+
+    // Assert
+    ASSERT_EQ(0, board_->get("e1"));
+    ASSERT_EQ(white_king, board_->get("e2"));
+    ASSERT_EQ("KQkq", ep);
+    ASSERT_EQ("kq", ep1);
+}
+
+TEST_F(move_test, if_king_moves_disable_castling_undo) {
+    // Arrange
+    prepare_castling(this);
+    auto k = std::make_shared<move>(king_, "e1", "e2");
+
+    // Act
+    std::string ep = board_->castling();
+    k->execute();
+    std::string ep1 = board_->castling();
+    k->undo();
+    std::string ep2 = board_->castling();
+
+    // Assert
+    ASSERT_EQ(white_king, board_->get("e1"));
+    ASSERT_EQ(0, board_->get("e2"));
+    ASSERT_EQ("KQkq", ep);
+    ASSERT_EQ("kq", ep1);
+    ASSERT_NE(ep2.npos, ep2.find('K'));
+    ASSERT_NE(ep2.npos, ep2.find('Q'));
 }

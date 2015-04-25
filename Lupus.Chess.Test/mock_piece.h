@@ -2,6 +2,8 @@
 #include <gmock/gmock.h>
 #include <chess/piece.h>
 
+using namespace chess;
+
 class mock_piece : public ipiece {
 public:
     MOCK_CONST_METHOD0(score, int());
