@@ -6,25 +6,58 @@ class move_castling : public move_state {
 public:
     move_castling(std::shared_ptr<board> board, castling castling, piece_color color)
         : board_(board), castling_(castling), color_(color) {
+        removed_.reserve(4);
     }
 
     virtual ~move_castling() = default;
 
     virtual void execute(move* move) final override {
+        std::string castling = board_->castling();
         auto rank = color_ == white ? 1 : 8;
+        auto king = color_ == white ? 'K' : 'k';
+        auto queen = color_ == white ? 'Q' : 'q';
+
         switch (castling_) {
-            case king_side:
-                board_->set('e', rank, 0);
-                board_->set('h', rank, 0);
-                board_->set('g', rank, white_king);
-                board_->set('f', rank, white_rook);
+            case king_side: {
+                auto match = find(begin(castling), end(castling), king);
+
+                if (match != end(castling)) {
+                    remove(begin(castling), end(castling), king);
+                    removed_ += king;
+
+                    if (castling.find(queen) != castling.npos) {
+                        remove(begin(castling), end(castling), queen);
+                        removed_ += queen;
+                    }
+
+                    board_->set('e', rank, 0);
+                    board_->set('h', rank, 0);
+                    board_->set('g', rank, color_ == white ? white_king : black_king);
+                    board_->set('f', rank, color_ == white ? white_rook : black_rook);
+                    board_->set_castling(castling.c_str());
+                }
                 break;
-            case queen_side:
-                board_->set('e', rank, 0);
-                board_->set('a', rank, 0);
-                board_->set('c', rank, white_king);
-                board_->set('d', rank, white_rook);
+            }
+            case queen_side: {
+                auto match = find(begin(castling), end(castling), queen);
+
+                if (match != end(castling)) {
+                    remove(begin(castling), end(castling), queen);
+                    removed_ += queen;
+
+                    if (castling.find(king) != castling.npos) {
+                        remove(begin(castling), end(castling), king);
+                        removed_ += king;
+                    }
+
+                    board_->set('e', rank, 0);
+                    board_->set('a', rank, 0);
+                    board_->set('c', rank, color_ == white ? white_king : black_king);
+                    board_->set('d', rank, color_ == white ? white_rook : black_rook);
+                    board_->set_castling(castling.c_str());
+                }
                 break;
+            }
             default:
                 break;
         }
@@ -36,18 +69,21 @@ public:
             case king_side:
                 board_->set('g', rank, 0);
                 board_->set('f', rank, 0);
-                board_->set('e', rank, white_king);
-                board_->set('h', rank, white_rook);
+                board_->set('e', rank, color_ == white ? white_king : black_king);
+                board_->set('h', rank, color_ == white ? white_rook : black_rook);
                 break;
             case queen_side:
                 board_->set('c', rank, 0);
                 board_->set('d', rank, 0);
-                board_->set('e', rank, white_king);
-                board_->set('a', rank, white_rook);
+                board_->set('e', rank, color_ == white ? white_king : black_king);
+                board_->set('a', rank, color_ == white ? white_rook : black_rook);
                 break;
             default:
                 break;
         }
+
+        board_->set_castling((board_->castling() + removed_).c_str());
+        removed_.clear();
     }
     
     virtual std::string to_string(const move* move) const final override {
@@ -75,6 +111,7 @@ private:
     std::shared_ptr<board> board_;
     castling castling_ = no_side;
     piece_color color_ = white;
+    std::string removed_;
 };
 
 class move_piece : public move_state {
@@ -109,6 +146,8 @@ public:
 
         board_->set(from_.data(), 0);
         board_->set(to_.data(), piece);
+        en_passant_ = board_->en_passant();
+        board_->set_en_passant("-");
     }
     
     virtual void undo(move* move) override {
@@ -121,6 +160,8 @@ public:
         board_->set(from_.data(), piece);
         if (captured_)
             captured_ = 0;
+        board_->set_en_passant(en_passant_.c_str());
+        en_passant_.clear();
     }
     
     virtual std::string to_string(const move* move) const override {
@@ -156,6 +197,7 @@ protected:
     std::shared_ptr<board> board_;
     std::array<char, 3> from_;
     std::array<char, 3> to_;
+    std::string en_passant_;
     uint8_t captured_ = 0;
 };
 
@@ -203,13 +245,136 @@ private:
     uint8_t rank_ = 0;
 };
 
+class move_pawn : public move_piece {
+public:
+    move_pawn(const ipiece* piece, const char* from, const char* to) : move_piece(piece, from, to) {
+    }
+
+    virtual ~move_pawn() = default;
+
+    virtual void execute(move* move) override {
+        move_piece::execute(move);
+        auto rank = piece_->color() == white ? '2' : '7';
+        
+        if (from_.at(1) == rank && abs(from_.at(1) - to_.at(1)) == 2)
+            board_->set_en_passant((std::string(1, from_.at(0)) + std::string(1, piece_->color() == white ? '3' : '6')).c_str());
+    }
+};
+
+class move_king : public move_piece {
+public:
+    move_king(const ipiece* piece, const char* from, const char* to) : move_piece(piece, from, to) {
+    }
+
+    virtual ~move_king() = default;
+
+    virtual void execute(move* move) override {
+        move_piece::execute(move);
+        auto color = piece_->color();
+        auto castling = castling_ = castling_ = board_->castling();
+        remove(begin(castling), end(castling), color == white ? 'K' : 'k');
+        remove(begin(castling), end(castling), color == white ? 'Q' : 'q');
+        board_->set_castling(castling.c_str());
+    }
+
+    virtual void undo(move* move) override {
+        board_->set_castling(castling_.c_str());
+        castling_.clear();
+        move_piece::undo(move);
+    }
+
+private:
+
+    std::string castling_;
+};
+
+class move_rook : public move_piece {
+public:
+    move_rook(const ipiece* piece, const char* from, const char* to) : move_piece(piece, from, to) {
+    }
+
+    virtual ~move_rook() = default;
+
+    virtual void execute(move* move) override {
+        move_piece::execute(move);
+        auto color = piece_->color();
+        auto castling = castling_ = castling_ = board_->castling();
+        char side = 0;
+
+        switch (color) {
+            case white:
+                if (strcmp(from_.data(), "a1") == 0)
+                    side = 'Q';
+                if (strcmp(from_.data(), "h1") == 0)
+                    side = 'K';
+                break;
+            case black:
+                if (strcmp(from_.data(), "a8") == 0)
+                    side = 'q';
+                if (strcmp(from_.data(), "h8") == 0)
+                    side = 'k';
+                break;
+        }
+
+        if (side) {
+            remove(begin(castling), end(castling), side);
+            board_->set_castling(castling.c_str());
+        }
+    }
+
+    virtual void undo(move* move) override {
+        board_->set_castling(castling_.c_str());
+        castling_.clear();
+        move_piece::undo(move);
+    }
+
+private:
+
+    std::string castling_;
+};
+
 move::move(std::shared_ptr<board> board, castling castling, piece_color color) {
-    state_ = std::make_unique<move_castling>(board, castling, color);
+    switch (castling) {
+        case king_side:
+        case queen_side:
+            state_ = std::make_unique<move_castling>(board, castling, color);
+            break;
+        default:
+            throw std::invalid_argument("castling needs to be either king_side or queen_side");
+    }
 }
 
 move::move(const ipiece* piece, const char* from, const char* to) {
-    if (piece->type() == pawn && strcmp(to, piece->board()->en_passant()) == 0)
-        state_ = std::make_unique<move_en_passant>(piece, from, to);
+    if (!piece)
+        throw std::invalid_argument("'piece' is null");
+    if (!from)
+        throw std::invalid_argument("'from' is null");
+    if (!to)
+        throw std::invalid_argument("'to' is null");
+    auto from_length = strlen(from);
+    auto to_length = strlen(to);
+
+    if (from_length != 2)
+        throw std::invalid_argument("'from' has to be exactly two characters long");
+    if (to_length != 2)
+        throw std::invalid_argument("'from' has to be exactly two characters long");
+    if (from[0] < 'a' || from[0] > 'h')
+        throw std::invalid_argument("'from' file value is invalid");
+    if (from[1] < '1' || from[1] > '8')
+        throw std::invalid_argument("'from' rank valud is invalid");
+    if (to[0] < 'a' || to[0] > 'h')
+        throw std::invalid_argument("'to' file value is invalid");
+    if (to[1] < '1' || to[1] > '8')
+        throw std::invalid_argument("'to' rank valud is invalid");
+    if (piece->type() == pawn)
+        if (strcmp(to, piece->board()->en_passant()) == 0)
+            state_ = std::make_unique<move_en_passant>(piece, from, to);
+        else
+            state_ = std::make_unique<move_pawn>(piece, from, to);
+    if (piece->type() == king)
+        state_ = std::make_unique<move_king>(piece, from, to);
+    if (piece->type() == rook)
+        state_ = std::make_unique<move_rook>(piece, from, to);
     else
         state_ = std::make_unique<move_piece>(piece, from, to);
 }

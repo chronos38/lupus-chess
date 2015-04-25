@@ -77,16 +77,6 @@ TEST_F(move_test, execute_valid_move) {
     ASSERT_EQ('Q', board_->get("h8"));
 }
 
-TEST_F(move_test, execute_invalid_move) {
-    // Arrange
-    auto m = std::make_shared<move>(piece_, "a1", "c2");
-
-    // Act & Assert
-    EXPECT_THROW({
-        m->execute();
-    }, std::range_error);
-}
-
 TEST_F(move_test, undo_move) {
     // Arrange
     auto m = std::make_shared<move>(piece_, "a1", "h8");
