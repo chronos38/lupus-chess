@@ -1,4 +1,5 @@
 ﻿#include "board.h"
+#include <string>
 
 board make_board(const char* fen) {
     board result;
@@ -85,14 +86,12 @@ std::shared_ptr<board> make_shared_board(const char* fen) {
     return std::make_shared<board>(std::move(make_board(fen)));
 }
 
-board::board() {
-    field_.fill(0);
+board::board() : array_2d<uint8_t, 8, 8>() {
     castling_.fill(0);
     en_passant_.fill(0);
 }
 
-board::board(board&& other) : board() {
-    swap(field_, other.field_);
+board::board(board&& other) : array_2d<uint8_t, 8, 8>(std::forward<array_2d&&>(other)) {
     swap(castling_, other.castling_);
     swap(en_passant_, other.en_passant_);
     active_ = other.active_;
@@ -104,8 +103,7 @@ board::board(board&& other) : board() {
     other.fullmove_ = 1;
 }
 
-board::board(const board& other) : board() {
-    field_ = other.field_;
+board::board(const board& other) : array_2d<uint8_t, 8, 8>(other) {
     castling_ = other.castling_;
     en_passant_ = other.en_passant_;
     active_ = other.active_;
@@ -113,34 +111,26 @@ board::board(const board& other) : board() {
     fullmove_ = other.fullmove_;
 }
 
-std::array<uint8_t, 64>::iterator board::begin() {
-    return field_.begin();
-}
-
-std::array<uint8_t, 64>::const_iterator board::begin() const {
-    return field_.begin();
-}
-
-std::array<uint8_t, 64>::iterator board::end() {
-    return field_.end();
-}
-
-std::array<uint8_t, 64>::const_iterator board::end() const {
-    return field_.end();
+uint8_t board::get(size_t index) const {
+    return array_2d<uint8_t, 8, 8>::get(index);
 }
 
 uint8_t board::get(char file, int rank) const {
     auto index = tolower(file) - 'a';
-    return field_[--rank * 8 + index];
+    return array_2d<uint8_t, 8, 8>::get(--rank * 8 + index);
 }
 
 uint8_t board::get(const char* position) const {
     return get(position[0], position[1] - '0');
 }
 
+void board::set(size_t index, uint8_t value) {
+    array_2d<uint8_t, 8, 8>::set(index, value);
+}
+
 void board::set(char file, int rank, uint8_t value) {
     auto index = tolower(file) - 'a';
-    field_[--rank * 8 + index] = value;
+    array_2d<uint8_t, 8, 8>::set(--rank * 8 + index, value);
 }
 
 void board::set(const char* position, uint8_t value) {
@@ -150,7 +140,7 @@ void board::set(const char* position, uint8_t value) {
 int board::count() {
     auto result = 0;
     for (auto i = 63; i >= 0; i--)
-        if (field_[i])
+        if (array_2d<uint8_t, 8, 8>::get(i))
             result++;
     return result;
 }
@@ -249,17 +239,9 @@ void board::set_fullmove(uint8_t value) {
     fullmove_ = value;
 }
 
-uint8_t& board::operator[](int index) {
-    return field_[index];
-}
-
-const uint8_t& board::operator[](int index) const {
-    return field_[index];
-}
-
 board& board::operator=(board&& other) {
     if (this != &other) {
-        swap(field_, other.field_);
+        array_2d<uint8_t, 8, 8>::operator=(other);
         swap(castling_, other.castling_);
         swap(en_passant_, other.en_passant_);
         active_ = other.active_;
@@ -269,7 +251,6 @@ board& board::operator=(board&& other) {
         other.active_ = white;
         other.halfmove_ = 0;
         other.fullmove_ = 1;
-        other.field_.fill(0);
         other.castling_.fill(0);
         other.en_passant_.fill(0);
     }
@@ -278,7 +259,7 @@ board& board::operator=(board&& other) {
 }
 
 board& board::operator=(const board& other) {
-    field_ = other.field_;
+    array_2d<uint8_t, 8, 8>::operator=(other);
     castling_ = other.castling_;
     en_passant_ = other.en_passant_;
     active_ = other.active_;
@@ -289,8 +270,4 @@ board& board::operator=(const board& other) {
 
 board board::create_starting_board() {
     return make_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-}
-
-void board::set(int row, int column, uint8_t value) {
-    field_[row * 8 + column] = value;
 }

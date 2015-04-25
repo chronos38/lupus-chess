@@ -43,8 +43,9 @@ uint64_t zobrist_hash(const board& board) {
     uint64_t hash = 0;
 
     for (auto i = 63; i >= 0; i--) {
-        if (board[i]) {
-            auto j = piece_value_map[board[i]];
+        auto value = board.get(i);
+        if (value) {
+            auto j = piece_value_map[value];
             hash = hash ^ zobrist_table[i * 12 + j];
         }
     }
@@ -56,7 +57,7 @@ uint64_t zobrist_hash(std::shared_ptr<board> board) {
     uint64_t hash = 0;
 
     for (auto i = 63; i >= 0; i--) {
-        auto value = (*board)[i];
+        auto value = board->get(i);
         if (value) {
             auto j = piece_value_map[value];
             hash = hash ^ zobrist_table[i * 12 + j];

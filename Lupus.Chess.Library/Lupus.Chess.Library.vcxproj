@@ -18,6 +18,7 @@
     <ClCompile Include="undo_redo.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="array.hpp" />
     <ClInclude Include="board.h" />
     <ClInclude Include="enum.h" />
     <ClInclude Include="hash.h" />
@@ -68,7 +69,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)Library;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>COPY /Y /B $(ProjectDir)*.h $(SolutionDir)Include\chess</Command>
+      <Command>COPY /Y /B $(ProjectDir)*.h* $(SolutionDir)Include\chess</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -95,7 +96,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)Library;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>COPY /Y /B $(ProjectDir)*.h $(SolutionDir)Include\chess</Command>
+      <Command>COPY /Y /B $(ProjectDir)*.h* $(SolutionDir)Include\chess</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
