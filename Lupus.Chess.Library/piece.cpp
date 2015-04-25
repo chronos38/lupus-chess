@@ -106,35 +106,10 @@ private:
 
 piece::piece(std::shared_ptr<::board> board, piece_value value) : board_(board) {
     throw std::exception("piece::piece(std::shared_ptr<::board> board, piece_value value) not implemented");
-    switch (value) {
-        case white_king:
-            break;
-        case white_queen:
-            break;
-        case white_rook:
-            break;
-        case white_bishop:
-            break;
-        case white_knight:
-            break;
-        case white_pawn:
-            break;
-        case black_king:
-            break;
-        case black_queen:
-            break;
-        case black_rook:
-            break;
-        case black_bishop:
-            break;
-        case black_knight:
-            break;
-        case black_pawn:
-            break;
-    }
 }
 
 piece::piece(std::shared_ptr<::board> board, piece_color color, piece_type type) {
+    throw std::exception("piece::piece(std::shared_ptr<::board> board, piece_color color, piece_type type) not implemented");
 }
 
 piece::piece(piece&& other) {
@@ -179,12 +154,12 @@ piece_color piece::color() const {
     return state_->color(this);
 }
 
-std::shared_ptr<board> piece::board() const {
-    return board_;
+const char* piece::position() const {
+    return position_.data();
 }
 
-void piece::set_board(std::shared_ptr<::board> value) {
-    board_ = value;
+std::shared_ptr<board> piece::board() const {
+    return board_;
 }
 
 piece& piece::operator=(piece&& other) {

@@ -5,25 +5,33 @@
 #include <array>
 
 class board;
-class piece;
+class ipiece;
+class move;
+
+class move_state {
+public:
+    virtual ~move_state() = default;
+    virtual void execute(move* move) = 0;
+    virtual void undo(move* move) = 0;
+    virtual std::string to_string(const move* move) const = 0;
+    virtual bool operator==(const move_state& other) const = 0;
+    virtual bool operator!=(const move_state& other) const = 0;
+};
 
 class move : public command {
 public:
-    move();
-    move(move&& other);
-    move(const move& other);
-    explicit move(std::shared_ptr<piece> piece, castling castling);
-    explicit move(std::shared_ptr<piece> piece, const char* from, const char* to);
+    move() = default;
+    move(move&& other) = delete;
+    move(const move& other) = delete;
+    move(std::shared_ptr<board> piece, castling castling, piece_color color);
+    move(const ipiece* piece, const char* from, const char* to);
     virtual ~move() = default;
     virtual void execute() override;
     virtual void undo() override;
-    std::string to_string() const;
-    move& operator=(move&& other);
-    move& operator=(const move& other);
+    virtual std::string to_string() const;
+    virtual bool operator==(const move& other) const;
+    virtual bool operator!=(const move& other) const;
 private:
-    std::shared_ptr<piece> piece_;
-    std::shared_ptr<board> board_;
-    std::array<char, 3> from_;
-    std::array<char, 3> to_;
-    castling castling_ = no_side;
+    friend class move_state;
+    std::unique_ptr<move_state> state_;
 };

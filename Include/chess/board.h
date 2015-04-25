@@ -15,10 +15,10 @@ public:
     board(const board& other);
     virtual ~board() = default;
     uint8_t get(size_t index) const;
-    uint8_t get(char file, int rank) const;
+    uint8_t get(char file, uint8_t rank) const;
     uint8_t get(const char* position) const;
     void set(size_t index, uint8_t value);
-    void set(char file, int rank, uint8_t value);
+    void set(char file, uint8_t rank, uint8_t value);
     void set(const char* position, uint8_t value);
     int count();
     std::string to_fen() const;
@@ -35,6 +35,7 @@ public:
     board& operator=(board&& other);
     board& operator=(const board& other);
     static board create_starting_board();
+    static std::shared_ptr<board> create_shared_starting_board();
 private:
     friend board make_board(const char*);
     std::array<char, 5> castling_;

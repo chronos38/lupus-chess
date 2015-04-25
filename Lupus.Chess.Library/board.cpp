@@ -115,7 +115,7 @@ uint8_t board::get(size_t index) const {
     return array_2d<uint8_t, 8, 8>::get(index);
 }
 
-uint8_t board::get(char file, int rank) const {
+uint8_t board::get(char file, uint8_t rank) const {
     auto index = tolower(file) - 'a';
     return array_2d<uint8_t, 8, 8>::get(--rank * 8 + index);
 }
@@ -128,7 +128,7 @@ void board::set(size_t index, uint8_t value) {
     array_2d<uint8_t, 8, 8>::set(index, value);
 }
 
-void board::set(char file, int rank, uint8_t value) {
+void board::set(char file, uint8_t rank, uint8_t value) {
     auto index = tolower(file) - 'a';
     array_2d<uint8_t, 8, 8>::set(--rank * 8 + index, value);
 }
@@ -270,4 +270,8 @@ board& board::operator=(const board& other) {
 
 board board::create_starting_board() {
     return make_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+}
+
+std::shared_ptr<board> board::create_shared_starting_board() {
+    return make_shared_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 }
