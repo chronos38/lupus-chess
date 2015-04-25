@@ -10,6 +10,8 @@ public:
         left_rook_ = nullptr;
         right_rook_ = nullptr;
         king_ = nullptr;
+        pawn_1_ = nullptr;
+        pawn_2_ = nullptr;
     }
 
     virtual void TearDown() override {
@@ -17,6 +19,8 @@ public:
         if (left_rook_) delete left_rook_;
         if (right_rook_) delete right_rook_;
         if (king_) delete king_;
+        if (pawn_1_) delete pawn_1_;
+        if (pawn_2_) delete pawn_2_;
     }
 
     std::shared_ptr<board> board_;
@@ -24,22 +28,14 @@ public:
     mock_piece* left_rook_ = nullptr;
     mock_piece* right_rook_ = nullptr;
     mock_piece* king_ = nullptr;
+    mock_piece* pawn_1_ = nullptr;
+    mock_piece* pawn_2_ = nullptr;
 };
 
 void prepare_queen(move_test* test) {
     test->board_ = make_shared_board("8/8/8/8/8/8/8/Q7 w - - 0 1");
     test->piece_ = new mock_piece();
 
-    ON_CALL(*test->piece_, score()).
-        WillByDefault(testing::Return(1000));
-    ON_CALL(*test->piece_, attack_score()).
-        WillByDefault(testing::Return(0));
-    ON_CALL(*test->piece_, defense_score()).
-        WillByDefault(testing::Return(0));
-    ON_CALL(*test->piece_, position_score()).
-        WillByDefault(testing::Return(0));
-    ON_CALL(*test->piece_, allowed_moves()).
-        WillByDefault(testing::Return(std::vector<std::shared_ptr<move>>()));
     ON_CALL(*test->piece_, value()).
         WillByDefault(testing::Return(white_queen));
     ON_CALL(*test->piece_, type()).
@@ -53,21 +49,11 @@ void prepare_queen(move_test* test) {
 }
 
 void prepare_castling(move_test* test) {
-    test->board_ = make_shared_board("r3k2r/p3p2p/8/8/8/8/P3P2P/R3K2R w KQkq - 0 1");
+    test->board_ = make_shared_board("8/8/8/8/8/8/8/R3K2R w KQkq - 0 1");
     test->king_ = new mock_piece();
     test->left_rook_ = new mock_piece();
     test->right_rook_ = new mock_piece();
 
-    ON_CALL(*test->king_, score()).
-        WillByDefault(testing::Return(20000));
-    ON_CALL(*test->king_, attack_score()).
-        WillByDefault(testing::Return(0));
-    ON_CALL(*test->king_, defense_score()).
-        WillByDefault(testing::Return(0));
-    ON_CALL(*test->king_, position_score()).
-        WillByDefault(testing::Return(0));
-    ON_CALL(*test->king_, allowed_moves()).
-        WillByDefault(testing::Return(std::vector<std::shared_ptr<move>>()));
     ON_CALL(*test->king_, value()).
         WillByDefault(testing::Return(white_king));
     ON_CALL(*test->king_, type()).
@@ -81,16 +67,6 @@ void prepare_castling(move_test* test) {
 
     for (auto i = 0; i < 2; i++) {
         auto rook = i ? test->left_rook_ : test->right_rook_;
-        ON_CALL(*rook, score()).
-            WillByDefault(testing::Return(525));
-        ON_CALL(*rook, attack_score()).
-            WillByDefault(testing::Return(0));
-        ON_CALL(*rook, defense_score()).
-            WillByDefault(testing::Return(0));
-        ON_CALL(*rook, position_score()).
-            WillByDefault(testing::Return(0));
-        ON_CALL(*rook, allowed_moves()).
-            WillByDefault(testing::Return(std::vector<std::shared_ptr<move>>()));
         ON_CALL(*rook, value()).
             WillByDefault(testing::Return(white_rook));
         ON_CALL(*rook, type()).
@@ -102,6 +78,34 @@ void prepare_castling(move_test* test) {
         ON_CALL(*rook, board()).
             WillByDefault(testing::Return(test->board_));
     }
+}
+
+void prepare_pawn_en_passant(move_test* test) {
+    test->board_ = make_shared_board("r3k2r/p3p2p/8/1P6/8/8/P3P2P/R3K2R w KQkq - 0 1");
+    test->pawn_1_ = new mock_piece();
+    test->pawn_2_ = new mock_piece();
+
+    ON_CALL(*test->pawn_1_, board()).
+        WillByDefault(testing::Return(test->board_));
+    ON_CALL(*test->pawn_1_, position()).
+        WillByDefault(testing::Return("b5"));
+    ON_CALL(*test->pawn_1_, value()).
+        WillByDefault(testing::Return(white_pawn));
+    ON_CALL(*test->pawn_1_, type()).
+        WillByDefault(testing::Return(pawn));
+    ON_CALL(*test->pawn_1_, color()).
+        WillByDefault(testing::Return(white));
+
+    ON_CALL(*test->pawn_2_, board()).
+        WillByDefault(testing::Return(test->board_));
+    ON_CALL(*test->pawn_2_, position()).
+        WillByDefault(testing::Return("a7"));
+    ON_CALL(*test->pawn_2_, value()).
+        WillByDefault(testing::Return(black_pawn));
+    ON_CALL(*test->pawn_2_, type()).
+        WillByDefault(testing::Return(pawn));
+    ON_CALL(*test->pawn_2_, color()).
+        WillByDefault(testing::Return(black));
 }
 
 TEST_F(move_test, constructor) {
@@ -288,4 +292,150 @@ TEST_F(move_test, castling_king_side_undo) {
     ASSERT_NE(e, std::find(c, e, 'Q'));
     ASSERT_NE(e, std::find(c, e, 'k'));
     ASSERT_NE(e, std::find(c, e, 'q'));
+}
+
+TEST_F(move_test, en_passant_possible) {
+    // Arrange
+    prepare_pawn_en_passant(this);
+    auto b = std::make_shared<move>(pawn_2_, "a7", "a5");
+
+    // Act
+    b->execute();
+    std::string ep = board_->en_passant();
+    auto w = std::make_shared<move>(pawn_1_, "b5", "a6");
+    w->execute();
+    std::string ep1 = board_->en_passant();
+
+    // Assert
+    ASSERT_EQ(0, board_->get("a5"));
+    ASSERT_EQ(white_pawn, board_->get("a6"));
+    ASSERT_EQ(ep, "a6");
+    ASSERT_EQ(ep1, "-");
+}
+
+TEST_F(move_test, en_passant_execute_and_reset) {
+    // Arrange
+    prepare_pawn_en_passant(this);
+    auto b = std::make_shared<move>(pawn_2_, "a7", "a5");
+
+    // Act
+    b->execute();
+    std::string ep = board_->en_passant();
+    auto w = std::make_shared<move>(pawn_1_, "b5", "b6");
+    w->execute();
+    std::string ep1 = board_->en_passant();
+
+    // Assert
+    ASSERT_EQ(black_pawn, board_->get("a5"));
+    ASSERT_EQ(white_pawn, board_->get("b6"));
+    ASSERT_EQ(ep, "a6");
+    ASSERT_EQ(ep1, "-");
+}
+
+TEST_F(move_test, en_passant_possible_undo) {
+    // Arrange
+    prepare_pawn_en_passant(this);
+    auto b = std::make_shared<move>(pawn_2_, "a7", "a5");
+
+    // Act
+    b->execute();
+    std::string ep = board_->en_passant();
+    auto w = std::make_shared<move>(pawn_1_, "b5", "a6");
+    w->execute();
+    std::string ep1 = board_->en_passant();
+    w->undo();
+    std::string ep2 = board_->en_passant();
+    b->undo();
+    std::string ep3 = board_->en_passant();
+
+    // Assert
+    ASSERT_EQ(0, board_->get("a5"));
+    ASSERT_EQ(0, board_->get("a6"));
+    ASSERT_EQ(black_pawn, board_->get("a7"));
+    ASSERT_EQ(white_pawn, board_->get("b5"));
+    ASSERT_EQ(ep, "a6");
+    ASSERT_EQ(ep1, "-");
+    ASSERT_EQ(ep2, "a6");
+    ASSERT_EQ(ep3, "-");
+}
+
+TEST_F(move_test, en_passant_execute_and_reset_undo) {
+    // Arrange
+    prepare_pawn_en_passant(this);
+    auto b = std::make_shared<move>(pawn_2_, "a7", "a5");
+
+    // Act
+    b->execute();
+    std::string ep = board_->en_passant();
+    auto w = std::make_shared<move>(pawn_1_, "b5", "b6");
+    w->execute();
+    std::string ep1 = board_->en_passant();
+    w->undo();
+    std::string ep2 = board_->en_passant();
+    b->undo();
+    std::string ep3 = board_->en_passant();
+
+    // Assert
+    ASSERT_EQ(0, board_->get("a5"));
+    ASSERT_EQ(0, board_->get("b6"));
+    ASSERT_EQ(black_pawn, board_->get("a7"));
+    ASSERT_EQ(white_pawn, board_->get("b5"));
+    ASSERT_EQ(ep, "a6");
+    ASSERT_EQ(ep1, "-");
+    ASSERT_EQ(ep2, "a6");
+    ASSERT_EQ(ep3, "-");
+}
+
+TEST_F(move_test, if_rook_moves_disable_castling) {
+    // Arrange
+    prepare_castling(this);
+    auto l = std::make_shared<move>(left_rook_, "a1", "a2");
+    auto r = std::make_shared<move>(right_rook_, "h1", "h2");
+
+    // Act
+    std::string ep = board_->castling();
+    l->execute();
+    std::string ep1 = board_->castling();
+    r->execute();
+    std::string ep2 = board_->castling();
+
+    // Assert
+    ASSERT_EQ(0, board_->get("a1"));
+    ASSERT_EQ(0, board_->get("h1"));
+    ASSERT_EQ(white_rook, board_->get("a2"));
+    ASSERT_EQ(white_rook, board_->get("h2"));
+    ASSERT_EQ("KQkq", ep);
+    ASSERT_EQ("Kkq", ep1);
+    ASSERT_EQ("kq", ep2);
+}
+
+TEST_F(move_test, if_rook_moves_disable_castling_undo) {
+    // Arrange
+    prepare_castling(this);
+    auto l = std::make_shared<move>(left_rook_, "a1", "a2");
+    auto r = std::make_shared<move>(right_rook_, "h1", "h2");
+
+    // Act
+    std::string ep = board_->castling();
+    l->execute();
+    std::string ep1 = board_->castling();
+    r->execute();
+    std::string ep2 = board_->castling();
+    r->undo();
+    std::string ep3 = board_->castling();
+    l->undo();
+    std::string ep4 = board_->castling();
+
+    // Assert
+    ASSERT_EQ(white_rook, board_->get("a1"));
+    ASSERT_EQ(white_rook, board_->get("h1"));
+    ASSERT_EQ(0, board_->get("a2"));
+    ASSERT_EQ(0, board_->get("h2"));
+    ASSERT_EQ("KQkq", ep);
+    ASSERT_EQ("Kkq", ep1);
+    ASSERT_EQ("kq", ep2);
+    ASSERT_NE(ep3.npos, ep3.find('K'));
+    ASSERT_EQ(ep3.npos, ep3.find('Q'));
+    ASSERT_NE(ep4.npos, ep4.find('K'));
+    ASSERT_NE(ep4.npos, ep4.find('Q'));
 }

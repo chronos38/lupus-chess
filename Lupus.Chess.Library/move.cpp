@@ -178,8 +178,6 @@ public:
             result += 'x';
         result += to_.data();
 
-        if (piece_->type() == pawn && strcmp(to_.data(), board_->en_passant()) == 0)
-            result += "e.p.";
         result.shrink_to_fit();
         return result;
     }
@@ -236,10 +234,15 @@ public:
                 break;
             case 6:
                 board_->set(file_, 5, black_pawn);
+                captured_ = 0;
                 break;
         }
 
         move_piece::undo(move);
+    }
+
+    virtual std::string to_string(const move* move) const override {
+        return move_piece::to_string(move) + "e.p.";
     }
 
 private:
@@ -319,7 +322,9 @@ public:
         }
 
         if (side) {
-            remove(begin(castling), end(castling), side);
+            auto match = castling.find(side);
+            if (match != castling.npos)
+                castling.erase(match, 1);
             board_->set_castling(castling.c_str());
         }
     }
@@ -373,9 +378,9 @@ move::move(const ipiece* piece, const char* from, const char* to) {
             state_ = std::make_unique<move_en_passant>(piece, from, to);
         else
             state_ = std::make_unique<move_pawn>(piece, from, to);
-    if (piece->type() == king)
+    else if (piece->type() == king)
         state_ = std::make_unique<move_king>(piece, from, to);
-    if (piece->type() == rook)
+    else if (piece->type() == rook)
         state_ = std::make_unique<move_rook>(piece, from, to);
     else
         state_ = std::make_unique<move_piece>(piece, from, to);
