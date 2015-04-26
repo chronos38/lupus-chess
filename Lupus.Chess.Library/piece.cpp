@@ -99,7 +99,7 @@ namespace chess {
             tasks[5] = async(std::launch::async, moves_till_end, piece->board(), lower_right, position_.data(), std::ref(collisions_[5]));
             tasks[6] = async(std::launch::async, moves_till_end, piece->board(), upper_left, position_.data(), std::ref(collisions_[6]));
             tasks[7] = async(std::launch::async, moves_till_end, piece->board(), upper_right, position_.data(), std::ref(collisions_[7]));
-            auto row = position_[1] - '0';
+            auto row = position_[1] - '1';
             auto column = position_[0] - 'a';
             position_score_ = center_position_score_array.get(row, column);
             moves_.clear();
@@ -107,6 +107,8 @@ namespace chess {
             for (auto&& task : tasks) {
                 auto positions = task.get();
                 auto collision = collisions_[index++];
+                if (positions.empty())
+                    continue;
                 
                 for (auto&& position : positions) {
                     moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
@@ -165,7 +167,7 @@ namespace chess {
             tasks[1] = async(std::launch::async, moves_till_end, piece->board(), right, position_.data(), std::ref(collisions_[1]));
             tasks[2] = async(std::launch::async, moves_till_end, piece->board(), up, position_.data(), std::ref(collisions_[2]));
             tasks[3] = async(std::launch::async, moves_till_end, piece->board(), down, position_.data(), std::ref(collisions_[3]));
-            auto row = position_[1] - '0';
+            auto row = position_[1] - '1';
             auto column = position_[0] - 'a';
             position_score_ = center_position_score_array.get(row, column);
             moves_.clear();
@@ -173,6 +175,8 @@ namespace chess {
             for (auto&& task : tasks) {
                 auto positions = task.get();
                 auto collision = collisions_[index++];
+                if (positions.empty())
+                    continue;
 
                 for (auto&& position : positions) {
                     moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
@@ -231,7 +235,7 @@ namespace chess {
             tasks[1] = async(std::launch::async, moves_till_end, piece->board(), lower_right, position_.data(), std::ref(collisions_[1]));
             tasks[2] = async(std::launch::async, moves_till_end, piece->board(), upper_left, position_.data(), std::ref(collisions_[2]));
             tasks[3] = async(std::launch::async, moves_till_end, piece->board(), upper_right, position_.data(), std::ref(collisions_[3]));
-            auto row = position_[1] - '0';
+            auto row = position_[1] - '1';
             auto column = position_[0] - 'a';
             position_score_ = center_position_score_array.get(row, column);
             moves_.clear();
@@ -239,6 +243,8 @@ namespace chess {
             for (auto&& task : tasks) {
                 auto positions = task.get();
                 auto collision = collisions_[index++];
+                if (positions.empty())
+                    continue;
 
                 for (auto&& position : positions) {
                     moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
@@ -302,7 +308,7 @@ namespace chess {
             tasks[5] = async(std::launch::async, move_knight, piece->board(), upper_left, up, position_.data(), std::ref(collisions_[5]));
             tasks[6] = async(std::launch::async, move_knight, piece->board(), upper_right, right, position_.data(), std::ref(collisions_[6]));
             tasks[7] = async(std::launch::async, move_knight, piece->board(), upper_right, up, position_.data(), std::ref(collisions_[7]));
-            auto row = position_[1] - '0';
+            auto row = position_[1] - '1';
             auto column = position_[0] - 'a';
             position_score_ = center_position_score_array.get(row, column);
             moves_.clear();
@@ -310,6 +316,8 @@ namespace chess {
             for (auto&& task : tasks) {
                 auto position = task.get();
                 auto collision = collisions_[index++];
+                if (position.empty())
+                    continue;
                 moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
 
                 if (!collision)
@@ -387,13 +395,13 @@ namespace chess {
             auto task_up = async(std::launch::async, move_direction, piece->board(), up, position_.data(), std::ref(collisions_[0]));
             tasks[0] = async(std::launch::async, move_direction, piece->board(), upper_left, position_.data(), std::ref(collisions_[1]));
             tasks[1] = async(std::launch::async, move_direction, piece->board(), upper_right, position_.data(), std::ref(collisions_[2]));
-            auto row = position_[1] - '0';
+            auto row = position_[1] - '1';
             auto column = position_[0] - 'a';
             position_score_ = pawn_position_score_array.get(row, column);
             moves_.clear();
 
             auto position = task_up.get();
-            if (!collisions_[0]) {
+            if (!position.empty() && !collisions_[0]) {
                 moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
 
                 if (position_[1] == '2') {
@@ -411,6 +419,8 @@ namespace chess {
             for (auto&& task : tasks) {
                 position = task.get();
                 auto collision = collisions_[index++];
+                if (position.empty())
+                    continue;
                 if (collision) {
                     auto collision_color = value_to_color(static_cast<piece_value>(collision));
                     auto collision_type = value_to_type(static_cast<piece_value>(collision));
@@ -454,7 +464,7 @@ namespace chess {
             moves_.clear();
 
             auto position = task_up.get();
-            if (!collisions_[0]) {
+            if (!position.empty() && !collisions_[0]) {
                 moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
 
                 if (position_[1] == '7') {
@@ -472,6 +482,8 @@ namespace chess {
             for (auto&& task : tasks) {
                 position = task.get();
                 auto collision = collisions_[index++];
+                if (position.empty())
+                    continue;
                 if (collision) {
                     auto collision_color = value_to_color(static_cast<piece_value>(collision));
                     auto collision_type = value_to_type(static_cast<piece_value>(collision));
@@ -536,7 +548,7 @@ namespace chess {
             tasks[5] = async(std::launch::async, move_direction, piece->board(), lower_right, position_.data(), std::ref(collisions_[5]));
             tasks[6] = async(std::launch::async, move_direction, piece->board(), upper_left, position_.data(), std::ref(collisions_[6]));
             tasks[7] = async(std::launch::async, move_direction, piece->board(), upper_right, position_.data(), std::ref(collisions_[7]));
-            auto row = position_[1] - '0';
+            auto row = position_[1] - '1';
             auto column = position_[0] - 'a';
             position_score_ = center_position_score_array.get(row, column);
             moves_.clear();
@@ -544,6 +556,8 @@ namespace chess {
             for (auto&& task : tasks) {
                 auto position = task.get();
                 auto collision = collisions_[index++];
+                if (position.empty())
+                    continue;
                 moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
 
                 if (!collision)
@@ -593,7 +607,7 @@ namespace chess {
             tasks[5] = async(std::launch::async, move_direction, piece->board(), lower_right, position_.data(), std::ref(collisions_[5]));
             tasks[6] = async(std::launch::async, move_direction, piece->board(), upper_left, position_.data(), std::ref(collisions_[6]));
             tasks[7] = async(std::launch::async, move_direction, piece->board(), upper_right, position_.data(), std::ref(collisions_[7]));
-            auto row = position_[1] - '0';
+            auto row = position_[1] - '1';
             auto column = position_[0] - 'a';
             position_score_ = king_position_score_array.get(row, column);
             moves_.clear();
@@ -601,6 +615,8 @@ namespace chess {
             for (auto&& task : tasks) {
                 auto position = task.get();
                 auto collision = collisions_[index++];
+                if (position.empty())
+                    continue;
                 moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
 
                 if (!collision)
@@ -659,6 +675,8 @@ namespace chess {
             for (auto&& task : tasks) {
                 auto position = task.get();
                 auto collision = collisions_[index++];
+                if (position.empty())
+                    continue;
                 moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
 
                 if (!collision)

@@ -141,10 +141,14 @@ namespace chess {
         switch (first) {
             case upper_left: {
                 auto upper_left = move_upper_left(position);
+                if (upper_left.empty())
+                    return "";
 
                 switch (second) {
                     case left: {
                         auto pos = move_left(upper_left.c_str());
+                        if (pos.empty())
+                            return "";
                         auto value = board->get(pos.c_str());
 
                         if (value)
@@ -153,6 +157,8 @@ namespace chess {
                     }
                     case up: {
                         auto pos = move_up(upper_left.c_str());
+                        if (pos.empty())
+                            return "";
                         auto value = board->get(pos.c_str());
 
                         if (value)
@@ -165,10 +171,14 @@ namespace chess {
             }
             case upper_right: {
                 auto upper_right = move_upper_right(position);
+                if (upper_right.empty())
+                    return "";
 
                 switch (second) {
                     case right: {
                         auto pos = move_right(upper_right.c_str());
+                        if (pos.empty())
+                            return "";
                         auto value = board->get(pos.c_str());
 
                         if (value)
@@ -177,6 +187,8 @@ namespace chess {
                     }
                     case up: {
                         auto pos = move_up(upper_right.c_str());
+                        if (pos.empty())
+                            return "";
                         auto value = board->get(pos.c_str());
 
                         if (value)
@@ -189,18 +201,24 @@ namespace chess {
             }
             case lower_left: {
                 auto lower_left = move_lower_left(position);
+                if (lower_left.empty())
+                    return "";
 
                 switch (second) {
                     case left: {
                         auto pos = move_left(lower_left.c_str());
+                        if (pos.empty())
+                            return "";
                         auto value = board->get(pos.c_str());
 
                         if (value)
                             collision = value;
                         return pos;
                     }
-                    case up: {
+                    case down: {
                         auto pos = move_down(lower_left.c_str());
+                        if (pos.empty())
+                            return "";
                         auto value = board->get(pos.c_str());
 
                         if (value)
@@ -213,18 +231,24 @@ namespace chess {
             }
             case lower_right: {
                 auto lower_right = move_lower_right(position);
+                if (lower_right.empty())
+                    return "";
 
                 switch (second) {
                     case right: {
                         auto pos = move_right(lower_right.c_str());
+                        if (pos.empty())
+                            return "";
                         auto value = board->get(pos.c_str());
 
                         if (value)
                             collision = value;
                         return pos;
                     }
-                    case up: {
+                    case down: {
                         auto pos = move_down(lower_right.c_str());
+                        if (pos.empty())
+                            return "";
                         auto value = board->get(pos.c_str());
 
                         if (value)
