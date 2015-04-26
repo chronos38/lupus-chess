@@ -112,6 +112,10 @@ namespace chess {
         fullmove_ = other.fullmove_;
     }
 
+    std::shared_ptr<board> board::clone() const {
+        return std::make_shared<board>(*this);
+    }
+
     uint8_t board::get(size_t index) const {
         return array_2d<uint8_t, 8, 8>::get(index);
     }

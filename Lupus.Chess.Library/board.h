@@ -15,6 +15,7 @@ namespace chess {
         board(board&& other);
         board(const board& other);
         virtual ~board() = default;
+        std::shared_ptr<board> clone() const;
         uint8_t get(size_t index) const;
         uint8_t get(char file, uint8_t rank) const;
         uint8_t get(const char* position) const;
