@@ -219,3 +219,131 @@ TEST_F(piece_test, end_king_movement) {
     ASSERT_NE(std::end(m), std::find_if(std::begin(m), std::end(m), [] (std::shared_ptr<move> move) { return move->to_string() == "Kfe5"; }));
     ASSERT_NE(std::end(m), std::find_if(std::begin(m), std::end(m), [] (std::shared_ptr<move> move) { return move->to_string() == "Kfe6"; }));
 }
+
+TEST_F(piece_test, score) {
+    auto p = std::make_shared<piece>(board_, "a2");
+    auto r = std::make_shared<piece>(board_, "a1");
+    auto n = std::make_shared<piece>(board_, "b1");
+    auto b = std::make_shared<piece>(board_, "c1");
+    auto q = std::make_shared<piece>(board_, "d1");
+    auto k = std::make_shared<piece>(board_, "e1");
+
+    ASSERT_EQ(100, p->score());
+    ASSERT_EQ(525, r->score());
+    ASSERT_EQ(350, n->score());
+    ASSERT_EQ(350, b->score());
+    ASSERT_EQ(1000, q->score());
+    ASSERT_EQ(20000, k->score());
+}
+
+TEST_F(piece_test, attack_score) {
+    auto p = std::make_shared<piece>(board_, "a2");
+    auto r = std::make_shared<piece>(board_, "a1");
+    auto n = std::make_shared<piece>(board_, "b1");
+    auto b = std::make_shared<piece>(board_, "c1");
+    auto q = std::make_shared<piece>(board_, "d1");
+    auto k = std::make_shared<piece>(board_, "e1");
+
+    ASSERT_EQ(0, p->attack_score());
+    ASSERT_EQ(0, r->attack_score());
+    ASSERT_EQ(0, n->attack_score());
+    ASSERT_EQ(0, b->attack_score());
+    ASSERT_EQ(0, q->attack_score());
+    ASSERT_EQ(0, k->attack_score());
+}
+
+TEST_F(piece_test, defense_score) {
+    auto p = std::make_shared<piece>(board_, "a2");
+    auto r = std::make_shared<piece>(board_, "a1");
+    auto n = std::make_shared<piece>(board_, "b1");
+    auto b = std::make_shared<piece>(board_, "c1");
+    auto q = std::make_shared<piece>(board_, "d1");
+    auto k = std::make_shared<piece>(board_, "e1");
+
+    ASSERT_EQ(0, p->defense_score());
+    ASSERT_EQ(0, r->defense_score());
+    ASSERT_EQ(0, n->defense_score());
+    ASSERT_EQ(0, b->defense_score());
+    ASSERT_EQ(0, q->defense_score());
+    ASSERT_EQ(0, k->defense_score());
+}
+
+TEST_F(piece_test, position_score) {
+    auto p = std::make_shared<piece>(board_, "a2");
+    auto r = std::make_shared<piece>(board_, "a1");
+    auto n = std::make_shared<piece>(board_, "b1");
+    auto b = std::make_shared<piece>(board_, "c1");
+    auto q = std::make_shared<piece>(board_, "d1");
+    auto k = std::make_shared<piece>(board_, "e1");
+
+    ASSERT_EQ(0, p->position_score());
+    ASSERT_EQ(0, r->position_score());
+    ASSERT_EQ(0, n->position_score());
+    ASSERT_EQ(0, b->position_score());
+    ASSERT_EQ(0, q->position_score());
+    ASSERT_EQ(0, k->position_score());
+}
+
+TEST_F(piece_test, value) {
+    auto p = std::make_shared<piece>(board_, "a2");
+    auto r = std::make_shared<piece>(board_, "a1");
+    auto n = std::make_shared<piece>(board_, "b1");
+    auto b = std::make_shared<piece>(board_, "c1");
+    auto q = std::make_shared<piece>(board_, "d1");
+    auto k = std::make_shared<piece>(board_, "e1");
+
+    ASSERT_EQ('P', p->value());
+    ASSERT_EQ('R', r->value());
+    ASSERT_EQ('N', n->value());
+    ASSERT_EQ('B', b->value());
+    ASSERT_EQ('Q', q->value());
+    ASSERT_EQ('K', k->value());
+}
+
+TEST_F(piece_test, type) {
+    auto p = std::make_shared<piece>(board_, "a2");
+    auto r = std::make_shared<piece>(board_, "a1");
+    auto n = std::make_shared<piece>(board_, "b1");
+    auto b = std::make_shared<piece>(board_, "c1");
+    auto q = std::make_shared<piece>(board_, "d1");
+    auto k = std::make_shared<piece>(board_, "e1");
+
+    ASSERT_EQ(pawn, p->type());
+    ASSERT_EQ(rook, r->type());
+    ASSERT_EQ(knight, n->type());
+    ASSERT_EQ(bishop, b->type());
+    ASSERT_EQ(queen, q->type());
+    ASSERT_EQ(king, k->type());
+}
+
+TEST_F(piece_test, color) {
+    auto p = std::make_shared<piece>(board_, "a2");
+    auto r = std::make_shared<piece>(board_, "a1");
+    auto n = std::make_shared<piece>(board_, "b1");
+    auto b = std::make_shared<piece>(board_, "c1");
+    auto q = std::make_shared<piece>(board_, "d1");
+    auto k = std::make_shared<piece>(board_, "e1");
+
+    ASSERT_EQ(white, p->color());
+    ASSERT_EQ(white, r->color());
+    ASSERT_EQ(white, n->color());
+    ASSERT_EQ(white, b->color());
+    ASSERT_EQ(white, q->color());
+    ASSERT_EQ(white, k->color());
+}
+
+TEST_F(piece_test, position) {
+    auto p = std::make_shared<piece>(board_, "a2");
+    auto r = std::make_shared<piece>(board_, "a1");
+    auto n = std::make_shared<piece>(board_, "b1");
+    auto b = std::make_shared<piece>(board_, "c1");
+    auto q = std::make_shared<piece>(board_, "d1");
+    auto k = std::make_shared<piece>(board_, "e1");
+
+    ASSERT_EQ(0, strcmp(p->position(), "a2"));
+    ASSERT_EQ(0, strcmp(r->position(), "a1"));
+    ASSERT_EQ(0, strcmp(n->position(), "b1"));
+    ASSERT_EQ(0, strcmp(b->position(), "c1"));
+    ASSERT_EQ(0, strcmp(q->position(), "d1"));
+    ASSERT_EQ(0, strcmp(k->position(), "e1"));
+}
