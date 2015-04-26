@@ -5,6 +5,54 @@
 #include <future>
 
 namespace chess {
+    static const int end_game_transition_count = 11;
+    static const std::unordered_map<piece_type, int> attack_score_map = {
+        { king, 2000 },
+        { queen, 100 },
+        { knight, 35 },
+        { bishop, 35 },
+        { rook, 50 },
+        { pawn, 10 }
+    };
+    static const std::unordered_map<piece_type, int> defense_score_map = {
+        { king, 0 },
+        { queen, 100 },
+        { knight, 35 },
+        { bishop, 35 },
+        { rook, 50 },
+        { pawn, 10 }
+    };
+    static const array_2d<int, 8, 8> center_position_score_array = {
+        -15, -15, -15, -15, -15, -15, -15, -15,
+        -15, 0, 0, 0, 0, 0, 0, -15,
+        -15, 0, 10, 10, 10, 10, 0, -15,
+        -15, 0, 10, 25, 25, 10, 0, -15,
+        -15, 0, 10, 25, 25, 10, 0, -15,
+        -15, 0, 10, 10, 10, 10, 0, -15,
+        -15, 0, 0, 0, 0, 0, 0, -15,
+        -15, -15, -15, -15, -15, -15, -15, -15
+    };
+    static const array_2d<int, 8, 8> king_position_score_array = {
+        55, 45, 25, 10, 10, 25, 45, 55,
+        10, 5, 0, -5, -5, 0, 5, 10,
+        -10, -10, -10, -15, -15 -10, -10, -10,
+        -25, -25, -25, -35, -35, -25, -25, -25,
+        -35, -35, -35, -45, -45, -35, -35, -35,
+        -50, -50, -50, -50, -50, -50, -50, -50,
+        -100, -100, -100, -100, -100, -100, -100, -100,
+        -200, -200, -200, -200, -200, -200, -200, -200
+    };
+    static const array_2d<int, 8, 8> pawn_position_score_array = {
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
+        5, 5, 5, 5, 5, 5, 5, 5,
+        5, 5, 7, 10, 10, 7, 5, 5,
+        10, 10, 10, 15, 15, 10, 10, 10,
+        15, 15, 15, 15, 15, 15, 15, 15,
+        20, 20, 20, 20, 20, 20, 20, 20,
+        100, 100, 100, 100, 100, 100, 100, 100
+    };
+
     const char* piece_position(std::shared_ptr<board> on_board, piece_value for_value, std::array<char, 3>& position) {
         auto file = 0;
         auto rank = 1;
@@ -26,14 +74,14 @@ namespace chess {
 
     class piece_queen : public piece_state {
     public:
-        explicit piece_queen(piece_color color) : piece_state(color) {
+        explicit piece_queen(const char* position, piece_color color) : piece_state(position, color) {
             score_ = 1000;
         }
 
         virtual ~piece_queen() = default;
         
         virtual std::unique_ptr<piece_state> clone() const override {
-            return std::make_unique<piece_queen>(color_);
+            return std::make_unique<piece_queen>(position_.data(), color_);
         }
 
         virtual void update(ipiece* piece) override {
@@ -43,7 +91,6 @@ namespace chess {
             attack_score_ = 0;
             defense_score_ = 0;
 
-            piece_position(piece->board(), value(), position_);
             tasks[0] = async(std::launch::async, moves_till_end, piece->board(), left, position_.data(), std::ref(collisions_[0]));
             tasks[1] = async(std::launch::async, moves_till_end, piece->board(), right, position_.data(), std::ref(collisions_[1]));
             tasks[2] = async(std::launch::async, moves_till_end, piece->board(), up, position_.data(), std::ref(collisions_[2]));
@@ -97,14 +144,14 @@ namespace chess {
 
     class piece_rook : public piece_state {
     public:
-        explicit piece_rook(piece_color color) : piece_state(color) {
+        explicit piece_rook(const char* position, piece_color color) : piece_state(position, color) {
             score_ = 525;
         }
 
         virtual ~piece_rook() = default;
 
         virtual std::unique_ptr<piece_state> clone() const override {
-            return std::make_unique<piece_rook>(color_);
+            return std::make_unique<piece_rook>(position_.data(), color_);
         }
 
         virtual void update(ipiece* piece) override {
@@ -114,7 +161,6 @@ namespace chess {
             attack_score_ = 0;
             defense_score_ = 0;
 
-            piece_position(piece->board(), value(), position_);
             tasks[0] = async(std::launch::async, moves_till_end, piece->board(), left, position_.data(), std::ref(collisions_[0]));
             tasks[1] = async(std::launch::async, moves_till_end, piece->board(), right, position_.data(), std::ref(collisions_[1]));
             tasks[2] = async(std::launch::async, moves_till_end, piece->board(), up, position_.data(), std::ref(collisions_[2]));
@@ -164,14 +210,14 @@ namespace chess {
 
     class piece_bishop : public piece_state {
     public:
-        explicit piece_bishop(piece_color color) : piece_state(color) {
+        explicit piece_bishop(const char* position, piece_color color) : piece_state(position, color) {
             score_ = 350;
         }
 
         virtual ~piece_bishop() = default;
 
         virtual std::unique_ptr<piece_state> clone() const override {
-            return std::make_unique<piece_bishop>(color_);
+            return std::make_unique<piece_bishop>(position_.data(), color_);
         }
         
         virtual void update(ipiece* piece) override {
@@ -181,7 +227,6 @@ namespace chess {
             attack_score_ = 0;
             defense_score_ = 0;
 
-            piece_position(piece->board(), value(), position_);
             tasks[0] = async(std::launch::async, moves_till_end, piece->board(), lower_left, position_.data(), std::ref(collisions_[0]));
             tasks[1] = async(std::launch::async, moves_till_end, piece->board(), lower_right, position_.data(), std::ref(collisions_[1]));
             tasks[2] = async(std::launch::async, moves_till_end, piece->board(), upper_left, position_.data(), std::ref(collisions_[2]));
@@ -231,14 +276,14 @@ namespace chess {
 
     class piece_knight : public piece_state {
     public:
-        explicit piece_knight(piece_color color) : piece_state(color) {
+        explicit piece_knight(const char* position, piece_color color) : piece_state(position, color) {
             score_ = 350;
         }
 
         virtual ~piece_knight() = default;
         
         virtual std::unique_ptr<piece_state> clone() const override {
-            return std::make_unique<piece_knight>(color_);
+            return std::make_unique<piece_knight>(position_.data(), color_);
         }
 
         
@@ -249,7 +294,6 @@ namespace chess {
             attack_score_ = 0;
             defense_score_ = 0;
 
-            piece_position(piece->board(), value(), position_);
             tasks[0] = async(std::launch::async, move_knight, piece->board(), lower_left, left, position_.data(), std::ref(collisions_[0]));
             tasks[1] = async(std::launch::async, move_knight, piece->board(), lower_left, down, position_.data(), std::ref(collisions_[1]));
             tasks[2] = async(std::launch::async, move_knight, piece->board(), lower_right, right, position_.data(), std::ref(collisions_[2]));
@@ -300,7 +344,7 @@ namespace chess {
 
     class piece_pawn : public piece_state {
     public:
-        explicit piece_pawn(piece_color color) : piece_state(color) {
+        explicit piece_pawn(const char* position, piece_color color) : piece_state(position, color) {
             score_ = 100;
         }
 
@@ -324,13 +368,13 @@ namespace chess {
 
     class piece_pawn_white : public piece_pawn {
     public:
-        piece_pawn_white() : piece_pawn(white) {
+        piece_pawn_white(const char* position) : piece_pawn(position, white) {
         }
 
         virtual ~piece_pawn_white() = default;
         
         virtual std::unique_ptr<piece_state> clone() const override {
-            return std::make_unique<piece_pawn_white>();
+            return std::make_unique<piece_pawn_white>(position_.data());
         }
 
         virtual void update(ipiece* piece) override {
@@ -339,7 +383,6 @@ namespace chess {
             collisions_.fill(0);
             attack_score_ = 0;
             defense_score_ = 0;
-            piece_position(piece->board(), value(), position_);
 
             auto task_up = async(std::launch::async, move_direction, piece->board(), up, position_.data(), std::ref(collisions_[0]));
             tasks[0] = async(std::launch::async, move_direction, piece->board(), upper_left, position_.data(), std::ref(collisions_[1]));
@@ -350,10 +393,20 @@ namespace chess {
             moves_.clear();
 
             auto position = task_up.get();
-            if (!collisions_[0])
+            if (!collisions_[0]) {
                 moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
-            else
+
+                if (position_[1] == '2') {
+                    uint8_t collision = 0;
+                    auto double_pos = std::string(1, position_[0]) + '3';
+                    position = move_direction(piece->board(), up, double_pos.c_str(), collision);
+
+                    if (!collision && !position.empty())
+                        moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
+                }
+            } else {
                 position_score_ -= 10;
+            }
 
             for (auto&& task : tasks) {
                 position = task.get();
@@ -362,7 +415,7 @@ namespace chess {
                     auto collision_color = value_to_color(static_cast<piece_value>(collision));
                     auto collision_type = value_to_type(static_cast<piece_value>(collision));
 
-                    if (collision_color == white)
+                    if (collision_color == color_)
                         defense_score_ += defense_score_map.at(collision_type);
                     else
                         attack_score_ += attack_score_map.at(collision_type);
@@ -375,13 +428,13 @@ namespace chess {
 
     class piece_pawn_black : public piece_pawn {
     public:
-        piece_pawn_black() : piece_pawn(black) {
+        piece_pawn_black(const char* position) : piece_pawn(position, black) {
         }
 
         virtual ~piece_pawn_black() = default;
         
         virtual std::unique_ptr<piece_state> clone() const override {
-            return std::make_unique<piece_pawn_black>();
+            return std::make_unique<piece_pawn_black>(position_.data());
         }
 
         virtual void update(ipiece* piece) override {
@@ -390,11 +443,10 @@ namespace chess {
             collisions_.fill(0);
             attack_score_ = 0;
             defense_score_ = 0;
-            piece_position(piece->board(), value(), position_);
 
-            auto task_up = async(std::launch::async, move_direction, piece->board(), up, position_.data(), std::ref(collisions_[0]));
-            tasks[0] = async(std::launch::async, move_direction, piece->board(), upper_left, position_.data(), std::ref(collisions_[1]));
-            tasks[1] = async(std::launch::async, move_direction, piece->board(), upper_right, position_.data(), std::ref(collisions_[2]));
+            auto task_up = async(std::launch::async, move_direction, piece->board(), down, position_.data(), std::ref(collisions_[0]));
+            tasks[0] = async(std::launch::async, move_direction, piece->board(), lower_left, position_.data(), std::ref(collisions_[1]));
+            tasks[1] = async(std::launch::async, move_direction, piece->board(), lower_right, position_.data(), std::ref(collisions_[2]));
             auto mirror = mirror_position(position_.data());
             auto row = mirror[1] - '0';
             auto column = mirror[0] - 'a';
@@ -402,10 +454,20 @@ namespace chess {
             moves_.clear();
 
             auto position = task_up.get();
-            if (!collisions_[0])
+            if (!collisions_[0]) {
                 moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
-            else
+
+                if (position_[1] == '7') {
+                    uint8_t collision = 0;
+                    auto double_pos = std::string(1, position_[0]) + '6';
+                    position = move_direction(piece->board(), down, double_pos.c_str(), collision);
+
+                    if (!collision && !position.empty())
+                        moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
+                }
+            } else {
                 position_score_ -= 10;
+            }
 
             for (auto&& task : tasks) {
                 position = task.get();
@@ -414,7 +476,7 @@ namespace chess {
                     auto collision_color = value_to_color(static_cast<piece_value>(collision));
                     auto collision_type = value_to_type(static_cast<piece_value>(collision));
 
-                    if (collision_color == white)
+                    if (collision_color == color_)
                         defense_score_ += defense_score_map.at(collision_type);
                     else
                         attack_score_ += attack_score_map.at(collision_type);
@@ -427,7 +489,7 @@ namespace chess {
 
     class piece_king : public piece_state {
     public:
-        explicit piece_king(piece_color color) : piece_state(color) {
+        explicit piece_king(const char* position, piece_color color) : piece_state(position, color) {
             score_ = 20000;
         }
 
@@ -451,12 +513,12 @@ namespace chess {
 
     class piece_king_end_game : public piece_king {
     public:
-        explicit piece_king_end_game(piece_color color) : piece_king(color) {}
+        explicit piece_king_end_game(const char* position, piece_color color) : piece_king(position, color) {}
 
         virtual ~piece_king_end_game() = default;
 
         virtual std::unique_ptr<piece_state> clone() const override {
-            return std::make_unique<piece_king_end_game>(color_);
+            return std::make_unique<piece_king_end_game>(position_.data(), color_);
         }
 
         virtual void update(ipiece* piece) override {
@@ -465,7 +527,6 @@ namespace chess {
             collisions_.fill(0);
             attack_score_ = 0;
             defense_score_ = 0;
-            piece_position(piece->board(), value(), position_);
 
             tasks[0] = async(std::launch::async, move_direction, piece->board(), left, position_.data(), std::ref(collisions_[0]));
             tasks[1] = async(std::launch::async, move_direction, piece->board(), right, position_.data(), std::ref(collisions_[1]));
@@ -502,18 +563,18 @@ namespace chess {
 
     class piece_king_white : public piece_king {
     public:
-        piece_king_white() : piece_king(white) {
+        piece_king_white(const char* position) : piece_king(position, white) {
         }
 
         virtual ~piece_king_white() = default;
 
         virtual std::unique_ptr<piece_state> clone() const override {
-            return std::make_unique<piece_king_white>();
+            return std::make_unique<piece_king_white>(position_.data());
         }
         
         virtual void update(ipiece* piece) override {
             if (piece->board()->count() <= end_game_transition_count) {
-                change_state(piece, std::make_unique<piece_king_end_game>(color_));
+                change_state(piece, std::make_unique<piece_king_end_game>(position_.data(), color_));
                 piece->update();
                 return;
             }
@@ -523,7 +584,6 @@ namespace chess {
             collisions_.fill(0);
             attack_score_ = 0;
             defense_score_ = 0;
-            piece_position(piece->board(), value(), position_);
 
             tasks[0] = async(std::launch::async, move_direction, piece->board(), left, position_.data(), std::ref(collisions_[0]));
             tasks[1] = async(std::launch::async, move_direction, piece->board(), right, position_.data(), std::ref(collisions_[1]));
@@ -560,18 +620,18 @@ namespace chess {
 
     class piece_king_black : public piece_king {
     public:
-        piece_king_black() : piece_king(black) {
+        piece_king_black(const char* position) : piece_king(position, black) {
         }
 
         virtual ~piece_king_black() = default;
 
         virtual std::unique_ptr<piece_state> clone() const override {
-            return std::make_unique<piece_king_black>();
+            return std::make_unique<piece_king_black>(position_.data());
         }
         
         virtual void update(ipiece* piece) override {
             if (piece->board()->count() <= end_game_transition_count) {
-                change_state(piece, std::make_unique<piece_king_end_game>(color_));
+                change_state(piece, std::make_unique<piece_king_end_game>(position_.data(), color_));
                 piece->update();
                 return;
             }
@@ -581,7 +641,6 @@ namespace chess {
             collisions_.fill(0);
             attack_score_ = 0;
             defense_score_ = 0;
-            piece_position(piece->board(), value(), position_);
 
             tasks[0] = async(std::launch::async, move_direction, piece->board(), left, position_.data(), std::ref(collisions_[0]));
             tasks[1] = async(std::launch::async, move_direction, piece->board(), right, position_.data(), std::ref(collisions_[1]));
@@ -617,44 +676,48 @@ namespace chess {
         }
     };
 
-    piece::piece(std::shared_ptr<chess::board> board, piece_value value) 
-        : piece(board, value_to_color(value), value_to_type(value)) {
-    }
+    piece::piece(std::shared_ptr<chess::board> board, const char* position) : board_(board) {
+        auto square = board->get(position);
 
-    piece::piece(std::shared_ptr<chess::board> board, piece_color color, piece_type type) {
+        if (!square)
+            throw std::invalid_argument("position points to an empty square");
+        auto value = static_cast<piece_value>(square);
+        auto color = value_to_color(value);
+        auto type = value_to_type(value);
+
         switch (type) {
             case pawn:
                 switch (color) {
                     case white:
-                        state_ = std::make_unique<piece_pawn_white>();
+                        state_ = std::make_unique<piece_pawn_white>(position);
                         break;
                     case black:
-                        state_ = std::make_unique<piece_pawn_black>();
+                        state_ = std::make_unique<piece_pawn_black>(position);
                         break;
                 }
                 break;
             case knight:
-                state_ = std::make_unique<piece_knight>(color);
+                state_ = std::make_unique<piece_knight>(position, color);
                 break;
             case bishop:
-                state_ = std::make_unique<piece_bishop>(color);
+                state_ = std::make_unique<piece_bishop>(position, color);
                 break;
             case rook:
-                state_ = std::make_unique<piece_rook>(color);
+                state_ = std::make_unique<piece_rook>(position, color);
                 break;
             case queen:
-                state_ = std::make_unique<piece_queen>(color);
+                state_ = std::make_unique<piece_queen>(position, color);
                 break;
             case king:
                 if (board->count() <= end_game_transition_count) {
-                    state_ = std::make_unique<piece_king_end_game>(color);
+                    state_ = std::make_unique<piece_king_end_game>(position, color);
                 } else {
                     switch (color) {
                         case white:
-                            state_ = std::make_unique<piece_king_white>();
+                            state_ = std::make_unique<piece_king_white>(position);
                             break;
                         case black:
-                            state_ = std::make_unique<piece_king_black>();
+                            state_ = std::make_unique<piece_king_black>(position);
                             break;
                     }
                 }
@@ -712,6 +775,10 @@ namespace chess {
         return state_->position();
     }
 
+    void piece::set_position(const char* value) {
+        state_->set_position(value);
+    }
+
     std::shared_ptr<board> piece::board() const {
         return board_;
     }
@@ -730,7 +797,10 @@ namespace chess {
         return *this;
     }
 
-    piece_state::piece_state(piece_color color) : color_(color) {
+    piece_state::piece_state(const char* position, piece_color color) : color_(color) {
+        position_[0] = position[0];
+        position_[1] = position[1];
+        position_[2] = 0;
     }
 
     int piece_state::score() const {
@@ -755,6 +825,12 @@ namespace chess {
 
     const char* piece_state::position() const {
         return position_.data();
+    }
+
+    void piece_state::set_position(const char* value) {
+        position_[0] = value[0];
+        position_[1] = value[1];
+        position_[2] = 0;
     }
 
     piece_color piece_state::color() const {

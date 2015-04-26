@@ -27,6 +27,12 @@
     <ClCompile Include="move_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="piece_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="movement_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mock_piece.h">

@@ -82,7 +82,9 @@
     <ClCompile Include="board_test.cpp" />
     <ClCompile Include="hash_test.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="movement_test.cpp" />
     <ClCompile Include="move_test.cpp" />
+    <ClCompile Include="piece_test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mock_piece.h" />

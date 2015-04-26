@@ -23,8 +23,8 @@ namespace chess {
         move() = default;
         move(move&& other) = delete;
         move(const move& other) = delete;
-        move(std::shared_ptr<board> board, castling castling, piece_color color);
-        move(const ipiece* piece, const char* from, const char* to);
+        move(std::shared_ptr<board> board, castling castling, piece_color color, ipiece* king, ipiece* rook);
+        move(ipiece* piece, const char* from, const char* to);
         virtual ~move() = default;
         virtual void execute() override;
         virtual void undo() override;

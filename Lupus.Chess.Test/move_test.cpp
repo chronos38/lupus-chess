@@ -112,18 +112,21 @@ void prepare_pawn_en_passant(move_test* test) {
 
 TEST_F(move_test, constructor) {
     prepare_queen(this);
+    king_ = new mock_piece();
+    left_rook_ = new mock_piece();
+    right_rook_ = new mock_piece();
 
     EXPECT_NO_THROW({
         move(piece_, "a1", "h8");
-        move(board_, queen_side, white);
+        move(board_, queen_side, white, king_, left_rook_);
     });
 
     EXPECT_THROW({
-        move(board_, no_side, white);
+        move(board_, no_side, white, king_, nullptr);
     }, std::invalid_argument);
 
     EXPECT_THROW({
-        move(board_, both_sides, white);
+        move(board_, both_sides, white, king_, nullptr);
     }, std::invalid_argument);
 
     EXPECT_THROW({
@@ -177,8 +180,8 @@ TEST_F(move_test, to_string_piece) {
 TEST_F(move_test, to_string_castling) {
     // Arrange
     prepare_queen(this);
-    auto m1 = std::make_shared<move>(board_, king_side, white);
-    auto m2 = std::make_shared<move>(board_, queen_side, white);
+    auto m1 = std::make_shared<move>(board_, king_side, white, king_, right_rook_);
+    auto m2 = std::make_shared<move>(board_, queen_side, white, king_, left_rook_);
 
     // Act
     auto s1 = m1->to_string();
@@ -197,9 +200,9 @@ TEST_F(move_test, equal) {
     auto m3 = std::make_shared<move>(piece_, "a1", "a8");
     auto m4 = std::make_shared<move>(piece_, "a1", "h1");
     auto m5 = std::make_shared<move>(piece_, "b2", "c2");
-    auto c1 = std::make_shared<move>(board_, king_side, white);
-    auto c2 = std::make_shared<move>(board_, king_side, white);
-    auto c3 = std::make_shared<move>(board_, queen_side, black);
+    auto c1 = std::make_shared<move>(board_, king_side, white, king_, right_rook_);
+    auto c2 = std::make_shared<move>(board_, king_side, white, king_, right_rook_);
+    auto c3 = std::make_shared<move>(board_, queen_side, black, king_, left_rook_);
 
     // Act
     auto b1 = *m1 == *m2;
@@ -223,7 +226,7 @@ TEST_F(move_test, equal) {
 TEST_F(move_test, castling_queen_side_execute) {
     // Arrange
     prepare_castling(this);
-    auto m = std::make_shared<move>(board_, queen_side, white);
+    auto m = std::make_shared<move>(board_, queen_side, white, king_, left_rook_);
 
     // Act
     m->execute();
@@ -239,7 +242,7 @@ TEST_F(move_test, castling_queen_side_execute) {
 TEST_F(move_test, castling_queen_side_undo) {
     // Arrange
     prepare_castling(this);
-    auto m = std::make_shared<move>(board_, queen_side, white);
+    auto m = std::make_shared<move>(board_, queen_side, white, king_, left_rook_);
 
     // Act
     m->execute();
@@ -261,7 +264,7 @@ TEST_F(move_test, castling_queen_side_undo) {
 TEST_F(move_test, castling_king_side_execute) {
     // Arrange
     prepare_castling(this);
-    auto m = std::make_shared<move>(board_, king_side, white);
+    auto m = std::make_shared<move>(board_, king_side, white, king_, right_rook_);
 
     // Act
     m->execute();
@@ -277,7 +280,7 @@ TEST_F(move_test, castling_king_side_execute) {
 TEST_F(move_test, castling_king_side_undo) {
     // Arrange
     prepare_castling(this);
-    auto m = std::make_shared<move>(board_, king_side, white);
+    auto m = std::make_shared<move>(board_, king_side, white, king_, right_rook_);
 
     // Act
     m->execute();

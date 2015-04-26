@@ -16,5 +16,6 @@ public:
     MOCK_CONST_METHOD0(type, piece_type());
     MOCK_CONST_METHOD0(color, piece_color());
     MOCK_CONST_METHOD0(position, const char*());
+    MOCK_METHOD1(set_position, void(const char*));
     MOCK_CONST_METHOD0(board, std::shared_ptr<::board>());
 };

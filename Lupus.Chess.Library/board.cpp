@@ -117,12 +117,12 @@ namespace chess {
     }
 
     uint8_t board::get(size_t index) const {
-        return array_2d<uint8_t, 8, 8>::get(index);
+        return array_2d::get(index);
     }
 
     uint8_t board::get(char file, uint8_t rank) const {
         auto index = tolower(file) - 'a';
-        return array_2d<uint8_t, 8, 8>::get(--rank * 8 + index);
+        return array_2d::get(--rank * 8 + index);
     }
 
     uint8_t board::get(const char* position) const {
@@ -130,12 +130,12 @@ namespace chess {
     }
 
     void board::set(size_t index, uint8_t value) {
-        array_2d<uint8_t, 8, 8>::set(index, value);
+        array_2d::set(index, value);
     }
 
     void board::set(char file, uint8_t rank, uint8_t value) {
         auto index = tolower(file) - 'a';
-        array_2d<uint8_t, 8, 8>::set(--rank * 8 + index, value);
+        array_2d::set(--rank * 8 + index, value);
     }
 
     void board::set(const char* position, uint8_t value) {
@@ -145,7 +145,7 @@ namespace chess {
     int board::count() {
         auto result = 0;
         for (auto i = 63; i >= 0; i--)
-            if (array_2d<uint8_t, 8, 8>::get(i))
+            if (array_2d::get(i))
                 result++;
         return result;
     }
@@ -245,7 +245,7 @@ namespace chess {
 
     board& board::operator=(board&& other) {
         if (this != &other) {
-            array_2d<uint8_t, 8, 8>::operator=(other);
+            array_2d::operator=(other);
             swap(castling_, other.castling_);
             swap(en_passant_, other.en_passant_);
             active_ = other.active_;
@@ -263,7 +263,7 @@ namespace chess {
     }
 
     board& board::operator=(const board& other) {
-        array_2d<uint8_t, 8, 8>::operator=(other);
+        array_2d::operator=(other);
         castling_ = other.castling_;
         en_passant_ = other.en_passant_;
         active_ = other.active_;

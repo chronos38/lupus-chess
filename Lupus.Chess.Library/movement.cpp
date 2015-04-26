@@ -1,10 +1,28 @@
 #include "movement.h"
+#include <unordered_map>
 
 namespace chess {
+    static const std::unordered_map<char, char> mirror_lookup_map = {
+        { 'a', 'h' },
+        { 'b', 'g' },
+        { 'c', 'f' },
+        { 'd', 'e' },
+        { 'e', 'd' },
+        { 'f', 'c' },
+        { 'g', 'b' },
+        { 'h', 'a' },
+        { '1', '8' },
+        { '2', '7' },
+        { '3', '6' },
+        { '4', '5' },
+        { '5', '4' },
+        { '6', '3' },
+        { '7', '2' },
+        { '8', '1' }
+    };
+
     std::string mirror_position(const char* position) {
-        auto file = position[0] < 'e' ? 'd' : 'e';
-        auto rank = position[1] < '5' ? '4' : '5';
-        return std::string(1, abs(position[0] - file) + file) + std::string(1, abs(position[1] - rank) + rank);
+        return std::string(1, mirror_lookup_map.at(position[0])) + std::string(1, mirror_lookup_map.at(position[1]));
     }
 
     std::string move_left(const char* position) {
@@ -110,8 +128,10 @@ namespace chess {
         result.reserve(7);
 
         while (!string.empty()) {
-            result.push_back(std::move(string));
-            string = move_direction(board, dir, position, collision);
+            result.push_back(string);
+            if (collision)
+                break;
+            string = move_direction(board, dir, string.c_str(), collision);
         }
 
         return result;
