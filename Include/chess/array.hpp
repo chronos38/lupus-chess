@@ -45,6 +45,10 @@ namespace chess {
             array_ = other.array_;
         }
 
+        array_2d(std::initializer_list<T> init) {
+            std::copy(std::begin(init), std::end(init), std::begin(array_));
+        }
+
         virtual ~array_2d() = default;
 
         typename std::array<T, WIDTH * HEIGHT>::iterator begin() {
