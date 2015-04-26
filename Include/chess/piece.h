@@ -9,24 +9,11 @@ namespace chess {
     class move;
     class piece;
 
-    class piece_state {
-    public:
-        virtual ~piece_state() = default;
-        virtual std::unique_ptr<piece_state> clone() const = 0;
-        virtual int score(const piece* piece) const = 0;
-        virtual int attack_score(const piece* piece, std::shared_ptr<board> board) const = 0;
-        virtual int defense_score(const piece* piece, std::shared_ptr<board> board) const = 0;
-        virtual int position_score(const piece* piece, std::shared_ptr<board> board) const = 0;
-        virtual std::vector<std::shared_ptr<move>> allowed_moves(const piece* piece, std::shared_ptr<board> board) const = 0;
-        virtual piece_value value(const piece* piece) const = 0;
-        virtual piece_type type(const piece* piece) const = 0;
-        virtual piece_color color(const piece* piece) const = 0;
-    };
-
     class ipiece {
     public:
         virtual ~ipiece() = default;
         virtual int score() const = 0;
+        virtual void update() = 0;
         virtual int attack_score() const = 0;
         virtual int defense_score() const = 0;
         virtual int position_score() const = 0;
@@ -38,6 +25,34 @@ namespace chess {
         virtual std::shared_ptr<board> board() const = 0;
     };
 
+    class piece_state {
+    public:
+        piece_state() = default;
+        piece_state(piece_color color);
+        virtual ~piece_state() = default;
+        int score() const;
+        int attack_score() const;
+        int defense_score() const;
+        int position_score() const;
+        std::vector<std::shared_ptr<move>> allowed_moves() const;
+        const char* position() const;
+        piece_color color() const;
+        virtual std::unique_ptr<piece_state> clone() const = 0;
+        virtual void update(ipiece* piece) = 0;
+        virtual piece_value value() const = 0;
+        virtual piece_type type() const = 0;
+    protected:
+        virtual void change_state(piece* piece, std::unique_ptr<piece_state> state) final;
+        std::vector<std::shared_ptr<move>> moves_;
+        std::array<char, 3> position_;
+        std::array<uint8_t, 8> collisions_;
+        piece_color color_;
+        int score_ = 0;
+        int attack_score_ = 0;
+        int defense_score_ = 0;
+        int position_score_ = 0;
+    };
+
     class piece : public ipiece {
     public:
         piece() = default;
@@ -46,6 +61,7 @@ namespace chess {
         piece(std::shared_ptr<chess::board> board, piece_value value);
         piece(std::shared_ptr<chess::board> board, piece_color color, piece_type type);
         virtual ~piece() = default;
+        virtual void update() override;
         virtual int score() const override;
         virtual int attack_score() const override;
         virtual int defense_score() const override;
@@ -59,7 +75,7 @@ namespace chess {
         virtual piece& operator=(piece&& other);
         virtual piece& operator=(const piece& other);
     private:
-        std::array<char, 3> position_;
+        friend class piece_state;
         std::shared_ptr<chess::board> board_;
         std::unique_ptr<piece_state> state_;
     };

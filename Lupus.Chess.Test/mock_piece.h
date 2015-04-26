@@ -6,6 +6,7 @@ using namespace chess;
 
 class mock_piece : public ipiece {
 public:
+    MOCK_METHOD0(update, void());
     MOCK_CONST_METHOD0(score, int());
     MOCK_CONST_METHOD0(attack_score, int());
     MOCK_CONST_METHOD0(defense_score, int());

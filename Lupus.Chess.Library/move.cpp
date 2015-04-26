@@ -179,7 +179,6 @@ namespace chess {
                 result += 'x';
             result += to_.data();
 
-            result.shrink_to_fit();
             return result;
         }
 

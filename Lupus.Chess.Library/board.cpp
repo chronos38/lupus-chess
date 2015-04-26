@@ -192,7 +192,6 @@ namespace chess {
         result += ' ';
         result += std::to_string(fullmove_);
 
-        result.shrink_to_fit();
         return result;
     }
 
