@@ -78,7 +78,7 @@ namespace chess {
             case black_rook:
             case black_queen:
             case black_king:
-                return white;
+                return black;
             default:
                 throw std::invalid_argument("could not determine the color from given piece value");
         }

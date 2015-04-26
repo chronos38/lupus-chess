@@ -15,6 +15,7 @@ public:
         king_ = make_shared_board("8/8/8/5K2/8/8/8/8 w - - 0 1");
         rook_ = make_shared_board("8/8/8/3R4/8/8/8/8 w - - 0 1");
         bishop_ = make_shared_board("8/8/8/3B4/8/8/8/8 w - - 0 1");
+        pawn_ = make_shared_board("3p1p2/4P3/8/p1p5/1P6/4p1p1/5P2/8 w - - 0 1");
     }
 
     virtual void TearDown() override {
@@ -27,6 +28,7 @@ public:
     std::shared_ptr<board> king_;
     std::shared_ptr<board> rook_;
     std::shared_ptr<board> bishop_;
+    std::shared_ptr<board> pawn_;
 };
 
 TEST_F(piece_test, pawn_single_and_double_movement) {
@@ -122,4 +124,32 @@ TEST_F(piece_test, bishop_movement) {
     ASSERT_NE(std::end(m), std::find_if(std::begin(m), std::end(m), [] (std::shared_ptr<move> move) { return move->to_string() == "Bdg8"; }));
     ASSERT_NE(std::end(m), std::find_if(std::begin(m), std::end(m), [] (std::shared_ptr<move> move) { return move->to_string() == "Bdh1"; }));
     ASSERT_NE(std::end(m), std::find_if(std::begin(m), std::end(m), [] (std::shared_ptr<move> move) { return move->to_string() == "Bda2"; }));
+}
+
+TEST_F(piece_test, pawn_movements) {
+    auto p1 = std::make_shared<piece>(pawn_, "e7");
+    auto p2 = std::make_shared<piece>(pawn_, "b4");
+    auto p3 = std::make_shared<piece>(pawn_, "f2");
+
+    p1->update();
+    p2->update();
+    p3->update();
+
+    auto m1 = p1->allowed_moves();
+    auto m2 = p2->allowed_moves();
+    auto m3 = p3->allowed_moves();
+
+    ASSERT_EQ(3, m1.size());
+    ASSERT_EQ(3, m2.size());
+    ASSERT_EQ(4, m3.size());
+    ASSERT_NE(std::end(m1), std::find_if(std::begin(m1), std::end(m1), [] (std::shared_ptr<move> move) { return move->to_string() == "ee8"; }));
+    ASSERT_NE(std::end(m1), std::find_if(std::begin(m1), std::end(m1), [] (std::shared_ptr<move> move) { return move->to_string() == "ed8"; }));
+    ASSERT_NE(std::end(m1), std::find_if(std::begin(m1), std::end(m1), [] (std::shared_ptr<move> move) { return move->to_string() == "ef8"; }));
+    ASSERT_NE(std::end(m2), std::find_if(std::begin(m2), std::end(m2), [] (std::shared_ptr<move> move) { return move->to_string() == "bb5"; }));
+    ASSERT_NE(std::end(m2), std::find_if(std::begin(m2), std::end(m2), [] (std::shared_ptr<move> move) { return move->to_string() == "ba5"; }));
+    ASSERT_NE(std::end(m2), std::find_if(std::begin(m2), std::end(m2), [] (std::shared_ptr<move> move) { return move->to_string() == "bc5"; }));
+    ASSERT_NE(std::end(m3), std::find_if(std::begin(m3), std::end(m3), [] (std::shared_ptr<move> move) { return move->to_string() == "ff3"; }));
+    ASSERT_NE(std::end(m3), std::find_if(std::begin(m3), std::end(m3), [] (std::shared_ptr<move> move) { return move->to_string() == "ff4"; }));
+    ASSERT_NE(std::end(m3), std::find_if(std::begin(m3), std::end(m3), [] (std::shared_ptr<move> move) { return move->to_string() == "fe3"; }));
+    ASSERT_NE(std::end(m3), std::find_if(std::begin(m3), std::end(m3), [] (std::shared_ptr<move> move) { return move->to_string() == "fg3"; }));
 }

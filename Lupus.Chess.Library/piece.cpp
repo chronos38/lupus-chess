@@ -376,7 +376,7 @@ namespace chess {
 
     class piece_pawn_white : public piece_pawn {
     public:
-        piece_pawn_white(const char* position) : piece_pawn(position, white) {
+        explicit piece_pawn_white(const char* position) : piece_pawn(position, white) {
         }
 
         virtual ~piece_pawn_white() = default;
@@ -425,10 +425,12 @@ namespace chess {
                     auto collision_color = value_to_color(static_cast<piece_value>(collision));
                     auto collision_type = value_to_type(static_cast<piece_value>(collision));
 
-                    if (collision_color == color_)
+                    if (collision_color == color_) {
                         defense_score_ += defense_score_map.at(collision_type);
-                    else
+                    } else {
                         attack_score_ += attack_score_map.at(collision_type);
+                        moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
+                    }
                 } else if (position == piece->board()->en_passant()) {
                     moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
                 }
@@ -438,7 +440,7 @@ namespace chess {
 
     class piece_pawn_black : public piece_pawn {
     public:
-        piece_pawn_black(const char* position) : piece_pawn(position, black) {
+        explicit piece_pawn_black(const char* position) : piece_pawn(position, black) {
         }
 
         virtual ~piece_pawn_black() = default;
@@ -488,10 +490,12 @@ namespace chess {
                     auto collision_color = value_to_color(static_cast<piece_value>(collision));
                     auto collision_type = value_to_type(static_cast<piece_value>(collision));
 
-                    if (collision_color == color_)
+                    if (collision_color == color_) {
                         defense_score_ += defense_score_map.at(collision_type);
-                    else
+                    } else {
                         attack_score_ += attack_score_map.at(collision_type);
+                        moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
+                    }
                 } else if (position == piece->board()->en_passant()) {
                     moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
                 }
