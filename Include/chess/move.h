@@ -2,7 +2,6 @@
 #include "command.h"
 #include "enum.h"
 #include <memory>
-#include <array>
 
 namespace chess {
     class board;
@@ -24,7 +23,7 @@ namespace chess {
         move() = default;
         move(move&& other) = delete;
         move(const move& other) = delete;
-        move(std::shared_ptr<board> piece, castling castling, piece_color color);
+        move(std::shared_ptr<board> board, castling castling, piece_color color);
         move(const ipiece* piece, const char* from, const char* to);
         virtual ~move() = default;
         virtual void execute() override;

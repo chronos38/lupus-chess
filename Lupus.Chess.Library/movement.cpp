@@ -1,6 +1,12 @@
 #include "movement.h"
 
 namespace chess {
+    std::string mirror_position(const char* position) {
+        auto file = position[0] < 'e' ? 'd' : 'e';
+        auto rank = position[1] < '5' ? '4' : '5';
+        return std::string(1, abs(position[0] - file) + file) + std::string(1, abs(position[1] - rank) + rank);
+    }
+
     std::string move_left(const char* position) {
         if (position[0] == 'a')
             return "";
@@ -109,5 +115,108 @@ namespace chess {
         }
 
         return result;
+    }
+
+    std::string move_knight(std::shared_ptr<board> board, direction first, direction second, const char* position, uint8_t& collision) {
+        switch (first) {
+            case upper_left: {
+                auto upper_left = move_upper_left(position);
+
+                switch (second) {
+                    case left: {
+                        auto pos = move_left(upper_left.c_str());
+                        auto value = board->get(pos.c_str());
+
+                        if (value)
+                            collision = value;
+                        return pos;
+                    }
+                    case up: {
+                        auto pos = move_up(upper_left.c_str());
+                        auto value = board->get(pos.c_str());
+
+                        if (value)
+                            collision = value;
+                        return pos;
+                    }
+                    default:
+                        return "";
+                }
+            }
+            case upper_right: {
+                auto upper_right = move_upper_right(position);
+
+                switch (second) {
+                    case right: {
+                        auto pos = move_right(upper_right.c_str());
+                        auto value = board->get(pos.c_str());
+
+                        if (value)
+                            collision = value;
+                        return pos;
+                    }
+                    case up: {
+                        auto pos = move_up(upper_right.c_str());
+                        auto value = board->get(pos.c_str());
+
+                        if (value)
+                            collision = value;
+                        return pos;
+                    }
+                    default:
+                        return "";
+                }
+            }
+            case lower_left: {
+                auto lower_left = move_lower_left(position);
+
+                switch (second) {
+                    case left: {
+                        auto pos = move_left(lower_left.c_str());
+                        auto value = board->get(pos.c_str());
+
+                        if (value)
+                            collision = value;
+                        return pos;
+                    }
+                    case up: {
+                        auto pos = move_down(lower_left.c_str());
+                        auto value = board->get(pos.c_str());
+
+                        if (value)
+                            collision = value;
+                        return pos;
+                    }
+                    default:
+                        return "";
+                }
+            }
+            case lower_right: {
+                auto lower_right = move_lower_right(position);
+
+                switch (second) {
+                    case right: {
+                        auto pos = move_right(lower_right.c_str());
+                        auto value = board->get(pos.c_str());
+
+                        if (value)
+                            collision = value;
+                        return pos;
+                    }
+                    case up: {
+                        auto pos = move_down(lower_right.c_str());
+                        auto value = board->get(pos.c_str());
+
+                        if (value)
+                            collision = value;
+                        return pos;
+                    }
+                    default:
+                        return "";
+                }
+            }
+            default:
+                return "";
+        }
     }
 }

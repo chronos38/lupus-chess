@@ -37,17 +37,46 @@ namespace chess {
         }
 
         virtual void update(ipiece* piece) override {
+            std::future<std::vector<std::string>> tasks[8];
+            auto index = 0;
             collisions_.fill(0);
+            attack_score_ = 0;
+            defense_score_ = 0;
 
-            auto left = std::async(std::launch::async, moves_till_end, piece->board(), direction::left, position_.data(), std::ref(collisions_[0]));
-            auto right = std::async(std::launch::async, moves_till_end, piece->board(), direction::right, position_.data(), std::ref(collisions_[1]));
-            auto up = std::async(std::launch::async, moves_till_end, piece->board(), direction::up, position_.data(), std::ref(collisions_[2]));
-            auto down = std::async(std::launch::async, moves_till_end, piece->board(), direction::down, position_.data(), std::ref(collisions_[3]));
-            auto lower_left = std::async(std::launch::async, moves_till_end, piece->board(), direction::lower_left, position_.data(), std::ref(collisions_[4]));
-            auto lower_right = std::async(std::launch::async, moves_till_end, piece->board(), direction::lower_right, position_.data(), std::ref(collisions_[5]));
-            auto upper_left = std::async(std::launch::async, moves_till_end, piece->board(), direction::upper_left, position_.data(), std::ref(collisions_[6]));
-            auto upper_right = std::async(std::launch::async, moves_till_end, piece->board(), direction::upper_right, position_.data(), std::ref(collisions_[7]));
             piece_position(piece->board(), value(), position_);
+            tasks[0] = async(std::launch::async, moves_till_end, piece->board(), left, position_.data(), std::ref(collisions_[0]));
+            tasks[1] = async(std::launch::async, moves_till_end, piece->board(), right, position_.data(), std::ref(collisions_[1]));
+            tasks[2] = async(std::launch::async, moves_till_end, piece->board(), up, position_.data(), std::ref(collisions_[2]));
+            tasks[3] = async(std::launch::async, moves_till_end, piece->board(), down, position_.data(), std::ref(collisions_[3]));
+            tasks[4] = async(std::launch::async, moves_till_end, piece->board(), lower_left, position_.data(), std::ref(collisions_[4]));
+            tasks[5] = async(std::launch::async, moves_till_end, piece->board(), lower_right, position_.data(), std::ref(collisions_[5]));
+            tasks[6] = async(std::launch::async, moves_till_end, piece->board(), upper_left, position_.data(), std::ref(collisions_[6]));
+            tasks[7] = async(std::launch::async, moves_till_end, piece->board(), upper_right, position_.data(), std::ref(collisions_[7]));
+            auto row = position_[1] - '0';
+            auto column = position_[0] - 'a';
+            position_score_ = center_position_score_array.get(row, column);
+            moves_.clear();
+
+            for (auto&& task : tasks) {
+                auto positions = task.get();
+                auto collision = collisions_[index++];
+                
+                for (auto&& position : positions) {
+                    moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
+                }
+
+                if (!collision)
+                    continue;
+                auto collision_color = value_to_color(static_cast<piece_value>(collision));
+                auto collision_type = value_to_type(static_cast<piece_value>(collision));
+
+                if (collision_color == color_) {
+                    defense_score_ += defense_score_map.at(collision_type);
+                    moves_.pop_back();
+                } else {
+                    attack_score_ += attack_score_map.at(collision_type);
+                }
+            }
         }
         
         virtual piece_value value() const override {
@@ -69,101 +98,523 @@ namespace chess {
     class piece_rook : public piece_state {
     public:
         explicit piece_rook(piece_color color) : piece_state(color) {
+            score_ = 525;
         }
 
         virtual ~piece_rook() = default;
-        virtual std::unique_ptr<piece_state> clone() const override;
-        virtual void update(ipiece* piece) override;
-        virtual piece_value value() const override;
-        virtual piece_type type() const override;
+
+        virtual std::unique_ptr<piece_state> clone() const override {
+            return std::make_unique<piece_rook>(color_);
+        }
+
+        virtual void update(ipiece* piece) override {
+            std::future<std::vector<std::string>> tasks[4];
+            auto index = 0;
+            collisions_.fill(0);
+            attack_score_ = 0;
+            defense_score_ = 0;
+
+            piece_position(piece->board(), value(), position_);
+            tasks[0] = async(std::launch::async, moves_till_end, piece->board(), left, position_.data(), std::ref(collisions_[0]));
+            tasks[1] = async(std::launch::async, moves_till_end, piece->board(), right, position_.data(), std::ref(collisions_[1]));
+            tasks[2] = async(std::launch::async, moves_till_end, piece->board(), up, position_.data(), std::ref(collisions_[2]));
+            tasks[3] = async(std::launch::async, moves_till_end, piece->board(), down, position_.data(), std::ref(collisions_[3]));
+            auto row = position_[1] - '0';
+            auto column = position_[0] - 'a';
+            position_score_ = center_position_score_array.get(row, column);
+            moves_.clear();
+
+            for (auto&& task : tasks) {
+                auto positions = task.get();
+                auto collision = collisions_[index++];
+
+                for (auto&& position : positions) {
+                    moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
+                }
+
+                if (!collision)
+                    continue;
+                auto collision_color = value_to_color(static_cast<piece_value>(collision));
+                auto collision_type = value_to_type(static_cast<piece_value>(collision));
+
+                if (collision_color == color_) {
+                    defense_score_ += defense_score_map.at(collision_type);
+                    moves_.pop_back();
+                } else {
+                    attack_score_ += attack_score_map.at(collision_type);
+                }
+            }
+        }
+
+        virtual piece_value value() const override {
+            switch (color_) {
+                case white:
+                    return white_rook;
+                case black:
+                    return black_rook;
+                default:
+                    throw std::domain_error("could not determine piece value");
+            }
+        }
+        
+        virtual piece_type type() const override {
+            return rook;
+        }
     };
 
     class piece_bishop : public piece_state {
     public:
-        piece_bishop(piece_color color) : piece_state(color) {
+        explicit piece_bishop(piece_color color) : piece_state(color) {
+            score_ = 350;
         }
 
         virtual ~piece_bishop() = default;
-        virtual std::unique_ptr<piece_state> clone() const override;
-        virtual void update(ipiece* piece) override;
-        virtual piece_value value() const override;
-        virtual piece_type type() const override;
+
+        virtual std::unique_ptr<piece_state> clone() const override {
+            return std::make_unique<piece_bishop>(color_);
+        }
+        
+        virtual void update(ipiece* piece) override {
+            std::future<std::vector<std::string>> tasks[4];
+            auto index = 0;
+            collisions_.fill(0);
+            attack_score_ = 0;
+            defense_score_ = 0;
+
+            piece_position(piece->board(), value(), position_);
+            tasks[0] = async(std::launch::async, moves_till_end, piece->board(), lower_left, position_.data(), std::ref(collisions_[0]));
+            tasks[1] = async(std::launch::async, moves_till_end, piece->board(), lower_right, position_.data(), std::ref(collisions_[1]));
+            tasks[2] = async(std::launch::async, moves_till_end, piece->board(), upper_left, position_.data(), std::ref(collisions_[2]));
+            tasks[3] = async(std::launch::async, moves_till_end, piece->board(), upper_right, position_.data(), std::ref(collisions_[3]));
+            auto row = position_[1] - '0';
+            auto column = position_[0] - 'a';
+            position_score_ = center_position_score_array.get(row, column);
+            moves_.clear();
+
+            for (auto&& task : tasks) {
+                auto positions = task.get();
+                auto collision = collisions_[index++];
+
+                for (auto&& position : positions) {
+                    moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
+                }
+
+                if (!collision)
+                    continue;
+                auto collision_color = value_to_color(static_cast<piece_value>(collision));
+                auto collision_type = value_to_type(static_cast<piece_value>(collision));
+
+                if (collision_color == color_) {
+                    defense_score_ += defense_score_map.at(collision_type);
+                    moves_.pop_back();
+                } else {
+                    attack_score_ += attack_score_map.at(collision_type);
+                }
+            }
+        }
+
+        virtual piece_value value() const override {
+            switch (color_) {
+                case white:
+                    return white_bishop;
+                case black:
+                    return black_bishop;
+                default:
+                    throw std::domain_error("could not determine piece value");
+            }
+        }
+        
+        virtual piece_type type() const override {
+            return bishop;
+        }
     };
 
     class piece_knight : public piece_state {
     public:
-        piece_knight(piece_color color) : piece_state(color) {
+        explicit piece_knight(piece_color color) : piece_state(color) {
+            score_ = 350;
         }
 
         virtual ~piece_knight() = default;
-        virtual std::unique_ptr<piece_state> clone() const override;
-        virtual void update(ipiece* piece) override;
-        virtual piece_value value() const override;
-        virtual piece_type type() const override;
+        
+        virtual std::unique_ptr<piece_state> clone() const override {
+            return std::make_unique<piece_knight>(color_);
+        }
+
+        
+        virtual void update(ipiece* piece) override {
+            std::future<std::string> tasks[8];
+            auto index = 0;
+            collisions_.fill(0);
+            attack_score_ = 0;
+            defense_score_ = 0;
+
+            piece_position(piece->board(), value(), position_);
+            tasks[0] = async(std::launch::async, move_knight, piece->board(), lower_left, left, position_.data(), std::ref(collisions_[0]));
+            tasks[1] = async(std::launch::async, move_knight, piece->board(), lower_left, down, position_.data(), std::ref(collisions_[1]));
+            tasks[2] = async(std::launch::async, move_knight, piece->board(), lower_right, right, position_.data(), std::ref(collisions_[2]));
+            tasks[3] = async(std::launch::async, move_knight, piece->board(), lower_right, down, position_.data(), std::ref(collisions_[3]));
+            tasks[4] = async(std::launch::async, move_knight, piece->board(), upper_left, left, position_.data(), std::ref(collisions_[4]));
+            tasks[5] = async(std::launch::async, move_knight, piece->board(), upper_left, up, position_.data(), std::ref(collisions_[5]));
+            tasks[6] = async(std::launch::async, move_knight, piece->board(), upper_right, right, position_.data(), std::ref(collisions_[6]));
+            tasks[7] = async(std::launch::async, move_knight, piece->board(), upper_right, up, position_.data(), std::ref(collisions_[7]));
+            auto row = position_[1] - '0';
+            auto column = position_[0] - 'a';
+            position_score_ = center_position_score_array.get(row, column);
+            moves_.clear();
+
+            for (auto&& task : tasks) {
+                auto position = task.get();
+                auto collision = collisions_[index++];
+                moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
+
+                if (!collision)
+                    continue;
+                auto collision_color = value_to_color(static_cast<piece_value>(collision));
+                auto collision_type = value_to_type(static_cast<piece_value>(collision));
+
+                if (collision_color == color_) {
+                    defense_score_ += defense_score_map.at(collision_type);
+                    moves_.pop_back();
+                } else {
+                    attack_score_ += attack_score_map.at(collision_type);
+                }
+            }
+        }
+
+        virtual piece_value value() const override {
+            switch (color_) {
+                case white:
+                    return white_knight;
+                case black:
+                    return black_knight;
+                default:
+                    throw std::domain_error("could not determine piece value");
+            }
+        }
+
+        virtual piece_type type() const override {
+            return knight;
+        }
     };
 
     class piece_pawn : public piece_state {
     public:
-        piece_pawn() = default;
-
-        piece_pawn(piece_color color) : piece_state(color) {
+        explicit piece_pawn(piece_color color) : piece_state(color) {
+            score_ = 100;
         }
 
         virtual ~piece_pawn() = default;
-        virtual std::unique_ptr<piece_state> clone() const override;
-        virtual void update(ipiece* piece) override;
-        virtual piece_value value() const override;
-        virtual piece_type type() const override;
+
+        virtual piece_value value() const override {
+            switch (color_) {
+                case white:
+                    return white_pawn;
+                case black:
+                    return black_pawn;
+                default:
+                    throw std::domain_error("could not determine piece value");
+            }
+        }
+
+        virtual piece_type type() const override {
+            return pawn;
+        }
     };
 
     class piece_pawn_white : public piece_pawn {
     public:
+        piece_pawn_white() : piece_pawn(white) {
+        }
+
         virtual ~piece_pawn_white() = default;
-        virtual std::unique_ptr<piece_state> clone() const override;
-        virtual void update(ipiece* piece) override;
+        
+        virtual std::unique_ptr<piece_state> clone() const override {
+            return std::make_unique<piece_pawn_white>();
+        }
+
+        virtual void update(ipiece* piece) override {
+            std::future<std::string> tasks[2];
+            auto index = 1;
+            collisions_.fill(0);
+            attack_score_ = 0;
+            defense_score_ = 0;
+            piece_position(piece->board(), value(), position_);
+
+            auto task_up = async(std::launch::async, move_direction, piece->board(), up, position_.data(), std::ref(collisions_[0]));
+            tasks[0] = async(std::launch::async, move_direction, piece->board(), upper_left, position_.data(), std::ref(collisions_[1]));
+            tasks[1] = async(std::launch::async, move_direction, piece->board(), upper_right, position_.data(), std::ref(collisions_[2]));
+            auto row = position_[1] - '0';
+            auto column = position_[0] - 'a';
+            position_score_ = pawn_position_score_array.get(row, column);
+            moves_.clear();
+
+            auto position = task_up.get();
+            if (!collisions_[0])
+                moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
+            else
+                position_score_ -= 10;
+
+            for (auto&& task : tasks) {
+                position = task.get();
+                auto collision = collisions_[index++];
+                if (collision) {
+                    auto collision_color = value_to_color(static_cast<piece_value>(collision));
+                    auto collision_type = value_to_type(static_cast<piece_value>(collision));
+
+                    if (collision_color == white)
+                        defense_score_ += defense_score_map.at(collision_type);
+                    else
+                        attack_score_ += attack_score_map.at(collision_type);
+                } else if (position == piece->board()->en_passant()) {
+                    moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
+                }
+            }
+        }
     };
 
     class piece_pawn_black : public piece_pawn {
     public:
+        piece_pawn_black() : piece_pawn(black) {
+        }
+
         virtual ~piece_pawn_black() = default;
-        virtual std::unique_ptr<piece_state> clone() const override;
-        virtual void update(ipiece* piece) override;
+        
+        virtual std::unique_ptr<piece_state> clone() const override {
+            return std::make_unique<piece_pawn_black>();
+        }
+
+        virtual void update(ipiece* piece) override {
+            std::future<std::string> tasks[2];
+            auto index = 1;
+            collisions_.fill(0);
+            attack_score_ = 0;
+            defense_score_ = 0;
+            piece_position(piece->board(), value(), position_);
+
+            auto task_up = async(std::launch::async, move_direction, piece->board(), up, position_.data(), std::ref(collisions_[0]));
+            tasks[0] = async(std::launch::async, move_direction, piece->board(), upper_left, position_.data(), std::ref(collisions_[1]));
+            tasks[1] = async(std::launch::async, move_direction, piece->board(), upper_right, position_.data(), std::ref(collisions_[2]));
+            auto mirror = mirror_position(position_.data());
+            auto row = mirror[1] - '0';
+            auto column = mirror[0] - 'a';
+            position_score_ = pawn_position_score_array.get(row, column);
+            moves_.clear();
+
+            auto position = task_up.get();
+            if (!collisions_[0])
+                moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
+            else
+                position_score_ -= 10;
+
+            for (auto&& task : tasks) {
+                position = task.get();
+                auto collision = collisions_[index++];
+                if (collision) {
+                    auto collision_color = value_to_color(static_cast<piece_value>(collision));
+                    auto collision_type = value_to_type(static_cast<piece_value>(collision));
+
+                    if (collision_color == white)
+                        defense_score_ += defense_score_map.at(collision_type);
+                    else
+                        attack_score_ += attack_score_map.at(collision_type);
+                } else if (position == piece->board()->en_passant()) {
+                    moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
+                }
+            }
+        }
     };
 
     class piece_king : public piece_state {
     public:
-        piece_king() = default;
-
-        piece_king(piece_color color) : piece_state(color) {
+        explicit piece_king(piece_color color) : piece_state(color) {
+            score_ = 20000;
         }
 
         virtual ~piece_king() = default;
-        virtual std::unique_ptr<piece_state> clone() const override;
-        virtual void update(ipiece* piece) override;
-        virtual piece_value value() const override;
-        virtual piece_type type() const override;
-    };
 
-    class piece_king_white : public piece_king {
-    public:
-        virtual ~piece_king_white() = default;
-        virtual std::unique_ptr<piece_state> clone() const override;
-        virtual void update(ipiece* piece) override;
-    };
+        virtual piece_value value() const override {
+            switch (color_) {
+                case white:
+                    return white_king;
+                case black:
+                    return black_king;
+                default:
+                    throw std::domain_error("could not determine piece value");
+            }
+        }
 
-    class piece_king_black : public piece_king {
-    public:
-        virtual ~piece_king_black() = default;
-        virtual std::unique_ptr<piece_state> clone() const override;
-        virtual void update(ipiece* piece) override;
+        virtual piece_type type() const override {
+            return king;
+        }
     };
 
     class piece_king_end_game : public piece_king {
     public:
-        piece_king_end_game(piece_color color);
+        explicit piece_king_end_game(piece_color color) : piece_king(color) {}
+
         virtual ~piece_king_end_game() = default;
-        virtual std::unique_ptr<piece_state> clone() const override;
-        virtual void update(ipiece* piece) override;
+
+        virtual std::unique_ptr<piece_state> clone() const override {
+            return std::make_unique<piece_king_end_game>(color_);
+        }
+
+        virtual void update(ipiece* piece) override {
+            std::future<std::string> tasks[8];
+            auto index = 0;
+            collisions_.fill(0);
+            attack_score_ = 0;
+            defense_score_ = 0;
+            piece_position(piece->board(), value(), position_);
+
+            tasks[0] = async(std::launch::async, move_direction, piece->board(), left, position_.data(), std::ref(collisions_[0]));
+            tasks[1] = async(std::launch::async, move_direction, piece->board(), right, position_.data(), std::ref(collisions_[1]));
+            tasks[2] = async(std::launch::async, move_direction, piece->board(), up, position_.data(), std::ref(collisions_[2]));
+            tasks[3] = async(std::launch::async, move_direction, piece->board(), down, position_.data(), std::ref(collisions_[3]));
+            tasks[4] = async(std::launch::async, move_direction, piece->board(), lower_left, position_.data(), std::ref(collisions_[4]));
+            tasks[5] = async(std::launch::async, move_direction, piece->board(), lower_right, position_.data(), std::ref(collisions_[5]));
+            tasks[6] = async(std::launch::async, move_direction, piece->board(), upper_left, position_.data(), std::ref(collisions_[6]));
+            tasks[7] = async(std::launch::async, move_direction, piece->board(), upper_right, position_.data(), std::ref(collisions_[7]));
+            auto row = position_[1] - '0';
+            auto column = position_[0] - 'a';
+            position_score_ = center_position_score_array.get(row, column);
+            moves_.clear();
+
+            for (auto&& task : tasks) {
+                auto position = task.get();
+                auto collision = collisions_[index++];
+                moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
+
+                if (!collision)
+                    continue;
+                auto collision_color = value_to_color(static_cast<piece_value>(collision));
+                auto collision_type = value_to_type(static_cast<piece_value>(collision));
+
+                if (collision_color == color_) {
+                    defense_score_ += defense_score_map.at(collision_type);
+                    moves_.pop_back();
+                } else {
+                    attack_score_ += attack_score_map.at(collision_type);
+                }
+            }
+        }
+    };
+
+    class piece_king_white : public piece_king {
+    public:
+        piece_king_white() : piece_king(white) {
+        }
+
+        virtual ~piece_king_white() = default;
+
+        virtual std::unique_ptr<piece_state> clone() const override {
+            return std::make_unique<piece_king_white>();
+        }
+        
+        virtual void update(ipiece* piece) override {
+            if (piece->board()->count() <= end_game_transition_count) {
+                change_state(piece, std::make_unique<piece_king_end_game>(color_));
+                piece->update();
+                return;
+            }
+
+            std::future<std::string> tasks[8];
+            auto index = 0;
+            collisions_.fill(0);
+            attack_score_ = 0;
+            defense_score_ = 0;
+            piece_position(piece->board(), value(), position_);
+
+            tasks[0] = async(std::launch::async, move_direction, piece->board(), left, position_.data(), std::ref(collisions_[0]));
+            tasks[1] = async(std::launch::async, move_direction, piece->board(), right, position_.data(), std::ref(collisions_[1]));
+            tasks[2] = async(std::launch::async, move_direction, piece->board(), up, position_.data(), std::ref(collisions_[2]));
+            tasks[3] = async(std::launch::async, move_direction, piece->board(), down, position_.data(), std::ref(collisions_[3]));
+            tasks[4] = async(std::launch::async, move_direction, piece->board(), lower_left, position_.data(), std::ref(collisions_[4]));
+            tasks[5] = async(std::launch::async, move_direction, piece->board(), lower_right, position_.data(), std::ref(collisions_[5]));
+            tasks[6] = async(std::launch::async, move_direction, piece->board(), upper_left, position_.data(), std::ref(collisions_[6]));
+            tasks[7] = async(std::launch::async, move_direction, piece->board(), upper_right, position_.data(), std::ref(collisions_[7]));
+            auto row = position_[1] - '0';
+            auto column = position_[0] - 'a';
+            position_score_ = king_position_score_array.get(row, column);
+            moves_.clear();
+
+            for (auto&& task : tasks) {
+                auto position = task.get();
+                auto collision = collisions_[index++];
+                moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
+
+                if (!collision)
+                    continue;
+                auto collision_color = value_to_color(static_cast<piece_value>(collision));
+                auto collision_type = value_to_type(static_cast<piece_value>(collision));
+
+                if (collision_color == color_) {
+                    defense_score_ += defense_score_map.at(collision_type);
+                    moves_.pop_back();
+                } else {
+                    attack_score_ += attack_score_map.at(collision_type);
+                }
+            }
+        }
+    };
+
+    class piece_king_black : public piece_king {
+    public:
+        piece_king_black() : piece_king(black) {
+        }
+
+        virtual ~piece_king_black() = default;
+
+        virtual std::unique_ptr<piece_state> clone() const override {
+            return std::make_unique<piece_king_black>();
+        }
+        
+        virtual void update(ipiece* piece) override {
+            if (piece->board()->count() <= end_game_transition_count) {
+                change_state(piece, std::make_unique<piece_king_end_game>(color_));
+                piece->update();
+                return;
+            }
+
+            std::future<std::string> tasks[8];
+            auto index = 0;
+            collisions_.fill(0);
+            attack_score_ = 0;
+            defense_score_ = 0;
+            piece_position(piece->board(), value(), position_);
+
+            tasks[0] = async(std::launch::async, move_direction, piece->board(), left, position_.data(), std::ref(collisions_[0]));
+            tasks[1] = async(std::launch::async, move_direction, piece->board(), right, position_.data(), std::ref(collisions_[1]));
+            tasks[2] = async(std::launch::async, move_direction, piece->board(), up, position_.data(), std::ref(collisions_[2]));
+            tasks[3] = async(std::launch::async, move_direction, piece->board(), down, position_.data(), std::ref(collisions_[3]));
+            tasks[4] = async(std::launch::async, move_direction, piece->board(), lower_left, position_.data(), std::ref(collisions_[4]));
+            tasks[5] = async(std::launch::async, move_direction, piece->board(), lower_right, position_.data(), std::ref(collisions_[5]));
+            tasks[6] = async(std::launch::async, move_direction, piece->board(), upper_left, position_.data(), std::ref(collisions_[6]));
+            tasks[7] = async(std::launch::async, move_direction, piece->board(), upper_right, position_.data(), std::ref(collisions_[7]));
+            auto mirror = mirror_position(position_.data());
+            auto row = mirror[1] - '0';
+            auto column = mirror[0] - 'a';
+            position_score_ = king_position_score_array.get(row, column);
+            moves_.clear();
+
+            for (auto&& task : tasks) {
+                auto position = task.get();
+                auto collision = collisions_[index++];
+                moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
+
+                if (!collision)
+                    continue;
+                auto collision_color = value_to_color(static_cast<piece_value>(collision));
+                auto collision_type = value_to_type(static_cast<piece_value>(collision));
+
+                if (collision_color == color_) {
+                    defense_score_ += defense_score_map.at(collision_type);
+                    moves_.pop_back();
+                } else {
+                    attack_score_ += attack_score_map.at(collision_type);
+                }
+            }
+        }
     };
 
     piece::piece(std::shared_ptr<chess::board> board, piece_value value) 
@@ -195,7 +646,7 @@ namespace chess {
                 state_ = std::make_unique<piece_queen>(color);
                 break;
             case king:
-                if (board->count() <= 10) {
+                if (board->count() <= end_game_transition_count) {
                     state_ = std::make_unique<piece_king_end_game>(color);
                 } else {
                     switch (color) {
@@ -310,7 +761,7 @@ namespace chess {
         return color_;
     }
 
-    void piece_state::change_state(piece* piece, std::unique_ptr<piece_state> state) {
+    void piece_state::change_state(ipiece* piece, std::unique_ptr<piece_state> state) {
         piece->state_ = std::move(state);
     }
 }

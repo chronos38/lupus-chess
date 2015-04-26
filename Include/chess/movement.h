@@ -16,6 +16,7 @@ namespace chess {
         lower_right
     };
 
+    std::string mirror_position(const char* position);
     std::string move_left(const char* position);
     std::string move_right(const char* position);
     std::string move_up(const char* position);
@@ -26,4 +27,5 @@ namespace chess {
     std::string move_lower_right(const char* position);
     std::string move_direction(std::shared_ptr<board> board, direction dir, const char* position, uint8_t& collision);
     std::vector<std::string> moves_till_end(std::shared_ptr<board> board, direction dir, const char* position, uint8_t& collision);
+    std::string move_knight(std::shared_ptr<board> board, direction first, direction second, const char* position, uint8_t& collision);
 }
