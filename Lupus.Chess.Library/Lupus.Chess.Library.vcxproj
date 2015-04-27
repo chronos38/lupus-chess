@@ -28,6 +28,7 @@
     <ClInclude Include="command.h" />
     <ClInclude Include="move.h" />
     <ClInclude Include="movement.h" />
+    <ClInclude Include="observer.h" />
     <ClInclude Include="piece.h" />
     <ClInclude Include="undo_redo.h" />
   </ItemGroup>

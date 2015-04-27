@@ -68,5 +68,8 @@
     <ClInclude Include="executor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="observer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -4,6 +4,7 @@
 #include "move.h"
 #include <future>
 #include <algorithm>
+#include <unordered_map>
 
 namespace chess {
     executor::executor(executor&& other) {
@@ -20,7 +21,7 @@ namespace chess {
     }
 
     executor::executor(std::shared_ptr<board> board) : board_(board) {
-        moves_.reserve(256);
+        moves_.reserve(128);
         for (auto rank = 1; rank != 9; rank++)
             for (auto file = 'a'; file != 'i'; file++)
                 if (board->get(file, rank))
@@ -33,19 +34,20 @@ namespace chess {
 
     void executor::update() {
         std::vector<std::future<std::shared_ptr<piece>>> tasks;
-        tasks.reserve(32);
+        tasks.reserve(pieces_.size());
         moves_.clear();
-        stack_.clear();
 
-        for_each(begin(pieces_), end(pieces_), [&] (std::shared_ptr<piece> piece) {
-            tasks.emplace_back(async(std::launch::async, [=] () {
+        for_each(begin(pieces_), end(pieces_), [&] (std::shared_ptr<piece> p) {
+            tasks.emplace_back(async(std::launch::async, [] (std::shared_ptr<piece> piece) {
                 piece->update();
                 return piece;
-            }));
+            }, p));
         });
 
         for (auto&& task : tasks) {
             auto piece = task.get();
+            if (piece->color() != board_->active_color())
+                continue;
             auto moves = piece->allowed_moves();
             moves_.insert(end(moves_), begin(moves), end(moves));
         }
@@ -56,7 +58,31 @@ namespace chess {
     }
 
     int executor::evaluate() const {
-        throw std::exception("executor::evaluate not implemented");
+        std::unordered_map<piece_color, int> material = {
+                { white, 0 },
+                { black, 0 }
+            }, attack = {
+                { white, 0 },
+                { black, 0 }
+            }, defense = {
+                { white, 0 },
+                { black, 0 }
+            }, position = {
+                { white, 0 },
+                { black, 0 }
+            };
+
+        for (auto&& piece : pieces_) {
+            material[piece->color()] += piece->score();
+            attack[piece->color()] += piece->attack_score();
+            defense[piece->color()] += piece->defense_score();
+            position[piece->color()] += piece->position_score();
+        }
+
+        return material[black] - material[white] +
+            attack[black] - attack[white] +
+            defense[black] - defense[white] +
+            position[black] - position[white];
     }
 
     void executor::make_move(std::shared_ptr<move> move) {
@@ -74,6 +100,8 @@ namespace chess {
 
         move->execute();
         stack_.push(move);
+        board_->increment_halfmove();
+        board_->toggle_active_color();
     }
 
     void executor::undo_move() {
@@ -83,6 +111,8 @@ namespace chess {
         }
 
         stack_.undo();
+        board_->decrement_halfmove();
+        board_->toggle_active_color();
     }
 
     executor& executor::operator=(executor&& other) {

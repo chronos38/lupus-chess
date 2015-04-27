@@ -243,6 +243,16 @@ namespace chess {
         halfmove_ = value;
     }
 
+    void board::increment_halfmove() {
+        if (++halfmove_ % 2 == 0)
+            fullmove_++;
+    }
+
+    void board::decrement_halfmove() {
+        if (halfmove_-- % 2 == 0)
+            fullmove_--;
+    }
+
     uint8_t board::fullmove() const {
         return fullmove_;
     }

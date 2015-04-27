@@ -32,6 +32,8 @@ namespace chess {
         void set_en_passant(const char* value);
         uint8_t halfmove() const;
         void set_halfmove(uint8_t value);
+        void increment_halfmove();
+        void decrement_halfmove();
         uint8_t fullmove() const;
         void set_fullmove(uint8_t value);
         board& operator=(board&& other);

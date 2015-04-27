@@ -1,10 +1,8 @@
 ﻿#pragma once
 #include "enum.h"
-#include "array.hpp"
 #include <memory>
 #include <vector>
 #include <array>
-#include <unordered_map>
 
 namespace chess {
     class board;
@@ -85,7 +83,4 @@ namespace chess {
         friend class piece_state;
         std::shared_ptr<chess::board> board_;
     };
-
-
-    const char* piece_position(std::shared_ptr<board> on_board, piece_value for_value, std::array<char, 3>& position);
 }

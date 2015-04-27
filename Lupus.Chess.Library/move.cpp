@@ -163,8 +163,9 @@ namespace chess {
             if (piece != piece_->value())
                 return;
             auto to = board_->get(to_.data());
-            if (to)
+            if (to) {
                 captured_ = to;
+            }
 
             board_->set(from_.data(), 0);
             board_->set(to_.data(), piece);

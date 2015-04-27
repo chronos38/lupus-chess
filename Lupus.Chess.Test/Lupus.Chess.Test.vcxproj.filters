@@ -33,6 +33,9 @@
     <ClCompile Include="movement_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="executor_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mock_piece.h">

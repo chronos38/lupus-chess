@@ -4,7 +4,7 @@
 namespace chess {
     void undo_redo_stack::push(std::shared_ptr<command> cmd) {
         auto empty = std::stack<std::shared_ptr<command>>();
-        std::swap(empty, redo_stack_);
+        swap(empty, redo_stack_);
         undo_stack_.push(cmd);
     }
 
@@ -25,7 +25,7 @@ namespace chess {
         auto cmd = redo_stack_.top();
         undo_stack_.push(cmd);
         redo_stack_.pop();
-        cmd->undo();
+        cmd->execute();
     }
 
     void undo_redo_stack::clear() {

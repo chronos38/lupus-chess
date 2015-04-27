@@ -3,6 +3,7 @@
 #include "move.h"
 #include "movement.h"
 #include <future>
+#include <unordered_map>
 
 namespace chess {
     static const int end_game_transition_count = 11;
@@ -33,7 +34,7 @@ namespace chess {
         -15, -15, -15, -15, -15, -15, -15, -15
     };
     static const array_2d<int, 8, 8> king_position_score_array = {
-        55, 45, 25, 10, 10, 25, 45, 55,
+        45, 45, 25, 10, 10, 25, 45, 45,
         10, 5, 0, -5, -5, 0, 5, 10,
         -10, -10, -10, -15, -15 -10, -10, -10,
         -25, -25, -25, -35, -35, -25, -25, -25,
@@ -52,25 +53,6 @@ namespace chess {
         20, 20, 20, 20, 20, 20, 20, 20,
         100, 100, 100, 100, 100, 100, 100, 100
     };
-
-    const char* piece_position(std::shared_ptr<board> on_board, piece_value for_value, std::array<char, 3>& position) {
-        auto file = 0;
-        auto rank = 1;
-
-        for (auto&& square : *on_board) {
-            if (square == for_value) {
-                position[0] = file + 'a';
-                position[1] = rank + '0';
-                return position.data();
-            }
-
-            file = (file + 1) % 8;
-            if (file == 0)
-                rank += 1;
-        }
-
-        return "";
-    }
 
     class piece_queen : public piece_state {
     public:
@@ -460,7 +442,7 @@ namespace chess {
             tasks[0] = async(std::launch::async, move_direction, piece->board(), lower_left, position_.data(), std::ref(collisions_[1]));
             tasks[1] = async(std::launch::async, move_direction, piece->board(), lower_right, position_.data(), std::ref(collisions_[2]));
             auto mirror = mirror_position(position_.data());
-            auto row = mirror[1] - '0';
+            auto row = mirror[1] - '1';
             auto column = mirror[0] - 'a';
             position_score_ = pawn_position_score_array.get(row, column);
             moves_.clear();
@@ -671,7 +653,7 @@ namespace chess {
             tasks[6] = async(std::launch::async, move_direction, piece->board(), upper_left, position_.data(), std::ref(collisions_[6]));
             tasks[7] = async(std::launch::async, move_direction, piece->board(), upper_right, position_.data(), std::ref(collisions_[7]));
             auto mirror = mirror_position(position_.data());
-            auto row = mirror[1] - '0';
+            auto row = mirror[1] - '1';
             auto column = mirror[0] - 'a';
             position_score_ = king_position_score_array.get(row, column);
             moves_.clear();
