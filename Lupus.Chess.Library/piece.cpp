@@ -699,6 +699,12 @@ namespace chess {
     };
 
     piece::piece(std::shared_ptr<chess::board> board, const char* position) : board_(board) {
+        if (!board)
+            throw std::invalid_argument("board is null");
+        if (!position)
+            throw std::invalid_argument("position is null");
+        if (strlen(position) != 2)
+            throw std::length_error("positions length must be equal to two");
         auto square = board->get(position);
 
         if (!square)

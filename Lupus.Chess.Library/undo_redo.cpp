@@ -27,4 +27,11 @@ namespace chess {
         redo_stack_.pop();
         cmd->undo();
     }
+
+    void undo_redo_stack::clear() {
+        while (!redo_stack_.empty())
+            redo_stack_.pop();
+        while (!undo_stack_.empty())
+            undo_stack_.pop();
+    }
 }

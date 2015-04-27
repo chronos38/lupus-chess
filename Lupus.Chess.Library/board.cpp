@@ -126,6 +126,10 @@ namespace chess {
     }
 
     uint8_t board::get(const char* position) const {
+        if (!position)
+            return 0;
+        if (strlen(position) != 2)
+            return 0;
         return get(position[0], position[1] - '0');
     }
 
@@ -139,6 +143,10 @@ namespace chess {
     }
 
     void board::set(const char* position, uint8_t value) {
+        if (!position)
+            return;
+        if (strlen(position) != 2)
+            return;
         set(position[0], position[1] - '0', value);
     }
 

@@ -109,12 +109,20 @@ namespace chess {
             }
         }
 
-        virtual bool operator==(const move_state& other) const override {
+        virtual const char* from() const final override {
+            return "";
+        }
+        
+        virtual const char* to() const final override {
+            return "";
+        }
+
+        virtual bool operator==(const move_state& other) const final override {
             auto o = dynamic_cast<const move_castling*>(std::addressof(other));
             return o && castling_ == o->castling_ && color_ == o->color_;
         }
 
-        virtual bool operator!=(const move_state& other) const override {
+        virtual bool operator!=(const move_state& other) const final override {
             return !(*this == other);
         }
 
@@ -193,6 +201,14 @@ namespace chess {
             result += to_.data();
 
             return result;
+        }
+
+        virtual const char* from() const final override {
+            return from_.data();
+        }
+        
+        virtual const char* to() const final override {
+            return to_.data();
         }
 
         virtual bool operator==(const move_state& other) const override {
@@ -410,6 +426,14 @@ namespace chess {
 
     std::string move::to_string() const {
         return state_->to_string(this);
+    }
+
+    const char* move::from() const {
+        return state_->from();
+    }
+
+    const char* move::to() const {
+        return state_->to();
     }
 
     bool move::operator==(const move& other) const {
