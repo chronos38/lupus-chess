@@ -153,11 +153,7 @@ TEST_F(executor_test, evaluate_with_update) {
 TEST_F(executor_test, clone) {
     // Arrange
     auto exe = executor(board_);
-
-    // Act
     auto clone = exe.clone();
-
-    // Assert?
 }
 
 TEST_F(executor_test, constructor) {
@@ -166,4 +162,39 @@ TEST_F(executor_test, constructor) {
     auto move = std::move(executor(std::move(exe)));
 }
 
-// TODO: add make_move capture test
+TEST_F(executor_test, make_capture) {
+    // Arrange
+    auto board = make_shared_board("r7/1B6/8/8/8/8/8/8 w KQkq - 0 1");
+    auto exe = executor(board);
+
+    // Act
+    exe.update();
+    for (auto&& move : exe.allowed_moves()) {
+        if (move->to()[0] == 'a' && move->to()[1] == '8') {
+            exe.make_move(move);
+            break;
+        }
+    }
+
+    // Assert
+    ASSERT_EQ("B7/8/8/8/8/8/8/8 b KQkq - 1 1", board->to_fen());
+}
+
+TEST_F(executor_test, undo_capture) {
+    // Arrange
+    auto board = make_shared_board("r7/1B6/8/8/8/8/8/8 w KQkq - 0 1");
+    auto exe = executor(board);
+
+    // Act
+    exe.update();
+    for (auto&& move : exe.allowed_moves()) {
+        if (move->to()[0] == 'a' && move->to()[1] == '8') {
+            exe.make_move(move);
+            break;
+        }
+    }
+    exe.undo_move();
+
+    // Assert
+    ASSERT_EQ("r7/1B6/8/8/8/8/8/8 w KQkq - 0 1", board->to_fen());
+}
