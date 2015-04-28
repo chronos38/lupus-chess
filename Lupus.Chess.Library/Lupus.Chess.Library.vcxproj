@@ -17,6 +17,7 @@
     <ClCompile Include="move.cpp" />
     <ClCompile Include="movement.cpp" />
     <ClCompile Include="piece.cpp" />
+    <ClCompile Include="search.cpp" />
     <ClCompile Include="undo_redo.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -30,6 +31,7 @@
     <ClInclude Include="movement.h" />
     <ClInclude Include="observer.h" />
     <ClInclude Include="piece.h" />
+    <ClInclude Include="search.h" />
     <ClInclude Include="undo_redo.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

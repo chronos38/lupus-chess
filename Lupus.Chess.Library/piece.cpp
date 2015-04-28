@@ -380,7 +380,7 @@ namespace chess {
             position_score_ = pawn_position_score_array.get(row, column);
             moves_.clear();
 
-            auto position = moves[0];
+            auto&& position = moves[0];
             if (!position.empty() && !collisions_[0]) {
                 moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
 
@@ -445,7 +445,7 @@ namespace chess {
             position_score_ = pawn_position_score_array.get(row, column);
             moves_.clear();
 
-            auto position = moves[0];
+            auto&& position = moves[0];
             if (!position.empty() && !collisions_[0]) {
                 moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
 

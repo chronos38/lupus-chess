@@ -11,16 +11,20 @@ namespace chess {
         std::swap(stack_, other.stack_);
         swap(board_, other.board_);
         swap(pieces_, other.pieces_);
+        swap(moves_, other.moves_);
+        swap(captures_, other.captures_);
     }
 
     executor::executor(const executor& other) {
         stack_ = other.stack_;
         board_ = other.board_->clone();
-        pieces_ = std::deque<std::shared_ptr<piece>>(begin(other.pieces_), end(other.pieces_));
-        moves_ = std::vector<std::shared_ptr<move>>(begin(other.moves_), end(other.moves_));
+        for (auto rank = 1; rank != 9; rank++)
+            for (auto file = 'a'; file != 'i'; file++)
+                if (board_->get(file, rank))
+                    pieces_.emplace_back(std::make_shared<piece>(board_, (std::string(1, file) + static_cast<char>(rank + '0')).c_str()));
     }
 
-    executor::executor(std::shared_ptr<board> board) : board_(board) {
+    executor::executor(std::shared_ptr<chess::board> board) : board_(board) {
         moves_.reserve(128);
         for (auto rank = 1; rank != 9; rank++)
             for (auto file = 'a'; file != 'i'; file++)
@@ -28,13 +32,19 @@ namespace chess {
                     pieces_.emplace_back(std::make_shared<piece>(board, (std::string(1, file) + static_cast<char>(rank + '0')).c_str()));
     }
 
-    executor executor::clone() const {
-        return std::move(executor(*this));
+    std::shared_ptr<executor> executor::clone() const {
+        return std::make_shared<executor>(*this);
     }
 
     void executor::update() {
         // Prepare update
         moves_.clear();
+        captures_.clear();
+        terminal_ = count_if(std::begin(*board_), std::end(*board_), [] (uint8_t square) {
+            return square ? value_to_type(static_cast<piece_value>(square)) == king : false;
+        }) != 2;
+        if (terminal_)
+            return;
 
         for (auto&& piece : pieces_) {
             piece->update();
@@ -156,6 +166,14 @@ namespace chess {
         stack_.undo();
         board_->decrement_halfmove();
         board_->toggle_active_color();
+    }
+
+    std::shared_ptr<board> executor::board() const {
+        return board_;
+    }
+
+    bool executor::terminal() const {
+        return terminal_;
     }
 
     executor& executor::operator=(executor&& other) {
