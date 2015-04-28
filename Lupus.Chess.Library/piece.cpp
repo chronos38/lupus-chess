@@ -67,27 +67,26 @@ namespace chess {
         }
 
         virtual void update(ipiece* piece) override {
-            std::future<std::vector<std::string>> tasks[8];
+            std::vector<std::string> moves[8];
             auto index = 0;
             collisions_.fill(0);
             attack_score_ = 0;
             defense_score_ = 0;
 
-            tasks[0] = async(std::launch::async, moves_till_end, piece->board(), left, position_.data(), std::ref(collisions_[0]));
-            tasks[1] = async(std::launch::async, moves_till_end, piece->board(), right, position_.data(), std::ref(collisions_[1]));
-            tasks[2] = async(std::launch::async, moves_till_end, piece->board(), up, position_.data(), std::ref(collisions_[2]));
-            tasks[3] = async(std::launch::async, moves_till_end, piece->board(), down, position_.data(), std::ref(collisions_[3]));
-            tasks[4] = async(std::launch::async, moves_till_end, piece->board(), lower_left, position_.data(), std::ref(collisions_[4]));
-            tasks[5] = async(std::launch::async, moves_till_end, piece->board(), lower_right, position_.data(), std::ref(collisions_[5]));
-            tasks[6] = async(std::launch::async, moves_till_end, piece->board(), upper_left, position_.data(), std::ref(collisions_[6]));
-            tasks[7] = async(std::launch::async, moves_till_end, piece->board(), upper_right, position_.data(), std::ref(collisions_[7]));
+            moves[0] = moves_till_end(piece->board(), left, position_.data(), collisions_[0]);
+            moves[1] = moves_till_end(piece->board(), right, position_.data(), collisions_[1]);
+            moves[2] = moves_till_end(piece->board(), up, position_.data(), collisions_[2]);
+            moves[3] = moves_till_end(piece->board(), down, position_.data(), collisions_[3]);
+            moves[4] = moves_till_end(piece->board(), lower_left, position_.data(), collisions_[4]);
+            moves[5] = moves_till_end(piece->board(), lower_right, position_.data(), collisions_[5]);
+            moves[6] = moves_till_end(piece->board(), upper_left, position_.data(), collisions_[6]);
+            moves[7] = moves_till_end(piece->board(), upper_right, position_.data(), collisions_[7]);
             auto row = position_[1] - '1';
             auto column = position_[0] - 'a';
             position_score_ = center_position_score_array.get(row, column);
             moves_.clear();
 
-            for (auto&& task : tasks) {
-                auto positions = task.get();
+            for (auto&& positions : moves) {
                 auto collision = collisions_[index++];
                 if (positions.empty())
                     continue;
@@ -139,23 +138,22 @@ namespace chess {
         }
 
         virtual void update(ipiece* piece) override {
-            std::future<std::vector<std::string>> tasks[4];
+            std::vector<std::string> moves[4];
             auto index = 0;
             collisions_.fill(0);
             attack_score_ = 0;
             defense_score_ = 0;
 
-            tasks[0] = async(std::launch::async, moves_till_end, piece->board(), left, position_.data(), std::ref(collisions_[0]));
-            tasks[1] = async(std::launch::async, moves_till_end, piece->board(), right, position_.data(), std::ref(collisions_[1]));
-            tasks[2] = async(std::launch::async, moves_till_end, piece->board(), up, position_.data(), std::ref(collisions_[2]));
-            tasks[3] = async(std::launch::async, moves_till_end, piece->board(), down, position_.data(), std::ref(collisions_[3]));
+            moves[0] = moves_till_end(piece->board(), left, position_.data(), collisions_[0]);
+            moves[1] = moves_till_end(piece->board(), right, position_.data(), collisions_[1]);
+            moves[2] = moves_till_end(piece->board(), up, position_.data(), collisions_[2]);
+            moves[3] = moves_till_end(piece->board(), down, position_.data(), collisions_[3]);
             auto row = position_[1] - '1';
             auto column = position_[0] - 'a';
             position_score_ = center_position_score_array.get(row, column);
             moves_.clear();
 
-            for (auto&& task : tasks) {
-                auto positions = task.get();
+            for (auto&& positions : moves) {
                 auto collision = collisions_[index++];
                 if (positions.empty())
                     continue;
@@ -207,23 +205,24 @@ namespace chess {
         }
         
         virtual void update(ipiece* piece) override {
-            std::future<std::vector<std::string>> tasks[4];
+            std::vector<std::string> moves[4];
             auto index = 0;
             collisions_.fill(0);
             attack_score_ = 0;
             defense_score_ = 0;
 
-            tasks[0] = async(std::launch::async, moves_till_end, piece->board(), lower_left, position_.data(), std::ref(collisions_[0]));
-            tasks[1] = async(std::launch::async, moves_till_end, piece->board(), lower_right, position_.data(), std::ref(collisions_[1]));
-            tasks[2] = async(std::launch::async, moves_till_end, piece->board(), upper_left, position_.data(), std::ref(collisions_[2]));
-            tasks[3] = async(std::launch::async, moves_till_end, piece->board(), upper_right, position_.data(), std::ref(collisions_[3]));
+            moves[0] = moves_till_end(piece->board(), lower_left, position_.data(), collisions_[0]);
+            moves[1] = moves_till_end(piece->board(), lower_right, position_.data(), collisions_[1]);
+            moves[2] = moves_till_end(piece->board(), upper_left, position_.data(), collisions_[2]);
+            moves[3] = moves_till_end(piece->board(), upper_right, position_.data(), collisions_[3]);
             auto row = position_[1] - '1';
             auto column = position_[0] - 'a';
             position_score_ = center_position_score_array.get(row, column);
             moves_.clear();
 
-            for (auto&& task : tasks) {
-                auto positions = task.get();
+            //for (auto&& task : tasks) {
+                //auto positions = task.get();
+            for (auto&& positions : moves) {
                 auto collision = collisions_[index++];
                 if (positions.empty())
                     continue;
@@ -276,27 +275,26 @@ namespace chess {
 
         
         virtual void update(ipiece* piece) override {
-            std::future<std::string> tasks[8];
+            std::string moves[8];
             auto index = 0;
             collisions_.fill(0);
             attack_score_ = 0;
             defense_score_ = 0;
 
-            tasks[0] = async(std::launch::async, move_knight, piece->board(), lower_left, left, position_.data(), std::ref(collisions_[0]));
-            tasks[1] = async(std::launch::async, move_knight, piece->board(), lower_left, down, position_.data(), std::ref(collisions_[1]));
-            tasks[2] = async(std::launch::async, move_knight, piece->board(), lower_right, right, position_.data(), std::ref(collisions_[2]));
-            tasks[3] = async(std::launch::async, move_knight, piece->board(), lower_right, down, position_.data(), std::ref(collisions_[3]));
-            tasks[4] = async(std::launch::async, move_knight, piece->board(), upper_left, left, position_.data(), std::ref(collisions_[4]));
-            tasks[5] = async(std::launch::async, move_knight, piece->board(), upper_left, up, position_.data(), std::ref(collisions_[5]));
-            tasks[6] = async(std::launch::async, move_knight, piece->board(), upper_right, right, position_.data(), std::ref(collisions_[6]));
-            tasks[7] = async(std::launch::async, move_knight, piece->board(), upper_right, up, position_.data(), std::ref(collisions_[7]));
+            moves[0] = move_knight(piece->board(), lower_left, left, position_.data(), collisions_[0]);
+            moves[1] = move_knight(piece->board(), lower_left, down, position_.data(), collisions_[1]);
+            moves[2] = move_knight(piece->board(), lower_right, right, position_.data(), collisions_[2]);
+            moves[3] = move_knight(piece->board(), lower_right, down, position_.data(), collisions_[3]);
+            moves[4] = move_knight(piece->board(), upper_left, left, position_.data(), collisions_[4]);
+            moves[5] = move_knight(piece->board(), upper_left, up, position_.data(), collisions_[5]);
+            moves[6] = move_knight(piece->board(), upper_right, right, position_.data(), collisions_[6]);
+            moves[7] = move_knight(piece->board(), upper_right, up, position_.data(), collisions_[7]);
             auto row = position_[1] - '1';
             auto column = position_[0] - 'a';
             position_score_ = center_position_score_array.get(row, column);
             moves_.clear();
 
-            for (auto&& task : tasks) {
-                auto position = task.get();
+            for (auto&& position : moves) {
                 auto collision = collisions_[index++];
                 if (position.empty())
                     continue;
@@ -368,21 +366,21 @@ namespace chess {
         }
 
         virtual void update(ipiece* piece) override {
-            std::future<std::string> tasks[2];
+            std::string moves[3];
             auto index = 1;
             collisions_.fill(0);
             attack_score_ = 0;
             defense_score_ = 0;
 
-            auto task_up = async(std::launch::async, move_direction, piece->board(), up, position_.data(), std::ref(collisions_[0]));
-            tasks[0] = async(std::launch::async, move_direction, piece->board(), upper_left, position_.data(), std::ref(collisions_[1]));
-            tasks[1] = async(std::launch::async, move_direction, piece->board(), upper_right, position_.data(), std::ref(collisions_[2]));
+            moves[0] = move_direction(piece->board(), up, position_.data(), collisions_[0]);
+            moves[1] = move_direction(piece->board(), upper_left, position_.data(), collisions_[1]);
+            moves[2] = move_direction(piece->board(), upper_right, position_.data(), collisions_[2]);
             auto row = position_[1] - '1';
             auto column = position_[0] - 'a';
             position_score_ = pawn_position_score_array.get(row, column);
             moves_.clear();
 
-            auto position = task_up.get();
+            auto position = moves[0];
             if (!position.empty() && !collisions_[0]) {
                 moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
 
@@ -398,8 +396,8 @@ namespace chess {
                 position_score_ -= 10;
             }
 
-            for (auto&& task : tasks) {
-                position = task.get();
+            for (auto i = 1; i < 3; i++) {
+                position = moves[i];
                 auto collision = collisions_[index++];
                 if (position.empty())
                     continue;
@@ -432,22 +430,22 @@ namespace chess {
         }
 
         virtual void update(ipiece* piece) override {
-            std::future<std::string> tasks[2];
+            std::string moves[3];
             auto index = 1;
             collisions_.fill(0);
             attack_score_ = 0;
             defense_score_ = 0;
 
-            auto task_up = async(std::launch::async, move_direction, piece->board(), down, position_.data(), std::ref(collisions_[0]));
-            tasks[0] = async(std::launch::async, move_direction, piece->board(), lower_left, position_.data(), std::ref(collisions_[1]));
-            tasks[1] = async(std::launch::async, move_direction, piece->board(), lower_right, position_.data(), std::ref(collisions_[2]));
+            moves[0] = move_direction(piece->board(), down, position_.data(), collisions_[0]);
+            moves[1] = move_direction(piece->board(), lower_left, position_.data(), collisions_[1]);
+            moves[2] = move_direction(piece->board(), lower_right, position_.data(), collisions_[2]);
             auto mirror = mirror_position(position_.data());
             auto row = mirror[1] - '1';
             auto column = mirror[0] - 'a';
             position_score_ = pawn_position_score_array.get(row, column);
             moves_.clear();
 
-            auto position = task_up.get();
+            auto position = moves[0];
             if (!position.empty() && !collisions_[0]) {
                 moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
 
@@ -463,8 +461,8 @@ namespace chess {
                 position_score_ -= 10;
             }
 
-            for (auto&& task : tasks) {
-                position = task.get();
+            for (auto i = 1; i < 3; i++) {
+                position = moves[i];
                 auto collision = collisions_[index++];
                 if (position.empty())
                     continue;
@@ -520,27 +518,26 @@ namespace chess {
         }
 
         virtual void update(ipiece* piece) override {
-            std::future<std::string> tasks[8];
+            std::string moves[8];
             auto index = 0;
             collisions_.fill(0);
             attack_score_ = 0;
             defense_score_ = 0;
 
-            tasks[0] = async(std::launch::async, move_direction, piece->board(), left, position_.data(), std::ref(collisions_[0]));
-            tasks[1] = async(std::launch::async, move_direction, piece->board(), right, position_.data(), std::ref(collisions_[1]));
-            tasks[2] = async(std::launch::async, move_direction, piece->board(), up, position_.data(), std::ref(collisions_[2]));
-            tasks[3] = async(std::launch::async, move_direction, piece->board(), down, position_.data(), std::ref(collisions_[3]));
-            tasks[4] = async(std::launch::async, move_direction, piece->board(), lower_left, position_.data(), std::ref(collisions_[4]));
-            tasks[5] = async(std::launch::async, move_direction, piece->board(), lower_right, position_.data(), std::ref(collisions_[5]));
-            tasks[6] = async(std::launch::async, move_direction, piece->board(), upper_left, position_.data(), std::ref(collisions_[6]));
-            tasks[7] = async(std::launch::async, move_direction, piece->board(), upper_right, position_.data(), std::ref(collisions_[7]));
+            moves[0] = move_direction(piece->board(), left, position_.data(), collisions_[0]);
+            moves[1] = move_direction(piece->board(), right, position_.data(), collisions_[1]);
+            moves[2] = move_direction(piece->board(), up, position_.data(), collisions_[2]);
+            moves[3] = move_direction(piece->board(), down, position_.data(), collisions_[3]);
+            moves[4] = move_direction(piece->board(), lower_left, position_.data(), collisions_[4]);
+            moves[5] = move_direction(piece->board(), lower_right, position_.data(), collisions_[5]);
+            moves[6] = move_direction(piece->board(), upper_left, position_.data(), collisions_[6]);
+            moves[7] = move_direction(piece->board(), upper_right, position_.data(), collisions_[7]);
             auto row = position_[1] - '1';
             auto column = position_[0] - 'a';
             position_score_ = center_position_score_array.get(row, column);
             moves_.clear();
 
-            for (auto&& task : tasks) {
-                auto position = task.get();
+            for (auto&& position : moves) {
                 auto collision = collisions_[index++];
                 if (position.empty())
                     continue;
@@ -579,27 +576,26 @@ namespace chess {
                 return;
             }
 
-            std::future<std::string> tasks[8];
+            std::string moves[8];
             auto index = 0;
             collisions_.fill(0);
             attack_score_ = 0;
             defense_score_ = 0;
 
-            tasks[0] = async(std::launch::async, move_direction, piece->board(), left, position_.data(), std::ref(collisions_[0]));
-            tasks[1] = async(std::launch::async, move_direction, piece->board(), right, position_.data(), std::ref(collisions_[1]));
-            tasks[2] = async(std::launch::async, move_direction, piece->board(), up, position_.data(), std::ref(collisions_[2]));
-            tasks[3] = async(std::launch::async, move_direction, piece->board(), down, position_.data(), std::ref(collisions_[3]));
-            tasks[4] = async(std::launch::async, move_direction, piece->board(), lower_left, position_.data(), std::ref(collisions_[4]));
-            tasks[5] = async(std::launch::async, move_direction, piece->board(), lower_right, position_.data(), std::ref(collisions_[5]));
-            tasks[6] = async(std::launch::async, move_direction, piece->board(), upper_left, position_.data(), std::ref(collisions_[6]));
-            tasks[7] = async(std::launch::async, move_direction, piece->board(), upper_right, position_.data(), std::ref(collisions_[7]));
+            moves[0] = move_direction(piece->board(), left, position_.data(), collisions_[0]);
+            moves[1] = move_direction(piece->board(), right, position_.data(), collisions_[1]);
+            moves[2] = move_direction(piece->board(), up, position_.data(), collisions_[2]);
+            moves[3] = move_direction(piece->board(), down, position_.data(), collisions_[3]);
+            moves[4] = move_direction(piece->board(), lower_left, position_.data(), collisions_[4]);
+            moves[5] = move_direction(piece->board(), lower_right, position_.data(), collisions_[5]);
+            moves[6] = move_direction(piece->board(), upper_left, position_.data(), collisions_[6]);
+            moves[7] = move_direction(piece->board(), upper_right, position_.data(), collisions_[7]);
             auto row = position_[1] - '1';
             auto column = position_[0] - 'a';
             position_score_ = king_position_score_array.get(row, column);
             moves_.clear();
 
-            for (auto&& task : tasks) {
-                auto position = task.get();
+            for (auto&& position : moves) {
                 auto collision = collisions_[index++];
                 if (position.empty())
                     continue;
@@ -638,28 +634,27 @@ namespace chess {
                 return;
             }
 
-            std::future<std::string> tasks[8];
+            std::string moves[8];
             auto index = 0;
             collisions_.fill(0);
             attack_score_ = 0;
             defense_score_ = 0;
 
-            tasks[0] = async(std::launch::async, move_direction, piece->board(), left, position_.data(), std::ref(collisions_[0]));
-            tasks[1] = async(std::launch::async, move_direction, piece->board(), right, position_.data(), std::ref(collisions_[1]));
-            tasks[2] = async(std::launch::async, move_direction, piece->board(), up, position_.data(), std::ref(collisions_[2]));
-            tasks[3] = async(std::launch::async, move_direction, piece->board(), down, position_.data(), std::ref(collisions_[3]));
-            tasks[4] = async(std::launch::async, move_direction, piece->board(), lower_left, position_.data(), std::ref(collisions_[4]));
-            tasks[5] = async(std::launch::async, move_direction, piece->board(), lower_right, position_.data(), std::ref(collisions_[5]));
-            tasks[6] = async(std::launch::async, move_direction, piece->board(), upper_left, position_.data(), std::ref(collisions_[6]));
-            tasks[7] = async(std::launch::async, move_direction, piece->board(), upper_right, position_.data(), std::ref(collisions_[7]));
+            moves[0] = move_direction(piece->board(), left, position_.data(), collisions_[0]);
+            moves[1] = move_direction(piece->board(), right, position_.data(), collisions_[1]);
+            moves[2] = move_direction(piece->board(), up, position_.data(), collisions_[2]);
+            moves[3] = move_direction(piece->board(), down, position_.data(), collisions_[3]);
+            moves[4] = move_direction(piece->board(), lower_left, position_.data(), collisions_[4]);
+            moves[5] = move_direction(piece->board(), lower_right, position_.data(), collisions_[5]);
+            moves[6] = move_direction(piece->board(), upper_left, position_.data(), collisions_[6]);
+            moves[7] = move_direction(piece->board(), upper_right, position_.data(), collisions_[7]);
             auto mirror = mirror_position(position_.data());
             auto row = mirror[1] - '1';
             auto column = mirror[0] - 'a';
             position_score_ = king_position_score_array.get(row, column);
             moves_.clear();
 
-            for (auto&& task : tasks) {
-                auto position = task.get();
+            for (auto&& position : moves) {
                 auto collision = collisions_[index++];
                 if (position.empty())
                     continue;

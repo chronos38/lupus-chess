@@ -33,23 +33,48 @@ namespace chess {
     }
 
     void executor::update() {
-        std::vector<std::future<std::shared_ptr<piece>>> tasks;
-        tasks.reserve(pieces_.size());
+        // Prepare update
         moves_.clear();
 
-        for_each(begin(pieces_), end(pieces_), [&] (std::shared_ptr<piece> p) {
-            tasks.emplace_back(async(std::launch::async, [] (std::shared_ptr<piece> piece) {
-                piece->update();
-                return piece;
-            }, p));
-        });
-
-        for (auto&& task : tasks) {
-            auto piece = task.get();
+        for (auto&& piece : pieces_) {
+            piece->update();
             if (piece->color() != board_->active_color())
                 continue;
             auto moves = piece->allowed_moves();
             moves_.insert(end(moves_), begin(moves), end(moves));
+            copy_if(begin(moves), end(moves), back_inserter(captures_), [&] (std::shared_ptr<move> move) {
+                return board_->get(move->to()) != 0;
+            });
+        }
+
+        // Move sorting
+        auto color = board_->active_color();
+        std::vector<int> scores;
+        std::vector<std::shared_ptr<move>> sorted;
+        sorted.reserve(moves_.size());
+        scores.reserve(moves_.size());
+
+        for (auto&& move : moves_) {
+            make_move(move);
+            scores.push_back(evaluate(color));
+            undo_move();
+        }
+
+        for (auto i = 0; i < std::min(moves_.size(), 5U); i++) {
+            auto max = std::numeric_limits<int>::min();
+            auto location = -1;
+
+            for (auto j = 0; j < scores.size(); j++) {
+                if (scores[j] > max) {
+                    max = scores[j];
+                    location = j;
+                }
+            }
+
+            if (location != -1) {
+                scores[location] = std::numeric_limits<int>::min();
+                swap(moves_[i], moves_[location]);
+            }
         }
     }
 
@@ -57,20 +82,28 @@ namespace chess {
         return moves_;
     }
 
+    std::vector<std::shared_ptr<move>> executor::allowed_captures() const {
+        return captures_;
+    }
+
     int executor::evaluate() const {
+        return evaluate(black);
+    }
+
+    int executor::evaluate(piece_color color) const {
         std::unordered_map<piece_color, int> material = {
-                { white, 0 },
-                { black, 0 }
-            }, attack = {
-                { white, 0 },
-                { black, 0 }
-            }, defense = {
-                { white, 0 },
-                { black, 0 }
-            }, position = {
-                { white, 0 },
-                { black, 0 }
-            };
+            { white, 0 },
+            { black, 0 }
+        }, attack = {
+            { white, 0 },
+            { black, 0 }
+        }, defense = {
+            { white, 0 },
+            { black, 0 }
+        }, position = {
+            { white, 0 },
+            { black, 0 }
+        };
 
         for (auto&& piece : pieces_) {
             material[piece->color()] += piece->score();
@@ -79,10 +112,20 @@ namespace chess {
             position[piece->color()] += piece->position_score();
         }
 
-        return material[black] - material[white] +
-            attack[black] - attack[white] +
-            defense[black] - defense[white] +
-            position[black] - position[white];
+        switch (color) {
+            case white:
+                return material[white] - material[black]
+                    + attack[white] - attack[black]
+                    + defense[white] - defense[black]
+                    + position[white] - position[black];
+            case black:
+                return material[black] - material[white]
+                    + attack[black] - attack[white]
+                    + defense[black] - defense[white]
+                    + position[black] - position[white];
+            default:
+                return 0;
+        }
     }
 
     void executor::make_move(std::shared_ptr<move> move) {

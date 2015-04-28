@@ -198,3 +198,31 @@ TEST_F(executor_test, undo_capture) {
     // Assert
     ASSERT_EQ("r7/1B6/8/8/8/8/8/8 w KQkq - 0 1", board->to_fen());
 }
+
+TEST_F(executor_test, allowed_captures) {
+    // Arrange
+    auto board = make_shared_board("r7/1B6/8/8/8/8/8/8 w KQkq - 0 1");
+    auto exe = executor(board);
+
+    // Act
+    exe.update();
+    auto captures = exe.allowed_captures();
+
+    // Assert
+    ASSERT_EQ(1, captures.size());
+}
+
+TEST_F(executor_test, make_allowed_captures) {
+    // Arrange
+    auto board = make_shared_board("r7/1B6/8/8/8/8/8/8 w KQkq - 0 1");
+    auto exe = executor(board);
+
+    // Act
+    exe.update();
+    for (auto&& move : exe.allowed_captures()) {
+        exe.make_move(move);
+    }
+
+    // Assert
+    ASSERT_EQ("B7/8/8/8/8/8/8/8 b KQkq - 1 1", board->to_fen());
+}
