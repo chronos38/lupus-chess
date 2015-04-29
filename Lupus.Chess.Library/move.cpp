@@ -117,6 +117,10 @@ namespace chess {
             return "";
         }
 
+        virtual void set_board(std::shared_ptr<board> value) final override {
+            board_ = value;
+        }
+
         virtual bool operator==(const move_state& other) const final override {
             auto o = dynamic_cast<const move_castling*>(std::addressof(other));
             return o && castling_ == o->castling_ && color_ == o->color_;
@@ -210,6 +214,10 @@ namespace chess {
         
         virtual const char* to() const final override {
             return to_.data();
+        }
+
+        virtual void set_board(std::shared_ptr<board> value) final override {
+            board_ = value;
         }
 
         virtual bool operator==(const move_state& other) const override {
@@ -435,6 +443,10 @@ namespace chess {
 
     const char* move::to() const {
         return state_->to();
+    }
+
+    void move::set_board(std::shared_ptr<board> value) {
+        state_->set_board(value);
     }
 
     bool move::operator==(const move& other) const {

@@ -56,7 +56,9 @@ namespace chess {
                 return board_->get(move->to()) != 0;
             });
         }
+    }
 
+    void executor::sort_moves() {
         // Move sorting
         auto color = board_->active_color();
         std::vector<int> scores;
@@ -84,6 +86,38 @@ namespace chess {
             if (location != -1) {
                 scores[location] = std::numeric_limits<int>::min();
                 swap(moves_[i], moves_[location]);
+            }
+        }
+    }
+
+    void executor::sort_captures() {
+        // Move sorting
+        auto color = board_->active_color();
+        std::vector<int> scores;
+        std::vector<std::shared_ptr<move>> sorted;
+        sorted.reserve(captures_.size());
+        scores.reserve(captures_.size());
+
+        for (auto&& move : captures_) {
+            make_move(move);
+            scores.push_back(evaluate(color));
+            undo_move();
+        }
+
+        for (auto i = 0; i < std::min(captures_.size(), 5U); i++) {
+            auto max = std::numeric_limits<int>::min();
+            auto location = -1;
+
+            for (auto j = 0; j < scores.size(); j++) {
+                if (scores[j] > max) {
+                    max = scores[j];
+                    location = j;
+                }
+            }
+
+            if (location != -1) {
+                scores[location] = std::numeric_limits<int>::min();
+                swap(captures_[i], captures_[location]);
             }
         }
     }

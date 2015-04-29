@@ -16,6 +16,7 @@ namespace chess {
         virtual std::string to_string(const move* move) const = 0;
         virtual bool operator==(const move_state& other) const = 0;
         virtual bool operator!=(const move_state& other) const = 0;
+        virtual void set_board(std::shared_ptr<board> value) = 0;
         virtual const char* from() const = 0;
         virtual const char* to() const = 0;
     };
@@ -33,6 +34,7 @@ namespace chess {
         virtual std::string to_string() const;
         virtual const char* from() const;
         virtual const char* to() const;
+        virtual void set_board(std::shared_ptr<board> value);
         virtual bool operator==(const move& other) const;
         virtual bool operator!=(const move& other) const;
     private:

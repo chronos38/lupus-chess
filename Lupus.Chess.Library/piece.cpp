@@ -560,7 +560,7 @@ namespace chess {
 
     class piece_king_white : public piece_king {
     public:
-        piece_king_white(const char* position) : piece_king(position, white) {
+        explicit piece_king_white(const char* position) : piece_king(position, white) {
         }
 
         virtual ~piece_king_white() = default;
@@ -618,7 +618,7 @@ namespace chess {
 
     class piece_king_black : public piece_king {
     public:
-        piece_king_black(const char* position) : piece_king(position, black) {
+        explicit piece_king_black(const char* position) : piece_king(position, black) {
         }
 
         virtual ~piece_king_black() = default;

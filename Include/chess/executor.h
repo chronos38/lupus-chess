@@ -20,6 +20,8 @@ namespace chess {
         ~executor() = default;
         std::shared_ptr<executor> clone() const;
         void update();
+        void sort_moves();
+        void sort_captures();
         std::vector<std::shared_ptr<move>> allowed_moves() const;
         std::vector<std::shared_ptr<move>> allowed_captures() const;
         int evaluate() const;
