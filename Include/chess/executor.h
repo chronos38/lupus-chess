@@ -19,6 +19,9 @@ namespace chess {
         explicit executor(std::shared_ptr<chess::board> board);
         ~executor() = default;
         std::shared_ptr<executor> clone() const;
+        bool is_attacked(piece_color color, const char* position) const;
+        bool king_in_check() const;
+        void update_king_only();
         void update();
         void sort_moves();
         void sort_captures();
@@ -32,6 +35,8 @@ namespace chess {
         bool terminal() const;
         executor& operator=(executor&& other);
         executor& operator=(const executor& other);
+        bool is_promoting_pawn() const;
+        void promote_pawn(piece_type type = queen);
     private:
         undo_redo_stack stack_;
         std::shared_ptr<chess::board> board_;
@@ -40,5 +45,6 @@ namespace chess {
         std::vector<std::shared_ptr<move>> captures_;
         std::stack<std::shared_ptr<piece>> erased_;
         bool terminal_ = false;
+        int eval_ = 0;
     };
 }

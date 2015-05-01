@@ -12,6 +12,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="view.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="view.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{AFE81B9A-79E4-4BEA-A1CD-1340EBD32650}</ProjectGuid>

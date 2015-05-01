@@ -2,7 +2,7 @@
 #include "board.h"
 #include "piece.h"
 #include "move.h"
-#include <future>
+#include "search.h"
 #include <algorithm>
 #include <unordered_map>
 
@@ -13,27 +13,56 @@ namespace chess {
         swap(pieces_, other.pieces_);
         swap(moves_, other.moves_);
         swap(captures_, other.captures_);
+        swap(erased_, other.erased_);
+        std::swap(terminal_, other.terminal_);
     }
 
     executor::executor(const executor& other) {
-        stack_ = other.stack_;
         board_ = other.board_->clone();
-        for (auto rank = 1; rank != 9; rank++)
-            for (auto file = 'a'; file != 'i'; file++)
-                if (board_->get(file, rank))
-                    pieces_.emplace_back(std::make_shared<piece>(board_, (std::string(1, file) + static_cast<char>(rank + '0')).c_str()));
     }
 
     executor::executor(std::shared_ptr<chess::board> board) : board_(board) {
         moves_.reserve(128);
-        for (auto rank = 1; rank != 9; rank++)
-            for (auto file = 'a'; file != 'i'; file++)
-                if (board->get(file, rank))
-                    pieces_.emplace_back(std::make_shared<piece>(board, (std::string(1, file) + static_cast<char>(rank + '0')).c_str()));
     }
 
     std::shared_ptr<executor> executor::clone() const {
         return std::make_shared<executor>(*this);
+    }
+
+    bool executor::is_attacked(piece_color color, const char* position) const {
+        std::vector<std::shared_ptr<piece>> pieces;
+
+        for (auto&& piece : pieces_) {
+            if (piece->color() != color)
+                continue;
+            auto moves = piece->allowed_moves();
+            auto any = any_of(begin(moves), end(moves), [&position] (std::shared_ptr<move> move) {
+                return strcmp(move->to(), position) == 0;
+            });
+            if (any)
+                return true;
+        }
+
+        return false;
+    }
+
+    bool executor::king_in_check() const {
+        auto k = *std::find_if(std::begin(pieces_), std::end(pieces_), [&] (std::shared_ptr<piece> piece) {
+            return piece->type() == king && piece->color() == board_->active_color();
+        });
+
+        return is_attacked(invert_color(board_->active_color()), k->position());
+    }
+
+    void executor::update_king_only() {
+        auto k = *std::find_if(std::begin(pieces_), std::end(pieces_), [&] (std::shared_ptr<piece> piece) {
+            return piece->type() == king && piece->color() == board_->active_color();
+        });
+
+        for (auto&& move : k->allowed_moves()) {
+            if (!is_attacked(invert_color(board_->active_color()), k->position()))
+                moves_.emplace_back(move);
+        }
     }
 
     void executor::update() {
@@ -43,8 +72,21 @@ namespace chess {
         terminal_ = count_if(std::begin(*board_), std::end(*board_), [] (uint8_t square) {
             return square ? value_to_type(static_cast<piece_value>(square)) == king : false;
         }) != 2;
-        if (terminal_)
+        if (terminal_) {
+            auto k = *find_if(std::begin(*board_), std::end(*board_), [] (uint8_t square) {
+                return square ? value_to_type(static_cast<piece_value>(square)) == king : false;
+            });
+            eval_ = k == white_king ? king_material_score : -king_material_score;
             return;
+        }
+
+        pieces_.clear();
+        for (auto rank = 1; rank != 9; rank++) {
+            for (auto file = 'a'; file != 'i'; file++) {
+                if (board_->get(file, rank))
+                    pieces_.emplace_back(std::make_shared<piece>(board_, (std::string(1, file) + static_cast<char>(rank + '0')).c_str()));
+            }
+        }
 
         for (auto&& piece : pieces_) {
             piece->update();
@@ -55,6 +97,20 @@ namespace chess {
             copy_if(begin(moves), end(moves), back_inserter(captures_), [&] (std::shared_ptr<move> move) {
                 return board_->get(move->to()) != 0;
             });
+        }
+
+        if (king_in_check()) {
+            moves_.clear();
+            update_king_only();
+            if (moves_.empty()) {
+                terminal_ = true;
+                eval_ = (board_->active_color() == white ? -king_material_score : king_material_score) / 2;
+                return;
+            } else {
+                eval_ = 0;
+            }
+        } else {
+            eval_ = 0;
         }
     }
 
@@ -131,10 +187,12 @@ namespace chess {
     }
 
     int executor::evaluate() const {
-        return evaluate(black);
+        return evaluate(white);
     }
 
     int executor::evaluate(piece_color color) const {
+        if (terminal_)
+            return eval_;
         std::unordered_map<piece_color, int> material = {
             { white, 0 },
             { black, 0 }
@@ -161,12 +219,14 @@ namespace chess {
                 return material[white] - material[black]
                     + attack[white] - attack[black]
                     + defense[white] - defense[black]
-                    + position[white] - position[black];
+                    + position[white] - position[black]
+                    + eval_;
             case black:
                 return material[black] - material[white]
                     + attack[black] - attack[white]
                     + defense[black] - defense[white]
-                    + position[black] - position[white];
+                    + position[black] - position[white]
+                    + eval_;
             default:
                 return 0;
         }
@@ -228,5 +288,16 @@ namespace chess {
         pieces_ = std::deque<std::shared_ptr<piece>>(begin(other.pieces_), end(other.pieces_));
         moves_ = std::vector<std::shared_ptr<move>>(begin(other.moves_), end(other.moves_));
         return *this;
+    }
+
+    bool executor::is_promoting_pawn() const {
+        for (auto file = 'a'; file != 'i'; file++) {
+            if (board_->get(file, 8) == white_pawn)
+                return true;
+            if (board_->get(file, 1) == black_pawn)
+                return true;
+        }
+
+        return false;
     }
 }

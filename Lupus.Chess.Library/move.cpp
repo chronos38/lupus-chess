@@ -297,9 +297,18 @@ namespace chess {
         virtual void execute(move* move) override {
             move_piece::execute(move);
             auto rank = piece_->color() == white ? '2' : '7';
+            auto promotion = piece_->color() == white ? '8' == to_[0] : '1' == to_[0];
 
             if (from_.at(1) == rank && abs(from_.at(1) - to_.at(1)) == 2)
                 board_->set_en_passant((std::string(1, from_.at(0)) + std::string(1, piece_->color() == white ? '3' : '6')).c_str());
+            if (promotion)
+                board_->set(to_.data(), type_to_value(queen, piece_->color()));
+        }
+
+        virtual void undo(move* move) override {
+            auto promotion = piece_->color() == white ? '8' == to_[0] : '1' == to_[0];
+            board_->set(to_.data(), type_to_value(pawn, piece_->color()));
+            move_piece::undo(move);
         }
     };
 
@@ -342,7 +351,7 @@ namespace chess {
         virtual void execute(move* move) override {
             move_piece::execute(move);
             auto color = piece_->color();
-            auto castling = castling_ = castling_ = board_->castling();
+            auto castling = castling_ = board_->castling();
             char side = 0;
 
             switch (color) {

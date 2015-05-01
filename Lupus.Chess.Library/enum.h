@@ -83,4 +83,45 @@ namespace chess {
                 throw std::invalid_argument("could not determine the color from given piece value");
         }
     }
+
+    inline piece_value type_to_value(piece_type type, piece_color color) {
+        switch (color) {
+            case white:
+                switch (type) {
+                    case queen:
+                        return white_queen;
+                    case rook:
+                        return white_rook;
+                    case bishop:
+                        return white_bishop;
+                    case knight:
+                        return white_knight;
+                    case pawn:
+                        return white_pawn;
+                    case king:
+                        return white_king;
+                }
+                return white_pawn;
+            case black:
+                switch (type) {
+                    case queen:
+                        return black_queen;
+                    case rook:
+                        return black_rook;
+                    case bishop:
+                        return black_bishop;
+                    case knight:
+                        return black_knight;
+                    case pawn:
+                        return black_pawn;
+                    case king:
+                        return black_king;
+                }
+                return black_pawn;
+        }
+    }
+
+    inline piece_color invert_color(piece_color color) {
+        return color == white ? black : white;
+    }
 }

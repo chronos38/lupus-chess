@@ -2,11 +2,10 @@
 #include "board.h"
 #include "move.h"
 #include "movement.h"
-#include <future>
+#include "search.h"
 #include <unordered_map>
 
 namespace chess {
-    static const int end_game_transition_count = 11;
     static const std::unordered_map<piece_type, int> attack_score_map = {
         { king, 2000 },
         { queen, 100 },
@@ -57,7 +56,7 @@ namespace chess {
     class piece_queen : public piece_state {
     public:
         explicit piece_queen(const char* position, piece_color color) : piece_state(position, color) {
-            score_ = 1000;
+            score_ = queen_material_score;
         }
 
         virtual ~piece_queen() = default;
@@ -83,7 +82,7 @@ namespace chess {
             moves[7] = moves_till_end(piece->board(), upper_right, position_.data(), collisions_[7]);
             auto row = position_[1] - '1';
             auto column = position_[0] - 'a';
-            position_score_ = center_position_score_array.get(row, column);
+            position_score_ = center_position_score_array.get(row, column) * (piece->color() == white ? 1 : -1);
             moves_.clear();
 
             for (auto&& positions : moves) {
@@ -150,7 +149,7 @@ namespace chess {
             moves[3] = moves_till_end(piece->board(), down, position_.data(), collisions_[3]);
             auto row = position_[1] - '1';
             auto column = position_[0] - 'a';
-            position_score_ = center_position_score_array.get(row, column);
+            position_score_ = center_position_score_array.get(row, column) * (piece->color() == white ? 1 : -1);
             moves_.clear();
 
             for (auto&& positions : moves) {
@@ -217,7 +216,7 @@ namespace chess {
             moves[3] = moves_till_end(piece->board(), upper_right, position_.data(), collisions_[3]);
             auto row = position_[1] - '1';
             auto column = position_[0] - 'a';
-            position_score_ = center_position_score_array.get(row, column);
+            position_score_ = center_position_score_array.get(row, column) * (piece->color() == white ? 1 : -1);
             moves_.clear();
 
             //for (auto&& task : tasks) {
@@ -291,7 +290,7 @@ namespace chess {
             moves[7] = move_knight(piece->board(), upper_right, up, position_.data(), collisions_[7]);
             auto row = position_[1] - '1';
             auto column = position_[0] - 'a';
-            position_score_ = center_position_score_array.get(row, column);
+            position_score_ = center_position_score_array.get(row, column) * (piece->color() == white ? 1 : -1);
             moves_.clear();
 
             for (auto&& position : moves) {
@@ -377,7 +376,7 @@ namespace chess {
             moves[2] = move_direction(piece->board(), upper_right, position_.data(), collisions_[2]);
             auto row = position_[1] - '1';
             auto column = position_[0] - 'a';
-            position_score_ = pawn_position_score_array.get(row, column);
+            position_score_ = pawn_position_score_array.get(row, column) * (piece->color() == white ? 1 : -1);
             moves_.clear();
 
             auto&& position = moves[0];
@@ -393,7 +392,7 @@ namespace chess {
                         moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
                 }
             } else {
-                position_score_ -= 10;
+                position_score_ = position_score_ - (piece->color() == white ? 10 : -10);
             }
 
             for (auto i = 1; i < 3; i++) {
@@ -442,7 +441,7 @@ namespace chess {
             auto mirror = mirror_position(position_.data());
             auto row = mirror[1] - '1';
             auto column = mirror[0] - 'a';
-            position_score_ = pawn_position_score_array.get(row, column);
+            position_score_ = pawn_position_score_array.get(row, column) * (piece->color() == white ? 1 : -1);
             moves_.clear();
 
             auto&& position = moves[0];
@@ -458,7 +457,7 @@ namespace chess {
                         moves_.emplace_back(std::make_shared<move>(piece, position_.data(), position.c_str()));
                 }
             } else {
-                position_score_ -= 10;
+                position_score_ = position_score_ - (piece->color() == white ? 10 : -10);
             }
 
             for (auto i = 1; i < 3; i++) {
@@ -486,7 +485,7 @@ namespace chess {
     class piece_king : public piece_state {
     public:
         explicit piece_king(const char* position, piece_color color) : piece_state(position, color) {
-            score_ = 20000;
+            score_ = king_material_score;
         }
 
         virtual ~piece_king() = default;
@@ -534,7 +533,7 @@ namespace chess {
             moves[7] = move_direction(piece->board(), upper_right, position_.data(), collisions_[7]);
             auto row = position_[1] - '1';
             auto column = position_[0] - 'a';
-            position_score_ = center_position_score_array.get(row, column);
+            position_score_ = center_position_score_array.get(row, column) * (piece->color() == white ? 1 : -1);
             moves_.clear();
 
             for (auto&& position : moves) {
@@ -570,7 +569,7 @@ namespace chess {
         }
         
         virtual void update(ipiece* piece) override {
-            if (piece->board()->count() <= end_game_transition_count) {
+            if (piece->board()->count() <= endgame_transition_count) {
                 change_state(piece, std::make_unique<piece_king_end_game>(position_.data(), color_));
                 piece->update();
                 return;
@@ -592,7 +591,7 @@ namespace chess {
             moves[7] = move_direction(piece->board(), upper_right, position_.data(), collisions_[7]);
             auto row = position_[1] - '1';
             auto column = position_[0] - 'a';
-            position_score_ = king_position_score_array.get(row, column);
+            position_score_ = king_position_score_array.get(row, column) * (piece->color() == white ? 1 : -1);
             moves_.clear();
 
             for (auto&& position : moves) {
@@ -628,7 +627,7 @@ namespace chess {
         }
         
         virtual void update(ipiece* piece) override {
-            if (piece->board()->count() <= end_game_transition_count) {
+            if (piece->board()->count() <= endgame_transition_count) {
                 change_state(piece, std::make_unique<piece_king_end_game>(position_.data(), color_));
                 piece->update();
                 return;
@@ -651,7 +650,7 @@ namespace chess {
             auto mirror = mirror_position(position_.data());
             auto row = mirror[1] - '1';
             auto column = mirror[0] - 'a';
-            position_score_ = king_position_score_array.get(row, column);
+            position_score_ = king_position_score_array.get(row, column) * (piece->color() == white ? 1 : -1);
             moves_.clear();
 
             for (auto&& position : moves) {
@@ -714,7 +713,7 @@ namespace chess {
                 state_ = std::make_unique<piece_queen>(position, color);
                 break;
             case king:
-                if (board->count() <= end_game_transition_count) {
+                if (board->count() <= endgame_transition_count) {
                     state_ = std::make_unique<piece_king_end_game>(position, color);
                 } else {
                     switch (color) {
